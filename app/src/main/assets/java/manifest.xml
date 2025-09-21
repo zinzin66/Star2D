@@ -1,61 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Decompiled with BotX Patcher -->
-<manifest
-   xmlns:android="http://schemas.android.com/apk/res/android"
-   android:versionCode="%1$s"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="%1$s"
    android:versionName="%2$s"
-   android:compileSdkVersion="33"
-   android:compileSdkVersionCodename="13"
-   package="%3$s"
-   platformBuildVersionCode="33"
-   platformBuildVersionName="13" >
-   <uses-sdk
-      android:minSdkVersion="21"
-      android:targetSdkVersion="33" >
-   </uses-sdk>
-   <uses-permission
-      android:name="android.permission.READ_EXTERNAL_STORAGE" >
-   </uses-permission>
-   <uses-permission
-      android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
-   </uses-permission>
-   <uses-permission
-      android:name="android.permission.ACCESS_MEDIA_LOCATION" >
-   </uses-permission>
-   <uses-feature
-      android:glEsVersion="0x00020000"
-      android:required="true" >
-   </uses-feature>
-   <application
-      android:theme="@7F0B0000"
-      android:label="%4$s"
-      android:icon="@7F040005"
-      android:name="com.star4droid.template.Star2dApp"
-      android:allowBackup="true"
-      android:supportsRtl="true"
-      >
-      <activity
-         android:name="com.star4droid.template.LoadingScreen"
-         android:screenOrientation="%5$s"
-         android:exported="true" >
-         <intent-filter>
-            <action
-               android:name="android.intent.action.MAIN" >
-            </action>
-            <category
-               android:name="android.intent.category.LAUNCHER" >
-            </category>
-         </intent-filter>
-      </activity>
-      <activity
-         android:name="com.star4droid.template.MainActivity"
-         android:screenOrientation="%5$s"
-         android:exported="true" >
-      </activity>
-      <activity
-         android:name="com.star4droid.template.DebugActivity"
-         android:screenOrientation="%5$s"
-         android:exported="true" >
-      </activity>
-   </application>
+    android:compileSdkVersion="34"
+    android:compileSdkVersionCodename="14"
+    package="%3$s"
+    platformBuildVersionCode="34"
+    platformBuildVersionName="14">
+    <uses-sdk
+        android:minSdkVersion="21"
+        android:targetSdkVersion="31" />
+    <!-- Read the contents of your shared storage -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Modify or delete the contents of your shared storage -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- View network connections -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- View network connections -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- View Wi-Fi connections -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- Read locations from your media collection -->
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+    <!-- Have full network access -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature
+        android:glEsVersion="0x20000"
+        android:required="true" />
+    <permission
+        android:name="com.star4droid.template.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        android:protectionLevel="0x00000002" />
+    <uses-permission android:name="com.star4droid.template.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <application
+        android:theme="@7f0b0000"
+        android:label="%4$s"
+        android:icon="@7f04000b"
+        android:name="com.star4droid.template.Star2dApp"
+        android:allowBackup="true"
+        android:supportsRtl="true"
+        android:appComponentFactory="androidx.core.app.CoreComponentFactory">
+        <activity
+            android:name="com.star4droid.template.LoadingScreen"
+            android:exported="true"
+            android:screenOrientation="%5$s">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.star4droid.template.MainActivity"
+            android:exported="true"
+            android:screenOrientation="%5$s" />
+        <activity
+            android:name="com.star4droid.template.DebugActivity"
+            android:exported="true"
+            android:screenOrientation="%5$s" />
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:exported="false"
+            android:authorities="com.star4droid.template.androidx-startup">
+            <meta-data
+                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+                android:value="androidx.startup" />
+        </provider>
+        <receiver
+            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+            android:permission="android.permission.DUMP"
+            android:enabled="true"
+            android:exported="true"
+            android:directBootAware="false">
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+            </intent-filter>
+        </receiver>
+    </application>
 </manifest>

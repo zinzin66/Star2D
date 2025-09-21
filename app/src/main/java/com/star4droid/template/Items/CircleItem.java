@@ -74,18 +74,19 @@ public class CircleItem extends Image implements PlayerItem {
 	
 	private void setup(){
 		int rx = propertySet.getInt("tileX"),
-		ry = propertySet.getInt("tileY");
-		float width = propertySet.getFloat("radius")*2,
-		     height = propertySet.getFloat("radius")*2;
+		    ry = propertySet.getInt("tileY");
+		boolean UI = getProperties().getString("type").equals("UI");
+		float width = (UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("radius")*2,
+		     height = (UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("radius")*2;
 		float x = propertySet.getFloat("x"),
 		y = propertySet.getFloat("y");
-		y = stage.getViewport().getWorldHeight()-getHeight()-y;
+		y = stage.getViewport().getWorldHeight()-height-y;
 		String imgPath=propertySet.getString("image");
 		
 		setDrawable(Utils.getDrawable(Utils.internal("images/logo.png")));
 		stage.setImage(this,propertySet.getString("image"));
 		setSize(width,height);
-		setPosition(x,y);
+		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
 		if(!propertySet.getString("Tint").equals(tint)){
 		    setColor(propertySet.getColor("Tint"));
 		    tint = propertySet.getString("Tint");
@@ -99,11 +100,11 @@ public class CircleItem extends Image implements PlayerItem {
 			String bt= String.valueOf(propertySet.getString("type").charAt(0)).toUpperCase();
 			BodyDef.BodyType type = bt.equals("K")?BodyDef.BodyType.KinematicBody:(bt.equals("S")?BodyDef.BodyType.StaticBody:BodyDef.BodyType.DynamicBody);
 			//creating the body
+			offset[0] = propertySet.getFloat("ColliderX")*-1;
+			offset[1] = propertySet.getFloat("ColliderY")*-1;
 			if(body==null){
     			BodyDef def = new BodyDef();
     			def.type = type;
-    			offset[0] = propertySet.getFloat("ColliderX")*-1;
-    			offset[1] = propertySet.getFloat("ColliderY")*-1;
     			def.position.set(0,0);
     			body = stage.world.createBody(def);
 			} else {
@@ -115,7 +116,7 @@ public class CircleItem extends Image implements PlayerItem {
 			}
 			//define its properties
 			CircleShape shape = new CircleShape();
-			shape.setRadius(propertySet.getFloat("Collider Radius"));
+			shape.setRadius(StageImp.WORLD_SCALE * propertySet.getFloat("Collider Radius"));
 			FixtureDef fx = new FixtureDef();
 			fx.shape = shape;
 			fx.friction=propertySet.getFloat("friction");
@@ -128,7 +129,10 @@ public class CircleItem extends Image implements PlayerItem {
 			body.setBullet(propertySet.getString("Bullet").equals("true"));
 			body.setGravityScale(propertySet.getFloat("Gravity Scale"));
 			// TODO : Need to fix (check the solution)
-			body.setTransform(new Vector2((offset[0]+x+(width/2)),(offset[1]+y-(height/2))),(float)Math.toRadians(-propertySet.getFloat("rotation")));
+			Vector2 pos = new Vector2((offset[0]+x+(width/2)),(offset[1]+y-(height/2)));
+			pos.x = StageImp.WORLD_SCALE * pos.x;
+			pos.y = StageImp.WORLD_SCALE * pos.y;
+			body.setTransform(pos ,(float)Math.toRadians(-propertySet.getFloat("rotation")));
 			
 		}
 		//if it's not added to stage ....
@@ -152,7 +156,7 @@ public class CircleItem extends Image implements PlayerItem {
 	protected void sizeChanged() {
 		super.sizeChanged();
 		//if(getStage()!=null) setY(circleY);
-		if(getProperties().getString("type").equals("UI"))
+		if(!getProperties().getString("type").equals("UI"))
 		    setOrigin(getWidth()*0.5f,getHeight()*0.5f);
 	}
 	
@@ -163,8 +167,8 @@ public class CircleItem extends Image implements PlayerItem {
 		    propertySet.remove("do update");
 		}
 		if(body!=null){
-		    offset[0] = propertySet.getFloat("ColliderX")*-1;
-			offset[1] = propertySet.getFloat("ColliderY")*-1;
+		    offset[0] = StageImp.WORLD_SCALE * propertySet.getFloat("ColliderX")*-1;
+			offset[1] = StageImp.WORLD_SCALE * propertySet.getFloat("ColliderY")*-1;
 			float x = body.getPosition().x,
 				y = body.getPosition().y;
 			setPosition(x - offset[0] - getWidth()*0.5f,

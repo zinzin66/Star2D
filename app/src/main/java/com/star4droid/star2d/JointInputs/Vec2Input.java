@@ -87,6 +87,18 @@ public class Vec2Input extends LinearLayout implements JointInput {
 		return name.getText().toString();
 	}
 	
+	// public String getStageValue() {
+		// try {
+			// float xf = Utils.getFloat(x.getText().toString());
+			// float yf = Utils.getFloat(y.getText().toString());
+			// float worldScale = com.star4droid.template.Items.StageImp.WORLD_SCALE;
+			// return "new Vector2("+(worldScale*xf)+"f&&"+(worldScale*yf)+"f)";
+		// } catch(Exception ex){
+			// Utils.showMessage(getContext(),"Error \n"+ex.toString());
+		// }
+		// return null;
+	// }
+	
 	@Override
 	public String getCode() {
 	    // field.set(x,y);

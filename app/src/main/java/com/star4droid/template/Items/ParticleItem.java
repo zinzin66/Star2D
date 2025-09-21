@@ -105,18 +105,18 @@ public class ParticleItem extends Image implements PlayerItem {
 				particleEffect.start();
 			} else loadDefault();
 		} else loadDefault();
-		
+		boolean UI = getProperties().getString("type").equals("UI");
 		float x = propertySet.getFloat("x"),
 			  y = getStage().getHeight()-getHeight()-propertySet.getFloat("y");
 		String name = propertySet.getString("name");
 		if(!name.equals(""))
 			setName(name);
-		setPosition(x,y);
+		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
 		setZIndex(propertySet.getInt("z"));
 		//setRotation(-propertySet.getFloat("rotation"));
 		setVisible(propertySet.getString("Visible").equals("true"));
-		particleEffect.setPosition(x,y);
-		particleEffect.scaleEffect(propertySet.getFloat("Scale X"),propertySet.getFloat("Scale Y"));
+		particleEffect.setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
+		particleEffect.scaleEffect((UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("Scale X"),(UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("Scale Y"));
 		int dur = propertySet.getInt("Duration");
 		if(dur>0)
 			particleEffect.setDuration(dur);

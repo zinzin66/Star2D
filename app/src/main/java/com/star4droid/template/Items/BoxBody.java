@@ -101,16 +101,19 @@ public class BoxBody extends Image implements PlayerItem {
 	}
 	
 	private void createBody(){
+	    boolean UI = getProperties().getString("type").equals("UI");
 		int rx = propertySet.getInt("tileX"),
 			ry = propertySet.getInt("tileY");
-		setSize(propertySet.getFloat("width"),propertySet.getFloat("height"));
+		float width = propertySet.getFloat("width"),
+		    height = propertySet.getFloat("height");
+		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
 		setOrigin(getWidth()*0.5f,getHeight()*0.5f);
 		float x = propertySet.getFloat("x"),
-		y = propertySet.getFloat("y");
-		y = stage.getViewport().getWorldHeight()-getHeight()-y;
+		    y = propertySet.getFloat("y");
+		    y = stage.getViewport().getWorldHeight()-height-y;
 		//setDrawable(Utils.getDrawable(Utils.absolute(propertySet.getString("image"))));
-		tileX = Math.max(propertySet.getInt("tileX"),1);
-		tileY = Math.max(propertySet.getInt("tileY"),1);
+		tileX = Math.max(rx ,1);
+		tileY = Math.max(ry, 1);
 		if(!stage.setImage(this,propertySet.getString("image"))){
 		    setDrawable(Utils.getDrawable(Utils.internal("images/logo.png")));
 		}
@@ -129,7 +132,7 @@ public class BoxBody extends Image implements PlayerItem {
 		}
 		
 		setName(propertySet.getString("name"));
-		setPosition(x,y);
+		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
 		if(!propertySet.getString("Tint").equals(tint)){
 		    setColor(propertySet.getColor("Tint"));
 		    tint = propertySet.getString("Tint");
@@ -139,14 +142,14 @@ public class BoxBody extends Image implements PlayerItem {
 		setScale(propertySet.getFloat("Scale X"),propertySet.getFloat("Scale Y"));
 		setVisible(propertySet.getString("Visible").equals("true"));
 		if(!propertySet.getString("type").equals("UI")){
-			String bt= String.valueOf(propertySet.getString("type").charAt(0)).toUpperCase();
+			String bt = String.valueOf(propertySet.getString("type").charAt(0)).toUpperCase();
 			BodyDef.BodyType type = bt.equals("K")?BodyDef.BodyType.KinematicBody:(bt.equals("S")?BodyDef.BodyType.StaticBody:BodyDef.BodyType.DynamicBody);
 			//creating the body
+			offset[0] = propertySet.getFloat("ColliderX")*-1;
+			offset[1] = propertySet.getFloat("ColliderY")*-1;
 			if(body==null){
     			BodyDef def = new BodyDef();
     			def.type = type;
-    			offset[0] = propertySet.getFloat("ColliderX")*-1;
-    			offset[1] = propertySet.getFloat("ColliderY")*-1;
     			def.position.set(0,0);
     			body = stage.world.createBody(def);
 			} else {
@@ -158,7 +161,7 @@ public class BoxBody extends Image implements PlayerItem {
 			}
 			//define its properties
 			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(propertySet.getFloat("Collider Width")*0.5f,propertySet.getFloat("Collider Height")*0.5f);
+			shape.setAsBox( StageImp.WORLD_SCALE * propertySet.getFloat("Collider Width")*0.5f, StageImp.WORLD_SCALE * propertySet.getFloat("Collider Height")*0.5f);
 			FixtureDef fx = new FixtureDef();
 			fx.shape = shape;
 			fx.friction=propertySet.getFloat("friction");
@@ -170,7 +173,10 @@ public class BoxBody extends Image implements PlayerItem {
 			body.setActive(propertySet.getString("Active").equals("true"));
 			body.setBullet(propertySet.getString("Bullet").equals("true"));
 			body.setGravityScale(propertySet.getFloat("Gravity Scale"));
-			body.setTransform(new Vector2((offset[0]+x+(getWidth()*0.5f)),(offset[1]+y+(getHeight()*0.5f))),(float)Math.toRadians(-propertySet.getFloat("rotation")));
+			Vector2 pos = new Vector2(offset[0]+x+(width*0.5f),offset[1]+y+(height*0.5f));
+			pos.x = StageImp.WORLD_SCALE * pos.x;
+			pos.y = StageImp.WORLD_SCALE * pos.y;
+			body.setTransform( pos ,(float)Math.toRadians(-propertySet.getFloat("rotation")));
 		}
 		if(getStage()==null)
 		    stage.addActor(this);
@@ -199,8 +205,8 @@ public class BoxBody extends Image implements PlayerItem {
 		    propertySet.remove("do update");
 		}
 		if(body!=null){
-		    offset[0] = propertySet.getFloat("ColliderX")*-1;
-			offset[1] = propertySet.getFloat("ColliderY")*-1;
+		    offset[0] = StageImp.WORLD_SCALE * propertySet.getFloat("ColliderX")*-1;
+			offset[1] = StageImp.WORLD_SCALE * propertySet.getFloat("ColliderY")*-1;
 			float x = body.getPosition().x,
 				y = body.getPosition().y;
 			setPosition(x - offset[0] - getWidth()*0.5f,

@@ -20,6 +20,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.ContactFilter;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -39,6 +40,7 @@ import com.star4droid.star2d.Helpers.Pair;
 import box2dLight.RayHandler;
 
 public class StageImp extends ApplicationAdapter {
+    public static final float WORLD_SCALE = 0.25f;
 	public World world = new World(new Vector2(0,-9.8f),true);
 	public boolean playing=true, debugBox2d = false;
 	public Stage UiStage,GameStage;
@@ -59,6 +61,7 @@ public class StageImp extends ApplicationAdapter {
 	float[] cameraOffset = new float[]{0,0};
 	FPSCalc fPSCalc=new FPSCalc();
 	StageImp currentStage;
+	
 	private RayHandler rayHandler;
 	Viewport viewport;
 	boolean loadComplete=false,onCreateCalled=false;
@@ -66,24 +69,41 @@ public class StageImp extends ApplicationAdapter {
 	public InputMultiplexer multiplexer;
 	private PropertySet<String,BitmapFont> bitmapFonts = new PropertySet<>();
 	ArrayList<LightInfo> lights= new ArrayList<>();
+	HashMap<String, Joint> joints = new HashMap<>();
 	int viewportWidth = -1,viewportHeight = -1;
 	
 	public StageImp(){
 		viewport = new FitViewport(720,1560);
+		fixCamera();
 	}
 	
 	public StageImp(Viewport port){
 		viewport = port;
+		fixCamera();
 	}
 	
 	public StageImp(ProjectAssetLoader loader){
 		this(new FitViewport(720,1560),loader);
+		fixCamera();
 	}
 	
 	public StageImp(Viewport port,ProjectAssetLoader projectAssetLoader){
 		super();
 		assetLoader = projectAssetLoader;
 		viewport = port;
+		fixCamera();
+	}
+	
+	private void fixCamera(){
+	    try {
+    	    OrthographicCamera cam = (OrthographicCamera) getCamera();
+            cam.zoom  = WORLD_SCALE;
+            cam.position.set(
+                cam.viewportWidth * cam.zoom / 2f,
+                cam.viewportHeight * cam.zoom / 2f,
+                0
+            );
+        } catch(Exception ex){}
 	}
 	
 	boolean needsUpdate = true;
@@ -173,6 +193,7 @@ public class StageImp extends ApplicationAdapter {
 		});
 		this.viewport = viewport;
 		updateViewport();
+		fixCamera();
 	}
 	
 	public StageImp updateViewport(){
@@ -209,6 +230,14 @@ public class StageImp extends ApplicationAdapter {
 	
 	public RayHandler getRayHandler(){
 	    return rayHandler;
+	}
+	
+	public void addJoint(String name, Joint joint){
+		joints.put(name, joint);
+	}
+	
+	public Joint getJoint(String name){
+		return joints.get(name);
 	}
 	
 	ArrayList<Actor> actors = null;

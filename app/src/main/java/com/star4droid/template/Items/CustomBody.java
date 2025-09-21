@@ -104,13 +104,14 @@ public class CustomBody extends Image implements PlayerItem {
 	private void createBody(){
 		int rx = propertySet.getInt("tileX"),
 			ry = propertySet.getInt("tileY");
-		float width = propertySet.getFloat("width"),
-			height = propertySet.getFloat("height");
+		boolean UI = getProperties().getString("type").equals("UI");
+		float width = (UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("width"),
+			height = (UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("height");
 		setSize(width, height);
 		setOrigin(getWidth()*0.5f,getHeight()*0.5f);
 		float x = propertySet.getFloat("x"),
 		y = propertySet.getFloat("y");
-		y = stage.getViewport().getWorldHeight()-getHeight()-y;
+		y = stage.getViewport().getWorldHeight()-height-y;
 		//setDrawable(Utils.getDrawable(Utils.absolute(propertySet.getString("image"))));
 		tileX = Math.max(propertySet.getInt("tileX"),1);
 		tileY = Math.max(propertySet.getInt("tileY"),1);
@@ -212,7 +213,7 @@ public class CustomBody extends Image implements PlayerItem {
 			body.setActive(propertySet.getString("Active").equals("true"));
 			body.setBullet(propertySet.getString("Bullet").equals("true"));
 			body.setGravityScale(propertySet.getFloat("Gravity Scale"));
-			body.setTransform(new Vector2((offset[0]+x+(getWidth()*0.5f)),(offset[1]+y+(getHeight()*0.5f))),(float)Math.toRadians(-propertySet.getFloat("rotation")));
+			body.setTransform(new Vector2((offset[0]+x+(width*0.5f)),(offset[1]+y+(height*0.5f))),(float)Math.toRadians(-propertySet.getFloat("rotation")));
 			
 		}
 		if(getStage()==null)

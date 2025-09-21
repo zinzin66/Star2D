@@ -66,14 +66,15 @@ public class ProgressItem extends Group implements PlayerItem {
 	}
 	
 	private void setup(){
+	    boolean UI = getProperties().getString("type").equals("UI");
 		float width = propertySet.getFloat("width"),
 		height = propertySet.getFloat("height"),
 		x = propertySet.getFloat("x"),
 		y = propertySet.getFloat("y");
 		setZIndex(propertySet.getInt("z"));
 		setVisible(propertySet.getString("Visible").equals("true"));
-		setSize(width,height);
-		setPosition(x,stage.getGameStage().getViewport().getWorldHeight()-getHeight()-y);
+		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
+		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * (stage.getGameStage().getViewport().getWorldHeight()-height-y));
 		setRotation(-propertySet.getFloat("rotation"));
 		setBackColor(propertySet.getString("Background Color"));
 		setProgressColor(propertySet.getString("Progress Color"));

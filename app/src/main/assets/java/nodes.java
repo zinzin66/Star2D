@@ -298,7 +298,7 @@ split
 copyBody body(Body) var newName
 <<=>>
 PlayerItem %2$s = %1$s.getClone(%3$s);
-%3$s
+%4$s
 split
 -color:#4A7814•
 destroy body(Body)
@@ -321,25 +321,25 @@ split
 --bodyControl
 split
 -color:#008375•
-applyForceToCenter body(Body) x y wake
+applyForceToCenter body(Body) x y wake(Boolean)
 <<=>>
 %1$s.getBody().applyForceToCenter((float)(%2$s),(float)(%3$s),%4$s);
 %5$s
 split
 -color:#008375•
-applyLinearImpulse body(Body) x y pointX pointY wake
+applyLinearImpulse body(Body) x y pointX pointY wake(Boolean)
 <<=>>
 %1$s.getBody().applyLinearImpulse((float)(%2$s),(float)(%3$s),(float)(%4$s),(float)(%5$s), %6$s);
 %7$s
 split
 -color:#008375•
-applyLinearImpulseToCenter body(Body) x y wake
+applyLinearImpulseToCenter body(Body) x y wake(Boolean)
 <<=>>
 %1$s.getBody().applyLinearImpulse((float)(%2$s),(float)(%3$s),%1$s.getBody().getWorldCenter().x,%1$s.getBody().getWorldCenter().y, %4$s);
 %5$s
 split
 -color:#008375•
-applyForce body(Body) x y pointX pointY wake
+applyForce body(Body) x y pointX pointY wake(Boolean)
 <<=>>
 %1$s.getBody().applyForce((float)(%2$s),(float)(%3$s),(float)(%4$s),(float)(%5$s),%6$s);
 %7$s
@@ -351,7 +351,7 @@ setAngularVelocity body(Body) velocity
 %3$s
 split
 -color:#008375•
-applyAngularImpulse body(Body) impulse wake
+applyAngularImpulse body(Body) impulse wake(Boolean)
 <<=>>
 %1$s.getBody().applyAngularImpulse((float)(%2$s),%3$s);
 %4$s
@@ -369,7 +369,7 @@ setLinearVelocity body(Body) xVelocity yVelocity
 %4$s
 split
 -color:#008375•
-applyTorque body(Body) torque wake
+applyTorque body(Body) torque wake(Boolean)
 <<=>>
 %1$s.getBody().applyTorque((float)(%2$s),%3$s);
 %4$s
@@ -384,7 +384,7 @@ split
 --bodyBooleans
 split
 -color:#008375•
-setAwake body(Body) wake
+setAwake body(Body) wake(Boolean)
 <<=>>
 %1$s.getBody().setAwake(%2$s);
 %3$s
@@ -438,3 +438,47 @@ releaseSound Sound(sound)
 <<=>>
 releaseSound("%1$s");
 %2$s
+split
+--Joints
+split
+-color:#BE9333•
+setMaxMotorTorque joint torque
+<<=>>
+%1$s.setMaxMotorTorque(%2$s);
+%3$s
+split
+-color:#BE9333•
+setMotorSpeed joint speed
+<<=>>
+%1$s.setMotorSpeed(%2$s);
+%3$s
+split
+-color:#BE9333•
+setLimits joint x y
+<<=>>
+%1$s.setLimits(%2$s,%3$s);
+%4$s
+split
+-color:#BE9333•
+setSpringDampingRatio joint ratio
+<<=>>
+%1$s.setSpringDampingRatio(%2$s);
+%4$s
+split
+-color:#BE9333•
+setSpringFrequencyHz joint frequency
+<<=>>
+%1$s.setSpringFrequencyHz(%2$s);
+%3$s
+split
+-color:#BE9333•
+enableMotor joint enable
+<<=>>
+%1$s.enableMotor(%2$s);
+%3$s
+split
+-color:#BE9333•
+enableLimit joint enable
+<<=>>
+%1$s.enableLimit(%2$s);
+%3$s

@@ -164,12 +164,13 @@ public class TextItem extends Label implements PlayerItem {
 	private void setup(){
 		if(propertySet==null) return;
 		setName(propertySet.getString("name"));
+		boolean UI = getProperties().getString("type").equals("UI");
 		float width = propertySet.getFloat("width"),
 		height = propertySet.getFloat("height"),
 		x = propertySet.getFloat("x"),
 		y = propertySet.getFloat("y");
-		setSize(width,height);
-		setPosition(x,stage.getViewport().getWorldHeight()-getHeight()-y);
+		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
+		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * (stage.getViewport().getWorldHeight()-height-y));
 		setZIndex(propertySet.getInt("z"));
 		setRotation(-propertySet.getFloat("rotation"));
 		setVisible(propertySet.getString("Visible").equals("true"));
@@ -182,7 +183,7 @@ public class TextItem extends Label implements PlayerItem {
 		getStyle().fontColor = propertySet.getColor("Text Color");
 		setStyle(getStyle());
 		if(propertySet.containsKey("Font Scale"))
-			setFontScale(propertySet.getFloat("Font Scale"));
+			setFontScale((UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("Font Scale"));
 		if(getStage()==null)
 		    stage.addActor(this);
 		if(elementEvent!=null)

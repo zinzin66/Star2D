@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.star4droid.star2d.editor.TestApp;
 import com.star4droid.star2d.editor.ui.sub.ConfirmDialog;
+import com.star4droid.template.Utils.Utils;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -13,7 +14,7 @@ import java.util.concurrent.Executors;
 
 public class UpdateChecker {
 
-    private static final String CURRENT_VERSION = "0.1.9";
+    private static final String CURRENT_VERSION = "0.2.4";
     private static final String CHECK_UPDATE_URL = "https://raw.githubusercontent.com/star4droid/Star2D/refs/heads/master/assets/latest.version"; 
     private static final String UPDATE_PAGE_URL = "https://github.com/star4droid/Star2D/releases/"; 
 
@@ -25,13 +26,34 @@ public class UpdateChecker {
             if(latestVersion!=null)
 				com.badlogic.gdx.Gdx.files.external("logs/update/latest.txt").writeString("version : "+latestVersion+"\n",false);
             Gdx.app.postRunnable(() -> {
-                if (latestVersion != null && !latestVersion.equals(CURRENT_VERSION)) {
+                if (latestVersion != null && isLarger(latestVersion, CURRENT_VERSION)) {
                     Gdx.files.external("logs/update/"+CURRENT_VERSION+".txt").writeString(latestVersion,false);
 					showUpdateDialog(testApp);
                 }
             });
         });
     }
+	
+	private static boolean isLarger(String first,String second){
+		first = getNums(first);
+		second = getNums(second);
+		try {
+			int f = Utils.getInt(first),
+				s = Utils.getInt(second);
+			return f > s;
+		} catch(Exception ex){}
+		return false;
+	}
+	
+	private static String getNums(String str){
+		StringBuilder sb = new StringBuilder();
+		for(char c:str.toCharArray()){
+			if("0123456789".contains(c+"")){
+				sb.append(c);
+			}
+		}
+		return sb.toString();
+	}
 
     private static String fetchLatestVersion() {
         String response = null;

@@ -16,7 +16,7 @@ android {
     defaultConfig {
         applicationId "com.star4droid.star2d.evo"
         minSdk 26
-        targetSdk 34
+        targetSdk 35
         versionCode 28
         versionName "0.2.4Beta"
         
@@ -56,7 +56,7 @@ dependencies {
     implementation 'com.google.guava:guava:32.0.1-android'
   //  implementation 'com.google.guava:guava:guava-33.4.0-jre'
     implementation 'com.android.tools:r8:8.1.56'
-    implementation platform("io.github.Rosemoe.sora-editor:bom:0.22.1")
+    implementation platform("io.github.Rosemoe.sora-editor:bom:0.23.6")
     implementation "io.github.Rosemoe.sora-editor:editor"
     implementation "io.github.Rosemoe.sora-editor:language-textmate"
     implementation 'com.badlogicgames.gdx:gdx:1.13.1'

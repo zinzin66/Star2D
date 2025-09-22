@@ -1,60 +1,43 @@
-name: Aab Build
-
-on:
-  workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:  
-    - uses: actions/checkout@v3  
+    steps:
+      - uses: actions/checkout@v3  
 
-    # Set up JDK 17  
-    - name: Set up JDK 17  
-      uses: actions/setup-java@v3  
-      with:  
-        java-version: '17'  
-        distribution: 'temurin'  
-        cache: gradle  
+      - name: Set up JDK 17  
+        uses: actions/setup-java@v3  
+        with:  
+          java-version: '17'  
+          distribution: 'temurin'  
+          cache: gradle  
 
-    # Setup Android NDK  
-    - name: Setup Android NDK  
-      uses: nttld/setup-ndk@v1.5.0  
-      with:  
-        ndk-version: r28c   # or r28 or higher  
+      - name: Setup Android NDK  
+        uses: nttld/setup-ndk@v1.5.0  
+        with:  
+          ndk-version: r28c  
 
-    # Grant execute permission for gradlew  
-    - name: Grant execute permission for gradlew  
-      run: chmod +x gradlew  
+      - name: Grant execute permission for gradlew  
+        run: chmod +x gradlew  
 
-    # Build AAB  
-    - name: Build with Gradle  
-      run: ./gradlew bundleRelease  
+      # 🔐 Add keystore
+      - name: Add keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > Star4droid.jks
 
-    # Upload AAB  
-    - name: Upload AAB  
-      uses: actions/upload-artifact@v4  
-      with:  
-        name: engine.aab  
-        path: app/build/outputs/bundle/release/app-release.aab  
-        retention-days: 999  
+      # Set environment variables for signing
+      - name: Set signing environment variables
+        run: |
+          echo "KEYSTORE_FILE=Star4droid.jks" >> $GITHUB_ENV
+          echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+          echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
 
-    # Verify 16KB Page Alignment (fixed unzip)  
-    - name: Verify 16KB Page Alignment  
-      run: |  
-        AAB_PATH="app/build/outputs/bundle/release/app-release.aab"  
-        
-        TEMP_DIR=$(mktemp -d)  
-        unzip -qo "$AAB_PATH" "*.so" -d "$TEMP_DIR"
-        
-        for so_file in "$TEMP_DIR"/*.so; do  
-          echo "Checking alignment for $so_file"  
-          readelf -l "$so_file" | grep "p_align"  
-        done  
-        
-        rm -rf "$TEMP_DIR"  
+      - name: Build with Gradle  
+        run: ./gradlew bundleRelease  
 
-    # Show files list  
-    - name: Show files list  
-      run: ls
+      - name: Upload AAB  
+        uses: actions/upload-artifact@v4  
+        with:  
+          name: engine.aab  
+          path: app/build/outputs/bundle/release/app-release.aab  
+          retention-days: 90

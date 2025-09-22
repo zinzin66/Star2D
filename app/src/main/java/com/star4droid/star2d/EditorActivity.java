@@ -20,7 +20,8 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.documentfile.provider.DocumentFile;
+import java.util.Objects;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.github.anrwatchdog.ANRError;
@@ -124,7 +125,7 @@ public class EditorActivity extends AppCompatActivity implements AndroidFragment
     					String last = "";
     					try {
     					    //last = Uri.fromFile(new java.io.File(FileUtil.convertUriToFilePath(EditorActivity.this,uri))).getLastPathSegment();
-    					    last = uri.getLastPathSegment();
+    					    last = Objects.requireNonNull(DocumentFile.fromSingleUri(EditorActivity.this, uri)).getName();
     					    if(last.contains("/"))
     					        last = last.substring(last.lastIndexOf("/"),last.length());
     					} catch(Exception ex){

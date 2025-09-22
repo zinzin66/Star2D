@@ -20,9 +20,9 @@ jobs:
 
     # Setup Android NDK
     - name: Setup Android NDK
-      uses: nttld/setup-ndk@v1
+      uses: nttld/setup-ndk@v1.5.0
       with:
-        ndk-version: '28.0.5195000'
+        ndk-version: r28c   # or r28 or higher
 
     # Grant execute permission for gradlew
     - name: Grant execute permission for gradlew

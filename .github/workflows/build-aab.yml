@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    # Set up JDK 17
+    # Set up JDK 17 with Gradle cache
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
@@ -18,21 +18,31 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    # Install Android SDK & Build Tools 35
+    - name: Install Android SDK & Build Tools
+      run: |
+        sudo apt-get update
+        yes | sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+
     # Setup Android NDK
     - name: Setup Android NDK
       uses: nttld/setup-ndk@v1.5.0
       with:
-        ndk-version: r28c   # or r28 or higher
+        ndk-version: r28c
 
     # Grant execute permission for gradlew
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    # ✅ قم بالبناء باستخدام أمر bundleRelease لإنشاء AAB
+    # Clear Gradle cache to avoid old Gradle/NDK issues
+    - name: Clear Gradle cache
+      run: rm -rf ~/.gradle/caches ~/.gradle/wrapper
+
+    # Build AAB
     - name: Build with Gradle
       run: ./gradlew bundleRelease
 
-    # ✅ تحميل ملف AAB الناتج
+    # Upload AAB
     - name: Upload AAB
       uses: actions/upload-artifact@v4
       with:
@@ -40,28 +50,21 @@ jobs:
         path: app/build/outputs/bundle/release/app-release.aab
         retention-days: 999
 
-        # خطوة فحص للتأكد من المحاذاة
+    # Verify 16KB Page Alignment for .so files
     - name: Verify 16KB Page Alignment
       run: |
         AAB_PATH="app/build/outputs/bundle/release/app-release.aab"
         
-        # قم بإنشاء مجلد مؤقت واستخرج منه ملفات .so
         TEMP_DIR=$(mktemp -d)
-        unzip -q -j "$AAB_PATH" "*.so" -d "$TEMP_DIR"
-        
-        # تحقق من المحاذاة لكل ملف .so
+        unzip -qo "$AAB_PATH" "*.so" -d "$TEMP_DIR"
+
         for so_file in "$TEMP_DIR"/*.so; do
           echo "Checking alignment for $so_file"
-          # استخدم readelf للتحقق من قيمة p_align
           readelf -l "$so_file" | grep "p_align"
-          
-          # أضف منطق للتحقق من أن القيمة هي 16384 أو 4096
-          # (يمكنك استخدام أدوات إضافية مثل awk للتأكد من القيمة)
         done
-        
-        # تنظيف المجلد المؤقت
+
         rm -rf "$TEMP_DIR"
 
     # Show files list
     - name: Show files list
-      run: ls
+      run: ls -R

@@ -9,6 +9,7 @@ data
 worldX
 worldY
 random(1,100)
+getTouch()
 getZooming()
 getValue("key")
 getNumber("key")
@@ -29,7 +30,8 @@ getRealNumber("key")
 .getParentName()
 .getBody().getLinearVelocity().x
 .getBody().getLinearVelocity().y
-.getView().getRotation()
+.getBody().getAngle()
+.getActor().getRotation()
 .getActor().getWidth()
 .getActor().getHeight()
 .getXTo(

@@ -314,15 +314,19 @@ public class TestApp implements ApplicationListener {
 	}
 	
 	public BitmapFont getFont(String path){
-		while(path.contains("//")){
-			path = path.replace("//","/");
+	    try {
+    		while(path.contains("//")){
+    			path = path.replace("//","/");
+    		}
+    		if(!path.startsWith("/")) path = "/"+path;
+    		if(bitmapFonts.containsKey(path))
+    			return (BitmapFont)bitmapFonts.get(path);
+    		BitmapFont font = com.star4droid.template.Utils.Utils.generateFontFrom(Gdx.files.absolute(path));
+    		bitmapFonts.put(path,font);
+    		return font;
+		} catch(Exception ex){
+		    return null;
 		}
-		if(!path.startsWith("/")) path = "/"+path;
-		if(bitmapFonts.containsKey(path))
-			return (BitmapFont)bitmapFonts.get(path);
-		BitmapFont font = com.star4droid.template.Utils.Utils.generateFontFrom(Gdx.files.absolute(path));
-		bitmapFonts.put(path,font);
-		return font;
 	}
 	
 	public void setOrienationChanger(LibgdxEditor.OrienationChangeListener changeListener){
@@ -512,6 +516,7 @@ public class TestApp implements ApplicationListener {
 					
 					this.stageImp.GameStage.dispose();
 					this.stageImp.UiStage.dispose();
+					this.stageImp.assetLoader.dispose();
 				}
 				Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
 				Gdx.input.setCatchKey(4,true);

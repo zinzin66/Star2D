@@ -110,13 +110,13 @@ split
 setCameraXAt body(Body)
 <<=>>
 setCameraX(%1$s);
-%3$s
+%2$s
 split
 -color:#387095•
 setCameraYAt body(Body)
 <<=>>
 setCameraY(%1$s);
-%3$s
+%2$s
 split
 -color:#387095•
 setCameraXY x y

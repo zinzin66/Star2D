@@ -40,6 +40,7 @@ public class house1Script extends ItemScript {
         }
         
     }
+    
     public void onCollisionEnd(PlayerItem other){
         if(other.getName().equals("player")){
             getPlayerItem().getActor().getColor().a = 1f;

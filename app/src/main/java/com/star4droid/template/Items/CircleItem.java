@@ -76,8 +76,8 @@ public class CircleItem extends Image implements PlayerItem {
 		int rx = propertySet.getInt("tileX"),
 		    ry = propertySet.getInt("tileY");
 		boolean UI = getProperties().getString("type").equals("UI");
-		float width = (UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("radius")*2,
-		     height = (UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("radius")*2;
+		float width = propertySet.getFloat("radius")*2,
+		     height = propertySet.getFloat("radius")*2;
 		float x = propertySet.getFloat("x"),
 		y = propertySet.getFloat("y");
 		y = stage.getViewport().getWorldHeight()-height-y;
@@ -85,7 +85,7 @@ public class CircleItem extends Image implements PlayerItem {
 		
 		setDrawable(Utils.getDrawable(Utils.internal("images/logo.png")));
 		stage.setImage(this,propertySet.getString("image"));
-		setSize(width,height);
+		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
 		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
 		if(!propertySet.getString("Tint").equals(tint)){
 		    setColor(propertySet.getColor("Tint"));
@@ -129,7 +129,7 @@ public class CircleItem extends Image implements PlayerItem {
 			body.setBullet(propertySet.getString("Bullet").equals("true"));
 			body.setGravityScale(propertySet.getFloat("Gravity Scale"));
 			// TODO : Need to fix (check the solution)
-			Vector2 pos = new Vector2((offset[0]+x+(width/2)),(offset[1]+y-(height/2)));
+			Vector2 pos = new Vector2((offset[0]+x+(width/2)),(offset[1]+y+(height/2)));
 			pos.x = StageImp.WORLD_SCALE * pos.x;
 			pos.y = StageImp.WORLD_SCALE * pos.y;
 			body.setTransform(pos ,(float)Math.toRadians(-propertySet.getFloat("rotation")));

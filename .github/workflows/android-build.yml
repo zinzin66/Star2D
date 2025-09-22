@@ -1,7 +1,7 @@
 name: Android CI
 
 on:
-  workflow_dispatch: # Trigger manually from the GitHub Actions UI
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,6 +18,12 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    # ✅ تم إضافة هذه الخطوة لتحديد إصدار NDK r28 أو أحدث
+    - name: Setup Android NDK
+      uses: android-actions/setup-ndk@v2
+      with:
+        ndk-version: '28.0.5195000'
+
     # Grant execute permission for gradlew
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -32,30 +38,25 @@ jobs:
       with:
         name: engine.apk
         path: app/build/outputs/apk/debug/app-debug.apk
-        retention-days: 999 # Specify how many days the artifact should be retained
+        retention-days: 90
 
     # Extract classes.dex files and zip them
     - name: Extract and Zip Classes
-      if: always() # Ensure this runs even if the APK upload succeeds
+      if: always()
       run: |
         APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
         ZIP_OUTPUT="classes.zip"
         
-        # Create a temporary directory
         TEMP_DIR=$(mktemp -d)
         
-        # Unzip the APK into the temporary directory
         unzip -o -q "$APK_PATH" -d "$TEMP_DIR"
         
-        # Find all classes.dex files and zip them
         cd "$TEMP_DIR"
         zip "$ZIP_OUTPUT" AndroidManifest.xml
         zip -r -q "$ZIP_OUTPUT" classes*.dex
 
-        # Return to the workspace
         cd -
         
-        # Move the ZIP file to the workspace
         mv "$TEMP_DIR/$ZIP_OUTPUT" .
 
     # Show files list
@@ -68,4 +69,4 @@ jobs:
       with:
         name: classes.zip
         path: classes.zip
-        retention-days: 1 # Specify how many days the artifact should be retained
+        retention-days: 1

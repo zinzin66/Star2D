@@ -63,7 +63,8 @@ public class CodeGenerator {
     
     private static final String JointInit =
         "\n\t\t\t%1$s_Def.initialize(%2$s);\n" +
-        "\t%1$s = (%3$s)(this.world.createJoint(%1$s_Def));";
+        "\t%1$s = (%3$s)(this.world.createJoint(%1$s_Def));\n"+
+        "\taddJoint(\"%1$s\",%1$s);";
     
     private static final String fixZIndexDefault =
         "\n\t\t %1$s.getActor().setZIndex((int)(%1$s_def.z));\n";
@@ -147,21 +148,24 @@ public class CodeGenerator {
                             new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType()
                         );
                         
+                        float worldScale = com.star4droid.template.Items.StageImp.WORLD_SCALE;
                         // Process joint properties
                         for (HashMap<String, Object> hash : fields) {
                             if (shouldSkip > 0) {
                                 // Skip initialization vars (constructor)
                                 initilaizer += (initilaizer.equals("") ? "" : ",") + 
-                                              hash.get("value").toString().replace("&&", ",");
+                                              hash.get("value").toString().replace("&&", ",").replace("f,","f*"+worldScale+"f,").replace("f)","f*"+worldScale+"f)");
                                 shouldSkip--;
                                 continue;
                             }
                             
                             fieldsInit.append(String.format(
-                                hash.get("code").toString().replace("ff", "f"),
+                                hash.get("code").toString().replace("ff", "f").replace("f,","f*"+worldScale+"f,").replace("f)","f*"+worldScale+"f)"),
                                 p.split("-")[0] + "_Def"
                             ));
                         }
+                        
+                        init.append(fieldsInit);
                         
                         init.append(String.format(
                             JointInit,
@@ -170,14 +174,13 @@ public class CodeGenerator {
                             p.split("-")[1]
                         ));
                         
-                        init.append(fieldsInit);
-                        
                         joint.append(String.format(
                             defualtJointCode,
                             p.split("-")[1],
                             p.split("-")[0],
                             init.toString()
                         ));
+                        
                     }
                 }
                 

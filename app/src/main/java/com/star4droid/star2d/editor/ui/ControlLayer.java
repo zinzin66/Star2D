@@ -841,7 +841,7 @@ public class ControlLayer extends Table {
 				dialog.setUserObject("false");
 			}
 		});
-		dialog.getTitleTable().add(closeButton).padRight(4);
+		//dialog.getTitleTable().add(closeButton).padRight(4);
 		// use user data to check dialog visibility...
 		dialog.setUserObject("false");
 		btn.addListener(new ClickListener() {

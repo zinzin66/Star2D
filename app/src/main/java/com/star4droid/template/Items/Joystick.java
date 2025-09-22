@@ -63,8 +63,8 @@ public class Joystick extends Touchpad implements PlayerItem {
 	private void setup(){
 		if(propertySet==null) return;
 		boolean UI = getProperties().getString("type").equals("UI");
-		float width = (UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("width"),
-			height = (UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("height"),
+		float width = propertySet.getFloat("width"),
+			height = propertySet.getFloat("height"),
 		x = propertySet.getFloat("x"),
 		y = propertySet.getFloat("y");
 		y = stage.getViewport().getWorldHeight()-height-y;
@@ -72,7 +72,7 @@ public class Joystick extends Touchpad implements PlayerItem {
 		setZIndex(propertySet.getInt("z"));
 		//setRotation(propertySet.getFloat("rotation"));
 		setVisible(propertySet.getString("Visible").equals("true"));
-		setSize(width,height);
+		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
 		setName(propertySet.getString("name"));
 		if(getStage()==null)
 		    stage.addActor(this);

@@ -56,6 +56,12 @@ public class SettingsDialog extends VisDialog {
 		saveUndoRedo.setValue(String.valueOf(preferences.getBoolean("SaveUndoRedo",true)));
 		table.add(saveUndoRedo).padTop(10).row();
 		
+		//World Scale
+		FloatInput worldScale = new FloatInput();
+		worldScale.setNameText("WorldScale");
+		worldScale.setValue(String.valueOf(preferences.getFloat("WorldScale",0.25f)));
+		//table.add(worldScale).padTop(10).row();
+		
 		//Controls of the editor position...
 		SpinnerInput layoutType = new SpinnerInput();
 		layoutType.setNameText("Control Position");
@@ -73,10 +79,15 @@ public class SettingsDialog extends VisDialog {
 		okBtn.addListener(new ClickListener(){
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
+			    float worldScalef = 1;
+			    try {
+			        worldScalef = Utils.getFloat(worldScale.getValue());
+			    } catch(Exception ex){}
 				String newLang = lang.getValue().substring(0,2).toLowerCase().equals("en") ? "en" : "ar";
 				preferences.putBoolean("Auto Completion",codeCompletion.getValue().equals("true"))
 					.putBoolean("SaveUndoRedo",saveUndoRedo.getValue().equals("true"))
 					.putBoolean("AutoSave",autoSave.getValue().equals("true"))
+					.putFloat("WorldScale", worldScalef)
 					.putString("Control Position",layoutType.getValue())
 					.putString("lang",newLang)
 					.putString("compiler",compiler.getValue()).flush();

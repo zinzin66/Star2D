@@ -166,9 +166,9 @@ public class TextItem extends Label implements PlayerItem {
 		setName(propertySet.getString("name"));
 		boolean UI = getProperties().getString("type").equals("UI");
 		float width = propertySet.getFloat("width"),
-		height = propertySet.getFloat("height"),
-		x = propertySet.getFloat("x"),
-		y = propertySet.getFloat("y");
+    		height = propertySet.getFloat("height"),
+    		x = propertySet.getFloat("x"),
+    		y = propertySet.getFloat("y");
 		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
 		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * (stage.getViewport().getWorldHeight()-height-y));
 		setZIndex(propertySet.getInt("z"));

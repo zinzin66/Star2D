@@ -93,7 +93,7 @@ public class Project {
 		for(String file:getSceneList(scene)){
 			FileHandle fh = Gdx.files.absolute(file);
 			if(!fh.exists()) continue;
-			if(!fh.isDirectory())
+			//if(!fh.isDirectory())
 			    fh.copyTo(Gdx.files.absolute(arrayList.get(x)));
 			x++;
 		}

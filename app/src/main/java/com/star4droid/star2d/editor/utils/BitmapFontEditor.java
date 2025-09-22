@@ -62,7 +62,7 @@ public class BitmapFontEditor extends VisDialog {
 		while(dir!=null && dir.child(newName+n+".s2df").exists())
 			n++;
 		newName = newName+n;
-		name.setValue(fileHandle!=null ? fileHandle.name() : newName);
+		name.setValue(fileHandle!=null ? fileHandle.nameWithoutExtension() : newName);
 		// disable when editing file is available
 		name.setDisabled(fileHandle!=null);
 		// field to select ttf font...

@@ -105,9 +105,9 @@ public class CustomBody extends Image implements PlayerItem {
 		int rx = propertySet.getInt("tileX"),
 			ry = propertySet.getInt("tileY");
 		boolean UI = getProperties().getString("type").equals("UI");
-		float width = (UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("width"),
-			height = (UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("height");
-		setSize(width, height);
+		float width = propertySet.getFloat("width"),
+			height = propertySet.getFloat("height");
+		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width, (UI ? 1 : StageImp.WORLD_SCALE) * height);
 		setOrigin(getWidth()*0.5f,getHeight()*0.5f);
 		float x = propertySet.getFloat("x"),
 		y = propertySet.getFloat("y");
@@ -131,7 +131,7 @@ public class CustomBody extends Image implements PlayerItem {
 		
 		//Utils.setImageFromFile(this,player.project.getImagesPath()+propertySet.getString("image"),new Point(rx,ry),null,null);
 		setName(propertySet.getString("name"));
-		setPosition(x,y);
+		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
 		if(!propertySet.getString("Tint").equals(tint)){
 		    setColor(propertySet.getColor("Tint"));
 		    tint = propertySet.getString("Tint");
@@ -189,7 +189,7 @@ public class CustomBody extends Image implements PlayerItem {
         				try {
                         	float px = Utils.getFloat(coords[0]) * width - width*0.5f;
                         	float py = (1 - Utils.getFloat(coords[1])) * height - height*0.5f; // Flip Y-axis
-                        	array.add(new Vector2(px, py));
+                        	array.add(new Vector2((UI ? 1 : StageImp.WORLD_SCALE) * px,(UI ? 1 : StageImp.WORLD_SCALE) *  py));
         				} catch(Exception e){}
                     }
                 }
@@ -213,7 +213,10 @@ public class CustomBody extends Image implements PlayerItem {
 			body.setActive(propertySet.getString("Active").equals("true"));
 			body.setBullet(propertySet.getString("Bullet").equals("true"));
 			body.setGravityScale(propertySet.getFloat("Gravity Scale"));
-			body.setTransform(new Vector2((offset[0]+x+(width*0.5f)),(offset[1]+y+(height*0.5f))),(float)Math.toRadians(-propertySet.getFloat("rotation")));
+			Vector2 pos = new Vector2((offset[0]+x+(width*0.5f)),(offset[1]+y+(height*0.5f)));
+			pos.x = (UI ? 1 : StageImp.WORLD_SCALE) * pos.x;
+			pos.y = (UI ? 1 : StageImp.WORLD_SCALE) * pos.y;
+			body.setTransform(pos,(float)Math.toRadians(-propertySet.getFloat("rotation")));
 			
 		}
 		if(getStage()==null)

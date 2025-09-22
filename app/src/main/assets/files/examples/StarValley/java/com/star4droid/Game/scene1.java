@@ -38,6 +38,7 @@ public class scene1 extends StageImp {
       house4,
       house3,
       house6,
+      Particle1,
       house5,
       house1,
       character,
@@ -50,7 +51,10 @@ public class scene1 extends StageImp {
       gainHeart,
       Welcome,
       light,
-      Progress1;
+      Progress1,
+      compass,
+      distance,
+      where;
 
   Light Light1;
 
@@ -116,7 +120,7 @@ public class scene1 extends StageImp {
     road2_def.name = "road2";
     road2_def.width = 200.0f;
     road2_def.y = 1251.6082f;
-    road2_def.z = 1f;
+    road2_def.z = 1.0f;
     road2_def.Tint = "#FFFFFF";
 
     road2_def.elementEvents = new ElementEvent() {
@@ -160,7 +164,7 @@ public class scene1 extends StageImp {
     Text3_def.name = "Text3";
     Text3_def.width = 490.45453f;
     Text3_def.y = 751.18964f;
-    Text3_def.z = 2f;
+    Text3_def.z = 2.0f;
     Text3_def.height = 364.16968f;
 
     Text3_def.elementEvents = new ElementEvent() {
@@ -201,7 +205,7 @@ public class scene1 extends StageImp {
     Text4_def.name = "Text4";
     Text4_def.width = 762.91626f;
     Text4_def.y = 149.1193f;
-    Text4_def.z = 3f;
+    Text4_def.z = 3.0f;
     Text4_def.height = 291.07068f;
 
     Text4_def.elementEvents = new ElementEvent() {
@@ -242,7 +246,7 @@ public class scene1 extends StageImp {
     getHeartText_def.name = "getHeartText";
     getHeartText_def.width = 433.30447f;
     getHeartText_def.y = 784.25183f;
-    getHeartText_def.z = 4f;
+    getHeartText_def.z = 4.0f;
     getHeartText_def.height = 78.41924f;
 
     getHeartText_def.elementEvents = new ElementEvent() {
@@ -283,7 +287,7 @@ public class scene1 extends StageImp {
     Text2_def.name = "Text2";
     Text2_def.width = 557.15894f;
     Text2_def.y = -144.60553f;
-    Text2_def.z = 5f;
+    Text2_def.z = 5.0f;
     Text2_def.height = 239.8862f;
 
     Text2_def.elementEvents = new ElementEvent() {
@@ -324,7 +328,7 @@ public class scene1 extends StageImp {
     Text1_def.name = "Text1";
     Text1_def.width = 433.30447f;
     Text1_def.y = 1503.4445f;
-    Text1_def.z = 6f;
+    Text1_def.z = 6.0f;
     Text1_def.height = 78.41924f;
 
     Text1_def.elementEvents = new ElementEvent() {
@@ -369,7 +373,7 @@ public class scene1 extends StageImp {
     road3_def.name = "road3";
     road3_def.width = 174.39789f;
     road3_def.y = 1363.0f;
-    road3_def.z = 7f;
+    road3_def.z = 7.0f;
     road3_def.Tint = "#FFFFFF";
 
     road3_def.elementEvents = new ElementEvent() {
@@ -417,7 +421,7 @@ public class scene1 extends StageImp {
     road1_def.name = "road1";
     road1_def.width = 174.39789f;
     road1_def.y = 1363.0f;
-    road1_def.z = 8f;
+    road1_def.z = 8.0f;
     road1_def.Tint = "#FFFFFF";
 
     road1_def.elementEvents = new ElementEvent() {
@@ -464,7 +468,7 @@ public class scene1 extends StageImp {
     road_def.name = "road";
     road_def.width = 415.5543f;
     road_def.y = 1363.0885f;
-    road_def.z = 9f;
+    road_def.z = 9.0f;
     road_def.Tint = "#FFFFFF";
 
     road_def.elementEvents = new ElementEvent() {
@@ -509,7 +513,7 @@ public class scene1 extends StageImp {
     player_def.x = 60.717503f;
     player_def.name = "player";
     player_def.y = 343.93973f;
-    player_def.z = 10f;
+    player_def.z = 10.0f;
     player_def.Tint = "#FFFFFF";
     player_def.Fixed_Rotation = true;
 
@@ -558,7 +562,7 @@ public class scene1 extends StageImp {
     wall4_def.name = "wall4";
     wall4_def.width = 177.64044f;
     wall4_def.y = 681.8973f;
-    wall4_def.z = 11f;
+    wall4_def.z = 11.0f;
     wall4_def.Tint = "#FFFFFF";
 
     wall4_def.elementEvents = new ElementEvent() {
@@ -603,7 +607,7 @@ public class scene1 extends StageImp {
     wall3_def.name = "wall3";
     wall3_def.width = 162.82349f;
     wall3_def.y = 653.68195f;
-    wall3_def.z = 12f;
+    wall3_def.z = 12.0f;
     wall3_def.Tint = "#FFFFFF";
 
     wall3_def.elementEvents = new ElementEvent() {
@@ -648,7 +652,7 @@ public class scene1 extends StageImp {
     wall1_def.name = "wall1";
     wall1_def.width = 331.5306f;
     wall1_def.y = 387.68942f;
-    wall1_def.z = 13f;
+    wall1_def.z = 13.0f;
     wall1_def.Tint = "#FFFFFF";
 
     wall1_def.elementEvents = new ElementEvent() {
@@ -693,7 +697,7 @@ public class scene1 extends StageImp {
     wall5_def.name = "wall5";
     wall5_def.width = 342.32135f;
     wall5_def.y = 1042.3829f;
-    wall5_def.z = 14f;
+    wall5_def.z = 14.0f;
     wall5_def.Tint = "#FFFFFF";
 
     wall5_def.elementEvents = new ElementEvent() {
@@ -738,7 +742,7 @@ public class scene1 extends StageImp {
     wall_def.name = "wall";
     wall_def.width = 839.1089f;
     wall_def.y = -130.81189f;
-    wall_def.z = 15f;
+    wall_def.z = 15.0f;
     wall_def.Tint = "#FFFFFF";
 
     wall_def.elementEvents = new ElementEvent() {
@@ -784,7 +788,7 @@ public class scene1 extends StageImp {
     house2_def.name = "house2";
     house2_def.width = 474.69897f;
     house2_def.y = -204.82393f;
-    house2_def.z = 16f;
+    house2_def.z = 16.0f;
     house2_def.Tint = "FFFFFFFF";
 
     house2_def.elementEvents = new ElementEvent() {
@@ -832,7 +836,7 @@ public class scene1 extends StageImp {
     car_def.name = "car";
     car_def.width = 154.0f;
     car_def.y = 253.49133f;
-    car_def.z = 17f;
+    car_def.z = 17.0f;
     car_def.Tint = "#FFFFFF";
 
     car_def.elementEvents = new ElementEvent() {
@@ -878,7 +882,7 @@ public class scene1 extends StageImp {
     house4_def.name = "house4";
     house4_def.width = 141.85135f;
     house4_def.y = 658.801f;
-    house4_def.z = 18f;
+    house4_def.z = 18.0f;
     house4_def.Tint = "#FFFFFF";
 
     house4_def.elementEvents = new ElementEvent() {
@@ -927,7 +931,7 @@ public class scene1 extends StageImp {
     house3_def.name = "house3";
     house3_def.width = 310.54962f;
     house3_def.y = 254.14668f;
-    house3_def.z = 19f;
+    house3_def.z = 19.0f;
     house3_def.Tint = "6EFF00FF";
 
     house3_def.elementEvents = new ElementEvent() {
@@ -976,7 +980,7 @@ public class scene1 extends StageImp {
     house6_def.name = "house6";
     house6_def.width = 342.37518f;
     house6_def.y = 964.79474f;
-    house6_def.z = 20f;
+    house6_def.z = 20.0f;
     house6_def.Tint = "#FFFFFF";
 
     house6_def.elementEvents = new ElementEvent() {
@@ -1011,6 +1015,46 @@ public class scene1 extends StageImp {
     house6.setScript(
         new com.star4droid.Game.Scripts.scene1.house1Script().setItem(house6).setStage(this));
 
+    ParticleDef Particle1_def = new ParticleDef();
+    Particle1_def.Script = "Particle1";
+    Particle1_def.rotation = 90.0f;
+    Particle1_def.type = "STATIC";
+    Particle1_def.x = 713.02985f;
+    Particle1_def.name = "Particle1";
+    Particle1_def.y = 222.86484f;
+    Particle1_def.z = 21.0f;
+    Particle1_def.Scale_X = 0.8f;
+    Particle1_def.Scale_Y = 0.5f;
+
+    Particle1_def.elementEvents = new ElementEvent() {
+      @Override
+      public void onClick(PlayerItem current) {}
+
+      @Override
+      public void onTouchStart(PlayerItem current, InputEvent event) {}
+
+      @Override
+      public void onTouchEnd(PlayerItem current, InputEvent event) {}
+
+      @Override
+      public void onBodyCreated(PlayerItem current) {}
+
+      @Override
+      public void onBodyUpdate(PlayerItem current) {}
+
+      @Override
+      public void onCollisionBegin(PlayerItem current, PlayerItem body2) {}
+
+      @Override
+      public void onCollisionEnd(PlayerItem current, PlayerItem body2) {}
+
+      @Override
+      public String getName() {
+        return "Particle1";
+      }
+    };
+    Particle1 = (PlayerItem) (Particle1_def.build(this));
+
     BoxDef house5_def = new BoxDef();
     house5_def.Gravity_Scale = 0.0f;
     house5_def.type = "STATIC";
@@ -1025,7 +1069,7 @@ public class scene1 extends StageImp {
     house5_def.name = "house5";
     house5_def.width = 182.21657f;
     house5_def.y = 606.7168f;
-    house5_def.z = 21f;
+    house5_def.z = 22.0f;
     house5_def.Tint = "#FFFFFF";
 
     house5_def.elementEvents = new ElementEvent() {
@@ -1074,7 +1118,7 @@ public class scene1 extends StageImp {
     house1_def.name = "house1";
     house1_def.width = 342.37518f;
     house1_def.y = -203.87836f;
-    house1_def.z = 22f;
+    house1_def.z = 23.0f;
     house1_def.Tint = "#FFFFFF";
 
     house1_def.elementEvents = new ElementEvent() {
@@ -1121,7 +1165,7 @@ public class scene1 extends StageImp {
     character_def.name = "character";
     character_def.width = 176.99924f;
     character_def.y = -0.88812375f;
-    character_def.z = 23f;
+    character_def.z = 24.0f;
     character_def.Tint = "#FFFFFF";
 
     character_def.elementEvents = new ElementEvent() {
@@ -1160,7 +1204,7 @@ public class scene1 extends StageImp {
     Joystick1_def.Pad_Image = "/joystick background.png";
     Joystick1_def.width = 190.58595f;
     Joystick1_def.y = 1271.7869f;
-    Joystick1_def.z = 24f;
+    Joystick1_def.z = 25.0f;
     Joystick1_def.height = 173.79958f;
 
     Joystick1_def.elementEvents = new ElementEvent() {
@@ -1201,7 +1245,7 @@ public class scene1 extends StageImp {
     text_def.name = "text";
     text_def.width = 653.30914f;
     text_def.y = 149.81345f;
-    text_def.z = 25f;
+    text_def.z = 26.0f;
     text_def.height = 88.194595f;
 
     text_def.elementEvents = new ElementEvent() {
@@ -1244,7 +1288,7 @@ public class scene1 extends StageImp {
     heart2_def.name = "heart2";
     heart2_def.width = 70.83362f;
     heart2_def.y = 80.0f;
-    heart2_def.z = 26f;
+    heart2_def.z = 27.0f;
     heart2_def.Tint = "#FFFFFF";
 
     heart2_def.elementEvents = new ElementEvent() {
@@ -1287,7 +1331,7 @@ public class scene1 extends StageImp {
     heart1_def.name = "heart1";
     heart1_def.width = 70.83362f;
     heart1_def.y = 80.0f;
-    heart1_def.z = 27f;
+    heart1_def.z = 28.0f;
     heart1_def.Tint = "#FFFFFF";
 
     heart1_def.elementEvents = new ElementEvent() {
@@ -1330,7 +1374,7 @@ public class scene1 extends StageImp {
     heart_def.name = "heart";
     heart_def.width = 70.83362f;
     heart_def.y = 80.0f;
-    heart_def.z = 28f;
+    heart_def.z = 29.0f;
     heart_def.Tint = "#FFFFFF";
 
     heart_def.elementEvents = new ElementEvent() {
@@ -1374,7 +1418,7 @@ public class scene1 extends StageImp {
     fan_def.name = "fan";
     fan_def.width = 90.02748f;
     fan_def.y = 765.5257f;
-    fan_def.z = 29f;
+    fan_def.z = 30.0f;
     fan_def.Tint = "0A5400FF";
 
     fan_def.elementEvents = new ElementEvent() {
@@ -1421,7 +1465,7 @@ public class scene1 extends StageImp {
     gainHeart_def.x = 426.72687f;
     gainHeart_def.name = "gainHeart";
     gainHeart_def.y = 730.52325f;
-    gainHeart_def.z = 30f;
+    gainHeart_def.z = 32.0f;
     gainHeart_def.Tint = "FFFFFFFF";
 
     gainHeart_def.elementEvents = new ElementEvent() {
@@ -1475,7 +1519,7 @@ public class scene1 extends StageImp {
     Welcome_def.name = "Welcome";
     Welcome_def.width = 722.1975f;
     Welcome_def.y = 490.9648f;
-    Welcome_def.z = 31f;
+    Welcome_def.z = 33.0f;
     Welcome_def.height = 402.88098f;
 
     Welcome_def.elementEvents = new ElementEvent() {
@@ -1518,7 +1562,7 @@ public class scene1 extends StageImp {
     Light1_def.name = "Light1";
     Light1_def.y = 236.22324f;
     Light1_def.Light_Type = "cone";
-    Light1_def.z = 32f;
+    Light1_def.z = 34.0f;
     Light1_def.Softness_Length = 250.0f;
     Light1_def.rays = 280f;
     Light1_def.Distance = 250f;
@@ -1536,7 +1580,7 @@ public class scene1 extends StageImp {
     light_def.name = "light";
     light_def.width = 154.011f;
     light_def.y = 1282.0317f;
-    light_def.z = 33f;
+    light_def.z = 35.0f;
     light_def.Tint = "#FFFFFF";
 
     light_def.elementEvents = new ElementEvent() {
@@ -1579,7 +1623,7 @@ public class scene1 extends StageImp {
     Progress1_def.name = "Progress1";
     Progress1_def.width = 277.8324f;
     Progress1_def.y = 223.63696f;
-    Progress1_def.z = 35f;
+    Progress1_def.z = 36.0f;
     Progress1_def.height = 15.331394f;
 
     Progress1_def.elementEvents = new ElementEvent() {
@@ -1614,6 +1658,134 @@ public class scene1 extends StageImp {
     Progress1.setScript(new com.star4droid.Game.Scripts.scene1.Progress1Script()
         .setItem(Progress1)
         .setStage(this));
+
+    BoxDef compass_def = new BoxDef();
+    compass_def.type = "UI";
+    compass_def.Collider_Width = 130.0f;
+    compass_def.height = 130.0f;
+    compass_def.Script = "compass";
+    compass_def.image = "/HUD/compass.png";
+    compass_def.Collider_Height = 130.0f;
+    compass_def.x = 563.812f;
+    compass_def.name = "compass";
+    compass_def.width = 130.0f;
+    compass_def.y = 30.417622f;
+    compass_def.z = 37.0f;
+    compass_def.Tint = "#FFFFFF";
+
+    compass_def.elementEvents = new ElementEvent() {
+      @Override
+      public void onClick(PlayerItem current) {}
+
+      @Override
+      public void onTouchStart(PlayerItem current, InputEvent event) {}
+
+      @Override
+      public void onTouchEnd(PlayerItem current, InputEvent event) {}
+
+      @Override
+      public void onBodyCreated(PlayerItem current) {}
+
+      @Override
+      public void onBodyUpdate(PlayerItem current) {}
+
+      @Override
+      public void onCollisionBegin(PlayerItem current, PlayerItem body2) {}
+
+      @Override
+      public void onCollisionEnd(PlayerItem current, PlayerItem body2) {}
+
+      @Override
+      public String getName() {
+        return "compass";
+      }
+    };
+    compass = (PlayerItem) (compass_def.build(this));
+
+    compass.setScript(
+        new com.star4droid.Game.Scripts.scene1.compassScript().setItem(compass).setStage(this));
+
+    ProgressDef distance_def = new ProgressDef();
+    distance_def.Script = "Progress2";
+    distance_def.Progress = 50.0f;
+    distance_def.Max = 100.0f;
+    distance_def.Progress_Color = "FF4043FF";
+    distance_def.x = 565.49524f;
+    distance_def.name = "distance";
+    distance_def.width = 132.31317f;
+    distance_def.y = 169.54889f;
+    distance_def.z = 38.0f;
+    distance_def.height = 41.02387f;
+
+    distance_def.elementEvents = new ElementEvent() {
+      @Override
+      public void onClick(PlayerItem current) {}
+
+      @Override
+      public void onTouchStart(PlayerItem current, InputEvent event) {}
+
+      @Override
+      public void onTouchEnd(PlayerItem current, InputEvent event) {}
+
+      @Override
+      public void onBodyCreated(PlayerItem current) {}
+
+      @Override
+      public void onBodyUpdate(PlayerItem current) {}
+
+      @Override
+      public void onCollisionBegin(PlayerItem current, PlayerItem body2) {}
+
+      @Override
+      public void onCollisionEnd(PlayerItem current, PlayerItem body2) {}
+
+      @Override
+      public String getName() {
+        return "distance";
+      }
+    };
+    distance = (PlayerItem) (distance_def.build(this));
+
+    TextDef where_def = new TextDef();
+    where_def.Script = "Text1";
+    where_def.Font_Scale = 2.0f;
+    where_def.Text = "where are you going sir ?";
+    where_def.x = 343.2226f;
+    where_def.name = "where";
+    where_def.Visible = false;
+    where_def.width = 596.4091f;
+    where_def.y = 205.57501f;
+    where_def.z = 45.0f;
+    where_def.height = 77.33186f;
+
+    where_def.elementEvents = new ElementEvent() {
+      @Override
+      public void onClick(PlayerItem current) {}
+
+      @Override
+      public void onTouchStart(PlayerItem current, InputEvent event) {}
+
+      @Override
+      public void onTouchEnd(PlayerItem current, InputEvent event) {}
+
+      @Override
+      public void onBodyCreated(PlayerItem current) {}
+
+      @Override
+      public void onBodyUpdate(PlayerItem current) {}
+
+      @Override
+      public void onCollisionBegin(PlayerItem current, PlayerItem body2) {}
+
+      @Override
+      public void onCollisionEnd(PlayerItem current, PlayerItem body2) {}
+
+      @Override
+      public String getName() {
+        return "where";
+      }
+    };
+    where = (PlayerItem) (where_def.build(this));
 
     Light1.attachToBody(player.getBody());
 
@@ -1659,6 +1831,8 @@ public class scene1 extends StageImp {
 
     house6.getActor().setZIndex((int) (house6_def.z));
 
+    Particle1.getActor().setZIndex((int) (Particle1_def.z));
+
     house5.getActor().setZIndex((int) (house5_def.z));
 
     house1.getActor().setZIndex((int) (house1_def.z));
@@ -1684,6 +1858,12 @@ public class scene1 extends StageImp {
     light.getActor().setZIndex((int) (light_def.z));
 
     Progress1.getActor().setZIndex((int) (Progress1_def.z));
+
+    compass.getActor().setZIndex((int) (compass_def.z));
+
+    distance.getActor().setZIndex((int) (distance_def.z));
+
+    where.getActor().setZIndex((int) (where_def.z));
     setZoom((float) (0.25));
     setAnimation(character, "idle-down");
 

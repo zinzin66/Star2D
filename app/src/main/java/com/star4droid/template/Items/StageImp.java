@@ -40,7 +40,7 @@ import com.star4droid.star2d.Helpers.Pair;
 import box2dLight.RayHandler;
 
 public class StageImp extends ApplicationAdapter {
-    public static final float WORLD_SCALE = 0.25f;
+    public static float WORLD_SCALE = 0.25f;
 	public World world = new World(new Vector2(0,-9.8f),true);
 	public boolean playing=true, debugBox2d = false;
 	public Stage UiStage,GameStage;
@@ -582,6 +582,8 @@ public class StageImp extends ApplicationAdapter {
 		if(finishFunc!=null){
 			finishFunc.onFinish(this);
 			finished=true;
+			GameStage.dispose();
+			UiStage.dispose();
 			return;
 		}
 		if(currentStage==null || currentStage.equals(this))
@@ -590,6 +592,8 @@ public class StageImp extends ApplicationAdapter {
 					if(previousStages.contains(this))
 						previousStages.remove(this);
 				    finished=true;
+				    GameStage.dispose();
+					UiStage.dispose();
 				}
 	}
 	
@@ -1008,7 +1012,7 @@ public class StageImp extends ApplicationAdapter {
 	}
 	
 	public void setValue(String name,String value){
-		preferences.putString(name,value);
+		preferences.putString(name,value). flush();
 	}
 	
 	public String getValue(String name){
@@ -1059,7 +1063,7 @@ public class StageImp extends ApplicationAdapter {
 		    UiStage.dispose();
 		    GameStage.dispose();
 		} catch(Exception e){}
-		//assetLoader.dispose();
+		assetLoader.dispose();
 	}
 	
     public void onPause(){

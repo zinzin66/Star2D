@@ -64,6 +64,10 @@ public class Vec2Input extends LinearLayout implements JointInput {
 			x.setText(vec2.x+"");
 			y.setText(vec2.y+"");
 		} else {
+		    if(v.toString().contains("getWorldCenter()")){
+		        x.setText(v.toString().replace(".getBody().getWorldCenter()",""));
+		        return;
+		    }
 			String str=v.toString().replace("f","").replace("new Vector2(","").replace(")","");
 			x.setText(str.split("&&")[0]);
 			y.setText(str.split("&&")[1]);
@@ -77,9 +81,11 @@ public class Vec2Input extends LinearLayout implements JointInput {
 			Utils.getFloat(y.getText().toString());
 			return "new Vector2("+x.getText().toString()+"f&&"+y.getText().toString()+"f)";
 		} catch(Exception ex){
-			Utils.showMessage(getContext(),"Error \n"+ex.toString());
+		    String str = x.getText().toString();
+		    if(str.contains("(")) return null;
+		    return str+".getBody().getWorldCenter()";
+			//Utils.showMessage(getContext(),"Error \n"+ex.toString());
 		}
-		return null;
 	}
 	
 	@Override

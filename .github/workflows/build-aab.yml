@@ -20,7 +20,7 @@ jobs:
 
     # Setup Android NDK
     - name: Setup Android NDK
-      uses: android-actions/setup-ndk@v2
+      uses: nttld/setup-ndk@v1
       with:
         ndk-version: '28.0.5195000'
 

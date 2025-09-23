@@ -34,7 +34,7 @@ jobs:
           echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Build with Gradle  
-        run: ./gradlew bundleRelease  
+        run: ./gradlew clean bundleRelease  
 
       - name: Upload AAB  
         uses: actions/upload-artifact@v4  
@@ -43,9 +43,10 @@ jobs:
           path: app/build/outputs/bundle/release/app-release.aab  
           retention-days: 90
           
-      - name: List native libraries in AAB
+      - name: List native .so files in AAB
         run: |
           mkdir -p tmp_aab
           unzip -q app/build/outputs/bundle/release/app-release.aab -d tmp_aab
-          echo "Native libraries found:"
-          find tmp_aab/base/lib -mindepth 1 -maxdepth 1 -type d | sed 's|tmp_aab/base/lib/|- |'
+          echo "Native libraries (.so files) found:"
+          find tmp_aab/base/lib -type f -name "*.so" | sed 's|tmp_aab/base/lib/|- |'
+          readelf -l tmp_aab/base/lib/arm64-v8a/libgdx.so

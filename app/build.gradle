@@ -118,7 +118,7 @@ dependencies {
         }
     }
 // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-box2d
-implementation 'com.badlogicgames.gdx:gdx-box2d:1.13.1'
+    implementation 'com.badlogicgames.gdx:gdx-box2d:1.13.1'
 
 }
 

@@ -2,6 +2,16 @@ name: Aab Build
 
 on:
   workflow_dispatch:
+    inputs:
+      release_notes:
+        description: 'Update notes for this release (e.g., "Added a new level, fixed a bug with sounds.").'
+        required: true
+        default: 'General bug fixes and performance improvements.'
+      upload_to_playstore:
+        description: 'Do you want to upload this build to Google Play?'
+        type: boolean
+        required: true
+        default: true
 
 jobs:
   build:
@@ -51,21 +61,14 @@ jobs:
           path: app/build/outputs/bundle/release/app-release.aab
           retention-days: 90
           
-      - name: List native .so files in AAB
-        run: |
-          mkdir -p tmp_aab
-          unzip -q app/build/outputs/bundle/release/app-release.aab -d tmp_aab
-          echo "Native libraries (.so files) found:"
-          find tmp_aab/base/lib -type f -name "*.so" | sed 's|tmp_aab/base/lib/|- |'
-          readelf -l tmp_aab/base/lib/arm64-v8a/libgdx.so
-          
-      # 🚀 New step: Upload to Google Play for Internal Testing
+      # 🚀 New step: Upload to Play Store for Production
       - name: Upload to Play Store
-        uses: r0adkll/upload-google-play@v1.1.3
+        if: ${{ github.event.inputs.upload_to_playstore == 'true' }}
+        uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
           packageName: com.star4droid.star2d.evo
           releaseFiles: app/build/outputs/bundle/release/*.aab
-          track: internal 
+          track: production 
           status: completed
-          
+          whatsNew: ${{ github.event.inputs.release_notes }}

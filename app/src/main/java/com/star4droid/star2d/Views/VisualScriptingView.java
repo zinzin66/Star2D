@@ -1898,6 +1898,7 @@ public class VisualScriptingView extends LinearLayout {
         }
       }
       for (String ss : hintsL) {
+        if(ss == null) continue;
         final TextView txt = new TextView(getContext());
         txt.setText(ss);
         txt.setBackground(

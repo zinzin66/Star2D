@@ -4,14 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       release_notes:
-        description: 'Update notes for this release (e.g., "Added a new level, fixed a bug with sounds.").'
+        description: 'release notes'
         required: true
         default: 'General bug fixes and performance improvements.'
       upload_to_playstore:
-        description: 'Do you want to upload this build to Google Play?'
+        description: 'upload to Google Play?'
         type: boolean
         required: true
-        default: true
+        default: false
 
 jobs:
   build:

@@ -31,7 +31,7 @@ import java.util.HashSet;
 import static com.star4droid.star2d.editor.utils.Lang.*;
 
 public class FileBrowser extends VisWindow implements Disposable {
-    private FileHandle currentDir;
+    private FileHandle currentDir,rootDir;
     private Runnable pickFilesRunnable;
 	private FileOpen javaOpen;
     private float uiScale = 1f;
@@ -134,8 +134,10 @@ public class FileBrowser extends VisWindow implements Disposable {
 					if(depth>0){
 						setCurrentDirectory(currentDir.parent());
 						depth--;
-					} else if(hideWhenNoBack)
+					} else if(hideWhenNoBack){
 						setVisible(false);
+						setRootDir(rootDir);
+					}
 				} catch(Exception e){}
             }
         });
@@ -299,6 +301,7 @@ public class FileBrowser extends VisWindow implements Disposable {
 	
 	public void setRootDir(FileHandle fileHandle){
 		depth=0;
+		this.rootDir = fileHandle;
 		setCurrentDirectory(fileHandle);
 	}
 	

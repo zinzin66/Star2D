@@ -58,3 +58,13 @@ jobs:
           echo "Native libraries (.so files) found:"
           find tmp_aab/base/lib -type f -name "*.so" | sed 's|tmp_aab/base/lib/|- |'
           readelf -l tmp_aab/base/lib/arm64-v8a/libgdx.so
+          
+      # 🚀 New step: Upload to Google Play for Internal Testing
+      - name: Upload to Play Store
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          packageName: com.star4droid.star2d.evo 
+          releaseFile: app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed

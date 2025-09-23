@@ -5,15 +5,15 @@
     <string name="community">Communauté</string>
     <string name="download">Télécharger</string>
     <string name="support">
-        Comme tu le sais..., chaque projet a besoin de soutien pour continuer à exister. 
-        Ce moteur a été créé par un développeur simple, avec des outils simples, 
-        un accès limité à Internet et un temps limité. 
-        Merci donc de m'aider à continuer à le développer : 
-        laissez de bons avis sur cette page, partagez-le avec vos amis, 
-        et n'oubliez pas le soutien financier. 
-        Même 1 $ (un dollar) peut me donner du courage et prouver que 
+        Comme tu le sais..., chaque projet a besoin de soutien pour continuer à exister.\n
+        Ce moteur a été créé par un développeur simple, avec des outils simples,\n
+        un accès limité à Internet et un temps limité.\n
+        Merci donc de m'aider à continuer à le développer :\n
+        laissez de bons avis sur cette page, partagez-le avec vos amis,\n
+        et n'oubliez pas le soutien financier.\n
+        Même 1 $ (un dollar) peut me donner du courage et prouver que\n
         vous êtes intéressé et que vous voulez soutenir ce moteur.\n
-        Merci d'avoir lu...≈≈\n
+        Merci d'avoir lu...\n
         Bon codage...
     </string>
     <string name="install">Installer</string>

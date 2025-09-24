@@ -27,7 +27,7 @@ public interface PlayerItem {
 	public void setParent(PlayerItem item);
 	public void addChild(PlayerItem item);
 	public PropertySet<String,Object> getProperties();
-	public Actor getClone(String newName);
+	public PlayerItem getClone(String newName);
 	public void setItemText(String text);
     public void setProgress(int progress);
 	public int getProgress();
@@ -43,6 +43,12 @@ public interface PlayerItem {
 	public float distToPoint(float x,float y);
 	public float getActorX();
 	public float getActorY();
+	public float getActorHeight();
+	public float getActorWidth();
+	public float angleTo(PlayerItem item);
+	public float angleToPoint(float x,float y);
+	public float angleToPointDegrees(float x,float y);
+	public float angleDegreesTo(PlayerItem item);
 	public float distTo(PlayerItem item);
 	public boolean isExsits(String file);
 	public Actor getActor();

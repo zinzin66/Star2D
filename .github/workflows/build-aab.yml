@@ -84,4 +84,4 @@ jobs:
           releaseFiles: app/build/outputs/bundle/release/*.aab
           track: production
           status: completed
-          whatsNew: "bugs fixed and some improvements, check the main site"
+          whatsNewDirectory: whatsNewDirectory

@@ -104,9 +104,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-backend-lwjgl
     testImplementation 'com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion'
     // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-backend-android
-    implementation 'com.badlogicgames.gdx:gdx-backend-android:$gdxVersion'
+    implementation 'com.badlogicgames.gdx:gdx-backend-android:1.13.0'
     // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-box2d
-    implementation 'com.badlogicgames.gdx:gdx-box2d:$gdxVersion'
+    implementation 'com.badlogicgames.gdx:gdx-box2d:1.13.0'
     // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-box2d-platform
     testImplementation 'com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion'
     constraints {

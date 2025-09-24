@@ -468,6 +468,7 @@ public class StageImp extends ApplicationAdapter {
         return onCreateCalled;
     }
     
+    private int finishTime=0;
 	@Override
 	public final void render() {
 		super.render();
@@ -499,8 +500,13 @@ public class StageImp extends ApplicationAdapter {
 			    loadingStage.draw();
 			}
 		} else if(currentStage==null){
-			act();
-			draw();
+			if(!finished){
+    			act();
+    			draw();
+			} else {
+			    finishTime++;
+			    if(finishTime > 10) Gdx.app.exit();
+			}
 		} else {
 		    if(!currentStage.initComplete())
 		        currentStage.init(null);
@@ -592,8 +598,8 @@ public class StageImp extends ApplicationAdapter {
 					if(previousStages.contains(this))
 						previousStages.remove(this);
 				    finished=true;
-				    GameStage.dispose();
-					UiStage.dispose();
+				    //GameStage.dispose();
+					//UiStage.dispose();
 				}
 	}
 	
@@ -842,7 +848,9 @@ public class StageImp extends ApplicationAdapter {
 			    while(temp.prevStage!=null){
 			        temp = temp.prevStage;
 			        if(temp == null){
-			            Gdx.app.exit();
+			            previousStages.clear();
+			            currentStage = null;
+			            //Gdx.app.exit();
 			            return;
 			        } else if(!temp.finished) {
 			            currentStage = temp;
@@ -852,7 +860,9 @@ public class StageImp extends ApplicationAdapter {
 			        } //if current != null && finished => check the previous stage
 			    }
 			    //debug("no scene opened, finish the game\n");
-			    Gdx.app.exit();
+			    currentStage = null;
+			    previousStages.clear();
+			    //Gdx.app.exit();
 			});
 		if(currentStage==null){
 			previousStages.add(this);
@@ -964,7 +974,7 @@ public class StageImp extends ApplicationAdapter {
 	// }
 	
 	public boolean draw() {
-		if(preferences==null || finished) return false;
+		if(preferences==null) return false;
 		if(followX!=null&&followY!=null){
 			getCamera().position.set(followX.getActorX()+followX.getActor().getWidth()*0.5f+cameraOffset[0],followY.getActorY()+followY.getActor().getHeight()*0.5f+cameraOffset[1],0);
 		} else if(followX!=null){
@@ -1041,7 +1051,7 @@ public class StageImp extends ApplicationAdapter {
 	}
 	
 	public void act() {
-	    if(finished) return;
+	    //if(finished) return;
 		if(preferences==null) {
 		    preferences = Gdx.app.getPreferences("prefs");
 		    if(preferences==null) return;

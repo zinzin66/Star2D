@@ -3,22 +3,30 @@ package com.star4droid.template.Utils;
 import box2dLight.Light;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.star4droid.template.Items.StageImp;
+import com.badlogic.gdx.physics.box2d.Joint;
 
 public class ItemScript {
 	public PlayerItem playerItem;
 	public Body body;
+	public Actor actor;
 	public StageImp stage;
 	
 	public ItemScript(){}
 	
 	public ItemScript(PlayerItem item){
 	    playerItem = item;
+	    try {
+	        body = item.getBody();
+		    actor = item.getActor();
+		} catch(Exception e){}
 	}
 	
 	public ItemScript(PlayerItem item,StageImp stage){
 		playerItem = item;
 		body = item.getBody();
+		actor = item.getActor();
 		this.stage = stage;
 	}
 	
@@ -32,6 +40,10 @@ public class ItemScript {
     	        return stage.findItem(name);
     	    } catch(Exception ex){}
 	    return null;
+	}
+	
+	public final Joint getJoint(String name){
+		return stage.getJoint(name);
 	}
 	
 	public final Light findLight(String name){

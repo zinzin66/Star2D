@@ -317,7 +317,7 @@ public class BodiesList extends Group {
 						  PropertySet<String,Object> ps = PropertySet.getPropertySet(app.getEditor().getSelectedActor());
 						  String old = ps.getString("name");
 						  try {
-        						FileHandle newHandle = Gdx.files.absolute(app.getEditor().getProject().getBodyScriptPath(ps.getString("name"),app.getEditor().getScene()));
+        						FileHandle newHandle = Gdx.files.absolute(app.getEditor().getProject().getBodyScriptPath(old,app.getEditor().getScene()));
 								newHandle.moveTo(
         							Gdx.files.absolute(app.getEditor().getProject().getBodyScriptPath(vl,app.getEditor().getScene()))
         						);
@@ -325,7 +325,7 @@ public class BodiesList extends Group {
         					} catch(Exception ex){}
 						  ps.put("name",vl);
 						  String scr = ps.getString("Script");
-        				if((scr.contains("/") && scr.split("/")[0].equals(app.getEditor().getScene()) && scr.split("/")[1].equals(ps.getString("name"))) || (scr.equals(ps.getString("name"))&&!ps.getString("name").equals(ps.getString("name")))){
+        				if((scr.contains("/") && scr.split("/")[0].equals(app.getEditor().getScene()) && scr.split("/")[1].equals(vl)) || scr.equals(old)){
         					ps.put("Script",vl);
         				}
 						  app.getEditor().getSelectedActor().setName(vl);

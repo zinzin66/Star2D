@@ -14,20 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 📄 Read release notes at the very start
-      - name: Read release notes
-        id: notes
-        run: |
-          if [ -f Star2D/release_notes.txt ]; then
-            echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-            cat Star2D/release_notes.txt >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
-            echo "Release notes loaded successfully."
-          else
-            echo "Error: release_notes.txt not found. Exiting workflow."
-            exit 1
-          fi
-
+      
       # 🔄 Checkout repository
       - uses: actions/checkout@v3  
 
@@ -38,6 +25,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
+          
+      # 📄 Read release notes at the very start
+      - name: Read release notes
+        id: notes
+        run: |
+          if [ -f release_notes.txt ]; then
+            echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+            cat release_notes.txt >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+            echo "Release notes loaded successfully."
+          else
+            echo "Error: release_notes.txt not found. Exiting workflow."
+            exit 1
+          fi
 
       # 🔐 Create keystore from secrets
       - name: Create keystore from secret

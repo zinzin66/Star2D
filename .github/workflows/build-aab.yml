@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       upload_to_playstore:
-        description: 'upload to Google Play?'
+        description: 'Upload to Google Play?'
         type: boolean
         required: true
         default: false
@@ -14,8 +14,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 📄 Read release notes at the very start
+      - name: Read release notes
+        id: notes
+        run: |
+          if [ -f release_notes.txt ]; then
+            echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+            cat release_notes.txt >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+            echo "Release notes loaded successfully."
+          else
+            echo "Error: release_notes.txt not found. Exiting workflow."
+            exit 1
+          fi
+
+      # 🔄 Checkout repository
       - uses: actions/checkout@v3  
 
+      # ☕ Set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -39,17 +55,33 @@ jobs:
             exit 1
           fi
 
+      # 🛠 Setup Android NDK
       - name: Setup Android NDK
         uses: nttld/setup-ndk@v1.5.0
         with:
           ndk-version: r28c
 
+      # 🔧 Ensure gradlew is executable
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew clean bundleRelease
+      # ⚡ Build APK
+      - name: Build APK with Gradle
+        run: ./gradlew clean assembleRelease
 
+      # ⚡ Build AAB
+      - name: Build AAB with Gradle
+        run: ./gradlew bundleRelease
+
+      # 📦 Upload APK as artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine.apk
+          path: app/build/outputs/apk/release/app-release.apk
+          retention-days: 90
+
+      # 📦 Upload AAB as artifact
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
@@ -57,15 +89,7 @@ jobs:
           path: app/build/outputs/bundle/release/app-release.aab
           retention-days: 90
 
-      # 📄 Read release notes from file
-      - name: Read release notes
-        id: notes
-        run: |
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-          cat release_notes.txt >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-          
-      # 🚀 Upload to Play Store for Production
+      # 🚀 Upload AAB to Play Store if requested
       - name: Upload to Play Store
         if: ${{ github.event.inputs.upload_to_playstore == 'true' }}
         uses: r0adkll/upload-google-play@v1

@@ -3,10 +3,6 @@ name: Aab Build
 on:
   workflow_dispatch:
     inputs:
-      release_notes:
-        description: 'release notes'
-        required: true
-        default: 'General bug fixes and performance improvements.'
       upload_to_playstore:
         description: 'upload to Google Play?'
         type: boolean
@@ -60,8 +56,16 @@ jobs:
           name: engine.aab
           path: app/build/outputs/bundle/release/app-release.aab
           retention-days: 90
+
+      # 📄 Read release notes from file
+      - name: Read release notes
+        id: notes
+        run: |
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          cat release_notes.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
           
-      # 🚀 New step: Upload to Play Store for Production
+      # 🚀 Upload to Play Store for Production
       - name: Upload to Play Store
         if: ${{ github.event.inputs.upload_to_playstore == 'true' }}
         uses: r0adkll/upload-google-play@v1
@@ -69,6 +73,6 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
           packageName: com.star4droid.star2d.evo
           releaseFiles: app/build/outputs/bundle/release/*.aab
-          track: production 
+          track: production
           status: completed
-          whatsNew: ${{ github.event.inputs.release_notes }}
+          whatsNew: ${{ env.RELEASE_NOTES }}

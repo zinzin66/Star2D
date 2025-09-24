@@ -1,0 +1,7 @@
+- speed enhanced...
+- car physics fixed.
+- car physics example added.
+- a lot of bugs and performance issues fixed.
+- fix exported apk isn't working.
+- fix in-game issues 
+if you face any bugs or you've suggestions, feel free to contact me.

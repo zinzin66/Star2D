@@ -35,10 +35,10 @@ jobs:
             exit 1
           fi
 
-          # Use a unique delimiter for multiline env
-          echo "RELEASE_NOTES<<'END_RELEASE_NOTES'" >> $GITHUB_ENV
+          # Use a plain, unique delimiter without quotes
+          echo "RELEASE_NOTES<<RELEASE_NOTES_DELIMITER" >> $GITHUB_ENV
           cat release_notes.txt >> $GITHUB_ENV
-          echo "END_RELEASE_NOTES" >> $GITHUB_ENV
+          echo "RELEASE_NOTES_DELIMITER" >> $GITHUB_ENV
 
           echo "Release notes loaded successfully."
 

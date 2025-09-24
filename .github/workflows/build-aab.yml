@@ -30,15 +30,17 @@ jobs:
       - name: Read release notes
         id: notes
         run: |
-          if [ -f release_notes.txt ]; then
-            echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-            cat release_notes.txt >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
-            echo "Release notes loaded successfully."
-          else
+          if [ ! -f release_notes.txt ]; then
             echo "Error: release_notes.txt not found. Exiting workflow."
             exit 1
           fi
+
+          # Use a unique delimiter for multiline env
+          echo "RELEASE_NOTES<<'END_RELEASE_NOTES'" >> $GITHUB_ENV
+          cat release_notes.txt >> $GITHUB_ENV
+          echo "END_RELEASE_NOTES" >> $GITHUB_ENV
+
+          echo "Release notes loaded successfully."
 
       # 🔐 Create keystore from secrets
       - name: Create keystore from secret

@@ -8,6 +8,11 @@ on:
         type: boolean
         required: true
         default: false
+      changes_not_sent_for_review: true:
+        description: 'changesNotSentForReview?'
+        type: boolean
+        required: true
+        default: true
 
 jobs:
   build:
@@ -96,3 +101,4 @@ jobs:
           track: production
           status: completed
           whatsNewDirectory: whatsNewDirectory
+          changesNotSentForReview: ${{ github.event.inputs.changes_not_sent_for_review == 'true' }}

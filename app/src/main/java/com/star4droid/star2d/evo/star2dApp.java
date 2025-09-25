@@ -67,10 +67,10 @@ public class star2dApp extends Application {
 				//AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 				//am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 1000, pendingIntent);
 				new Handler(Looper.getMainLooper()).postDelayed(()->mApplicationContext.startActivity(intent),1500);
-				Process.killProcess(Process.myPid());
-				System.exit(1);
+				//Process.killProcess(Process.myPid());
+				//System.exit(1);
 				//Logger.initialize(this);
-				//star2dApp.this.uncaughtExceptionHandler.uncaughtException(thread, throwable);
+				star2dApp.this.uncaughtExceptionHandler.uncaughtException(thread, throwable);
 			}
 		});
         

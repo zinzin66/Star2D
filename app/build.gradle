@@ -1,6 +1,8 @@
 
 plugins {
     id 'com.android.application'  
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -119,6 +121,12 @@ dependencies {
     }
 // https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-box2d
     implementation 'com.badlogicgames.gdx:gdx-box2d:$gdxVersion'
+    
+    implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
+
+    implementation("com.google.firebase:firebase-crashlytics-ndk")
+    implementation("com.google.firebase:firebase-analytics")
+
 
 }
 

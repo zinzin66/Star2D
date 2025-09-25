@@ -39,6 +39,17 @@ jobs:
             echo "Error: Keystore file was not created."
             exit 1
           fi
+          
+      # 🔥 Create google-services.json from secret
+      - name: Create google-services.json from secret
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICES_JSON }}" > app/google-services.json
+          if [ -f app/google-services.json ]; then
+            echo "google-services.json file created successfully."
+          else
+            echo "Error: google-services.json file was not created."
+            exit 1
+          fi
 
       # 🛠 Setup Android NDK
       - name: Setup Android NDK

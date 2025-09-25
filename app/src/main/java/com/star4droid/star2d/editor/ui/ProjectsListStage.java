@@ -83,6 +83,7 @@ public class ProjectsListStage extends Stage {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                  createNewProject();
+                 throw new RuntimeException("Test Error");
             }
         });
 

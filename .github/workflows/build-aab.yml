@@ -8,7 +8,7 @@ on:
         type: boolean
         required: true
         default: false
-      changes_not_sent_for_review: true:
+      changes_not_sent_for_review:
         description: 'changesNotSentForReview?'
         type: boolean
         required: true

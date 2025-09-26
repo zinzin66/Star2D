@@ -21,14 +21,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Gradle
-        run: sudo apt-get install -y gradle
-
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build APK
-        run: ./gradlew assembleDebug
+      - name: Build APK using Gradle wrapper
+        run: ./gradlew assembleDebug --warning-mode all
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

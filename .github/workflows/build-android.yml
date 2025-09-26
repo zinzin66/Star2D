@@ -1,0 +1,33 @@
+name: Build Star2D APK
+
+on:
+  push:
+    branches:
+      - french-translation   # Ta branche de traduction
+  workflow_dispatch:        # Permet de lancer manuellement le build
+
+jobs:
+  build-apk:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      - name: Install Gradle
+        run: sudo apt-get install -y gradle
+
+      - name: Build APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: Star2D-APK
+          path: app/build/outputs/apk/debug/app-debug.apk

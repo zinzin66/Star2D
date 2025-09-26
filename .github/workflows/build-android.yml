@@ -1,4 +1,4 @@
-name: Build Star2D APK
+name: Build Star2D APK (no Google Services)
 
 on:
   push:

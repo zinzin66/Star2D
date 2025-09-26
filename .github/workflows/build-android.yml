@@ -24,6 +24,9 @@ jobs:
       - name: Install Gradle
         run: sudo apt-get install -y gradle
 
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
       - name: Build APK
         run: ./gradlew assembleDebug
 

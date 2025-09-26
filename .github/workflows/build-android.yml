@@ -3,8 +3,8 @@ name: Build Star2D APK
 on:
   push:
     branches:
-      - french-translation   # Ta branche de traduction
-  workflow_dispatch:        # Permet de lancer manuellement le build
+      - french-translation
+  workflow_dispatch:
 
 jobs:
   build-apk:

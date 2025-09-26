@@ -17,6 +17,8 @@ public class LanguageDialog extends VisDialog {
 		reset();
 		addLang("العربيه","ar");
 		addLang("English","en");
+		addLang("Français","fr");
+		addLang("português","br");
 	}
 	
 	private void addLang(String name,String key){

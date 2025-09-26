@@ -18,6 +18,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
+          distribution: 'temurin'
           java-version: '17'
 
       - name: Install Gradle
@@ -27,7 +28,7 @@ jobs:
         run: ./gradlew assembleDebug
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4   # <-- corrigé v3 -> v4
+        uses: actions/upload-artifact@v4
         with:
           name: Star2D-APK
           path: app/build/outputs/apk/debug/app-debug.apk

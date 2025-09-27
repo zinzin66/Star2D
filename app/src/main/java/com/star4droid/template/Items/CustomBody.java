@@ -14,12 +14,12 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.star4droid.star2d.ElementDefs.CustomDef;
 import com.star4droid.star2d.ElementDefs.ElementEvent;
 import com.star4droid.template.Utils.ChildsHolder;
 import com.star4droid.template.Utils.ItemScript;
 import com.star4droid.template.Utils.PlayerItem;
 import java.util.ArrayList;
-import com.star4droid.template.Utils.PropertySet;
 import com.star4droid.template.Utils.Utils;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -30,8 +30,8 @@ public class CustomBody extends Image implements PlayerItem {
 	float boxY=0,animationTime=0;
 	int tileX=1,tileY=1;
 	ElementEvent elementEvent;
+	CustomDef customDef;
 	String tint = "#FFFFFF";
-	PropertySet<String,Object> propertySet;
 	float[] offset=new float[]{0,0};
 	Body body;
 	ChildsHolder childsHolder = new ChildsHolder(this);
@@ -66,21 +66,17 @@ public class CustomBody extends Image implements PlayerItem {
 		});
 	}
 	
-	public CustomBody setElementEvent(ElementEvent event){
-		elementEvent = event;
-		return this;
-	}
-	
-	public CustomBody setPropertySet(PropertySet<String,Object> set){
-		propertySet = set;
-		/*if(body!=null) {
-		    body.getWorld().destroyBody(body);
-		    body = null;
-		}*/
+	public CustomBody setDef(CustomDef def){
+		customDef = def;
 		createBody();
 		return this;
 	}
 	
+	public CustomBody setElementEvent(ElementEvent event){
+		elementEvent = event;
+		return this;
+	}
+		
 	@Override
 	public void setY(float y) {
 		super.setY(y);//stage.getViewport().getWorldHeight()-getHeight()-y);
@@ -97,25 +93,24 @@ public class CustomBody extends Image implements PlayerItem {
 	protected void sizeChanged() {
 		super.sizeChanged();
 		//if(getStage()!=null) setY(boxY);
-		if(!getProperties().getString("type").equals("UI"))
+		if(!customDef.type.equals("UI"))
 		    setOrigin(getWidth()*0.5f,getHeight()*0.5f);
 	}
 	
 	private void createBody(){
-		int rx = propertySet.getInt("tileX"),
-			ry = propertySet.getInt("tileY");
-		boolean UI = getProperties().getString("type").equals("UI");
-		float width = propertySet.getFloat("width"),
-			height = propertySet.getFloat("height");
+		int rx = (int) customDef.tileX,
+			ry = (int) customDef.tileY;
+		boolean UI = customDef.type.equals("UI");
+		float width = customDef.width,
+			height = customDef.height;
 		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width, (UI ? 1 : StageImp.WORLD_SCALE) * height);
 		setOrigin(getWidth()*0.5f,getHeight()*0.5f);
-		float x = propertySet.getFloat("x"),
-		y = propertySet.getFloat("y");
+		float x = customDef.x,
+		y = customDef.y;
 		y = stage.getViewport().getWorldHeight()-height-y;
-		//setDrawable(Utils.getDrawable(Utils.absolute(propertySet.getString("image"))));
-		tileX = Math.max(propertySet.getInt("tileX"),1);
-		tileY = Math.max(propertySet.getInt("tileY"),1);
-		if(!stage.setImage(this,propertySet.getString("image"))){
+		tileX = Math.max((int) customDef.tileX,1);
+		tileY = Math.max((int) customDef.tileY,1);
+		if(!stage.setImage(this,customDef.image)){
 		    setDrawable(Utils.getDrawable(Utils.internal("images/logo.png")));
 		}
 		
@@ -129,26 +124,25 @@ public class CustomBody extends Image implements PlayerItem {
 		    } catch(Exception ex){}
 		}
 		
-		//Utils.setImageFromFile(this,player.project.getImagesPath()+propertySet.getString("image"),new Point(rx,ry),null,null);
-		setName(propertySet.getString("name"));
+		setName(customDef.name);
 		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
-		if(!propertySet.getString("Tint").equals(tint)){
-		    setColor(propertySet.getColor("Tint"));
-		    tint = propertySet.getString("Tint");
+		if(!customDef.getColor(customDef.Tint).equals(tint)){
+		    setColor(customDef.getColor(customDef.Tint));
+		    tint = customDef.Tint;
 		}
-		setZIndex(propertySet.getInt("z"));
-		setRotation(-propertySet.getFloat("rotation"));
-		setScale(propertySet.getFloat("Scale X"),propertySet.getFloat("Scale Y"));
-		setVisible(propertySet.getString("Visible").equals("true"));
-		if(!propertySet.getString("type").equals("UI")){
-			String bt= String.valueOf(propertySet.getString("type").charAt(0)).toUpperCase();
+		setZIndex((int) customDef.z);
+		setRotation(-customDef.rotation);
+		setScale(customDef.Scale_X,customDef.Scale_Y);
+		setVisible(customDef.Visible);
+		if(!customDef.type.equals("UI")){
+			String bt= String.valueOf(customDef.type.charAt(0)).toUpperCase();
 			BodyDef.BodyType type = bt.equals("K")?BodyDef.BodyType.KinematicBody:(bt.equals("S")?BodyDef.BodyType.StaticBody:BodyDef.BodyType.DynamicBody);
 			//creating the body
 			if(body==null){
     			BodyDef def = new BodyDef();
     			def.type = type;
-    			offset[0] = 0;//propertySet.getFloat("ColliderX")*-1;
-    			offset[1] = 0;//propertySet.getFloat("ColliderY")*-1;
+    			offset[0] = 0;
+    			offset[1] = 0;
     			def.position.set(0,0);
     			body = stage.world.createBody(def);
 			} else {
@@ -159,30 +153,10 @@ public class CustomBody extends Image implements PlayerItem {
 		    	} catch(Exception ex){}
 			}
 			//define its properties
-			//PolygonShape shape = new PolygonShape();
-			//shape.setAsBox(propertySet.getFloat("Collider Width")*0.5f,propertySet.getFloat("Collider Height")*0.5f);
 			ChainShape shape = new ChainShape();
 			ArrayList<Vector2> array = new ArrayList<>();
-			if(!propertySet.getString("Points").equals("")){
-				/*String[] pointsStr = propertySet.getString("Points").split("-");
-				
-				float hg = propertySet.getFloat("height"),
-				        wd = propertySet.getFloat("height");
-				for(int i = 0; i < pointsStr.length; i++){
-					try {
-					    String[] pointStr = pointsStr[i].split(",");
-					    float py = Utils.getFloat(pointStr[1]),
-					        px = Utils.getFloat(pointStr[0]);
-						array.add(new Vector2(px * wd - wd * 0.5f,Math.abs(1f - py) * hg - hg * 0.5f));
-						//points[i] = new Vector2(Math.abs(1f - px) * wd - wd * 0.5f,Math.abs(1f - py) * hg - hg * 0.5f);
-					} catch(Exception e){
-					    //new RuntimeException("error points : \n+ "+Utils.getStackTraceString(e));
-					    e.printStackTrace();
-					    //Gdx.files.external("/logs/custom.txt").writeString("error points : \n+ "+Utils.getStackTraceString(e),false);
-					}
-				}*/
-			    
-                String pointsStr = propertySet.getString("Points");
+			if(!customDef.Points.equals("")){
+                String pointsStr = customDef.Points;
                 for (String point : pointsStr.split("-")) {
                     String[] coords = point.split(",");
                     if (coords.length == 2) {
@@ -199,64 +173,43 @@ public class CustomBody extends Image implements PlayerItem {
     			    points[po] = vec;
     			    po++;
     			}
-    			//Gdx.files.external("/logs/points.txt").writeString("points: "+propertySet.getString("Points"),false);
     			shape.createLoop(points);
 			}
 			FixtureDef fx = new FixtureDef();
 			fx.shape = shape;
-			fx.friction=propertySet.getFloat("friction");
-			fx.density=propertySet.getFloat("density");
-			fx.restitution=propertySet.getFloat("restitution");
-			fx.isSensor = propertySet.getString("isSensor").equals("true");
+			fx.friction=customDef.friction;
+			fx.density=customDef.density;
+			fx.restitution=customDef.restitution;
+			fx.isSensor = customDef.isSensor;
 			body.createFixture(fx).setUserData(this);
-			body.setFixedRotation(propertySet.getString("Fixed Rotation").equals("true"));
-			body.setActive(propertySet.getString("Active").equals("true"));
-			body.setBullet(propertySet.getString("Bullet").equals("true"));
-			body.setGravityScale(propertySet.getFloat("Gravity Scale"));
+			body.setFixedRotation(customDef.Fixed_Rotation);
+			body.setActive(customDef.Active);
+			body.setBullet(customDef.Bullet);
+			body.setGravityScale(customDef.Gravity_Scale);
 			Vector2 pos = new Vector2((offset[0]+x+(width*0.5f)),(offset[1]+y+(height*0.5f)));
 			pos.x = (UI ? 1 : StageImp.WORLD_SCALE) * pos.x;
 			pos.y = (UI ? 1 : StageImp.WORLD_SCALE) * pos.y;
-			body.setTransform(pos,(float)Math.toRadians(-propertySet.getFloat("rotation")));
+			body.setTransform(pos,(float)Math.toRadians(-customDef.rotation));
 			
 		}
 		if(getStage()==null)
 		    stage.addActor(this);
 	}
 	
-	/*@Override
-	public void setImage(Texture texture) {
-		if(propertySet!=null){
-			int tx = Math.max(1,propertySet.getInt("tileX")),
-				ty = Math.max(1,propertySet.getInt("tileY"));
-			if(tx != 1 || ty != 1){
-				texture.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.MirroredRepeat);
-				TextureRegion textureRegion = new TextureRegion(texture);
-				textureRegion.setRegion(0,0,texture.getWidth()*tx,texture.getHeight()*ty);
-				setDrawable(new TextureRegionDrawable(textureRegion));
-			} else setDrawable(Utils.getDrawable(texture));
-		}
-	}*/
-	
 	@Override
 	public void update() {
-		//body_x = offset + x + (width/2)
-		//x = body_x - offset - (width/2)
-		if(propertySet!=null&&propertySet.getString("do update").equals("true")){
-		    setPropertySet(propertySet);
-		    propertySet.remove("do update");
-		}
 		if(body!=null){
-		    offset[0] = 0;//propertySet.getFloat("ColliderX")*-1;
-			offset[1] = 0;//propertySet.getFloat("ColliderY")*-1;
+		    offset[0] = 0;
+			offset[1] = 0;
 			float x = body.getPosition().x,
 				y = body.getPosition().y;
 			setPosition(x - offset[0] - getWidth()*0.5f,
 					y - offset[1] - getHeight()*0.5f);
 			setRotation((float)Math.toDegrees(body.getAngle()));
 		}
-		if(!propertySet.getString("Tint").equals(tint)){
-		    setColor(propertySet.getColor("Tint"));
-		    tint = propertySet.getString("Tint");
+		if(!customDef.Tint.equals(tint)){
+		    setColor(customDef.getColor(customDef.Tint));
+		    tint = customDef.Tint;
 		}
 		if(getScript()!=null)
 			getScript().bodyUpdate();
@@ -287,23 +240,25 @@ public class CustomBody extends Image implements PlayerItem {
 			return childsHolder;
 		}
 	}
-
-
+	
+	com.star4droid.template.Utils.ItemScript itemScript;
 	@Override
-	public PropertySet<String, Object> getProperties() {
-	    return propertySet;
+	public void setScript(com.star4droid.template.Utils.ItemScript script){
+	    this.itemScript = script;
+	}
+	
+	@Override
+	public <T extends com.star4droid.template.Utils.ItemScript> T getScript(){
+	    return (T) itemScript;
 	}
 
 	@Override
 	public PlayerItem getClone(String newName) {
-	    PropertySet<String,Object> set = new PropertySet<>();
-		set.putAll(propertySet);
-		set.put("old",getParentName());
-		set.put("name",newName);
-		CustomBody body = new CustomBody(stage,null).setElementEvent(elementEvent).setPropertySet(set);
-		if(set.getScript()!=null){
+	    CustomDef newDef = customDef.getClone(newName);
+		CustomBody body = new CustomBody(stage,null).setElementEvent(elementEvent).setDef(newDef);
+		if(getScript()!=null){
 			try {
-				ItemScript script = (ItemScript)(set.getScript().getClass().getConstructor(PlayerItem.class).newInstance(body));
+				ItemScript script = (ItemScript)(getScript().getClass().getConstructor(PlayerItem.class).newInstance(body));
 				script.setItem(body).setStage(stage);
 				body.setScript(script);
 			} catch(Exception ex){}
@@ -341,6 +296,11 @@ public class CustomBody extends Image implements PlayerItem {
 	public void setAnimation(Animation animation) {
 		this.animation = animation;
 		animationTime = 0;
+	}
+	
+	@Override
+	public com.star4droid.star2d.ElementDefs.ItemDef getProperties(){
+	    return customDef;
 	}
 	
 	@Override

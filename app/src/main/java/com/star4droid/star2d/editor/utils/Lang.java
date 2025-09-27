@@ -13,12 +13,23 @@ public class Lang {
 	private static I18NBundle currentLang = null;
 	private static HashMap<String,I18NBundle> map = new HashMap<>();
 	public static void loadTrans(String lang){
-		String key = lang.equals("ar") ? lang : "en";
+		String key = lang.equals("ar") ? lang : "en",
+		    code = lang.equals("ar") ? "SD" : "GB";
+		switch(lang){
+		    case "fr" :
+		        key = "fr";
+		        code = "US";
+		    break;
+		    case "br" :
+		        key = "br";
+		        code = "US";
+		    break;
+		}
 		if(map.containsKey(key)){
 			currentLang = map.get(key);
 			return;
 		}
-		currentLang = I18NBundle.createBundle(Gdx.files.internal("i18n/"+(lang.equals("ar") ? "strings_ar_SD" : "strings_en_GB")),lang.equals("ar") ? new Locale("ar","SD") : Locale.UK);
+		currentLang = I18NBundle.createBundle(Gdx.files.internal("i18n/strings_"+key+"_"+code),key.equals("en") ? Locale.UK : new Locale(key, code));
 		map.put(key,currentLang);
 	}
 	

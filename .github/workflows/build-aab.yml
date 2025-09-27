@@ -11,7 +11,7 @@ on:
       changes_not_sent_for_review:
         description: 'changesNotSentForReview?'
         type: boolean
-        required: true
+        required: false
         default: true
 
 jobs:

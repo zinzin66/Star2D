@@ -1,6 +1,5 @@
 package com.star4droid.star2d.ElementDefs;
 
-import android.view.View;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.star4droid.template.Utils.PropertySet;
@@ -9,7 +8,7 @@ import com.star4droid.template.Utils.PlayerItem;
 public interface ElementEvent {
 	default public String getName(){
 		try {
-			return ((Actor)this).getName();//PropertySet.getPropertySet((View)this).get("name").toString();
+			return ((Actor)this).getName();
 		} catch(Exception ex){
 			return "Null";
 		}

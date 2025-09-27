@@ -268,7 +268,7 @@ public class FileBrowser extends VisWindow implements Disposable {
 			}
 		}
 		return file.isDirectory() ? folderIcon : 
-                        isImage ? getAsset(file) : fileIcon;
+                        (isImage ? getAsset(file) : fileIcon);
 	}
 
     private VisImageButton.ButtonStyle createButtonStyle(FileHandle file) {
@@ -286,7 +286,11 @@ public class FileBrowser extends VisWindow implements Disposable {
     }
 	
 	private Texture getAsset(FileHandle asset){
-		return (projectAssetLoader!=null && projectAssetLoader.contains(asset.toString())) ? projectAssetLoader.get(asset.toString() ): new Texture(asset);
+		boolean available = projectAssetLoader!=null && projectAssetLoader.contains(asset.toString());
+		Texture texture = available ? projectAssetLoader.get(asset.toString() ): new Texture(asset);
+		if(!available)
+		    projectAssetLoader.load(asset.file(), Texture.class);
+		return texture;
 	}
 	
 	/*private void centerOnScreen(){

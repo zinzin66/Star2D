@@ -10,17 +10,17 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.star4droid.star2d.ElementDefs.TextDef;
 import com.star4droid.star2d.ElementDefs.ElementEvent;
 import com.star4droid.template.Utils.ChildsHolder;
 import com.star4droid.template.Utils.ItemScript;
 import com.star4droid.template.Utils.PlayerItem;
-import com.star4droid.template.Utils.PropertySet;
 
 public class TextItem extends Label implements PlayerItem {
 	StageImp stage;
 	float textY=0;
 	ElementEvent elementEvent;
-	PropertySet<String,Object> propertySet;
+	TextDef textDef;
 	String font = "";
 	ChildsHolder childsHolder = new ChildsHolder(this);
 	
@@ -55,17 +55,20 @@ public class TextItem extends Label implements PlayerItem {
 		});
 	}
 	
-	public static TextItem create(StageImp stageImp,PropertySet<String,Object> propertySet,ElementEvent elementEvent){
+	public static TextItem create(StageImp stageImp,TextDef textDef,ElementEvent elementEvent){
 		BitmapFont font = new BitmapFont(Gdx.files.internal("files/default.fnt"));
 		LabelStyle labelStyle = new LabelStyle(font, Color.GOLD);
-		return new TextItem(propertySet.getString("Text"),labelStyle,stageImp).setElementEvent(elementEvent).setPropertySet(propertySet);
+		return new TextItem(textDef.Text,labelStyle,stageImp).setElementEvent(elementEvent).setDef(textDef);
 	}
+	
+	public TextItem setDef(TextDef textDef){
+	    this.textDef = textDef;
+	    setup();
+	    return this;
+	}
+	
 	@Override
 	public void update() {
-	    if(propertySet!=null&&propertySet.getString("do update").equals("true")){
-		    setPropertySet(propertySet);
-		    propertySet.remove("do update");
-		}
 		if(getScript()!=null)
 			getScript().bodyUpdate();
 		else if(elementEvent!=null) elementEvent.onBodyUpdate(this);
@@ -102,22 +105,25 @@ public class TextItem extends Label implements PlayerItem {
 			return childsHolder;
 		}
 	}
-
+	
+	com.star4droid.template.Utils.ItemScript itemScript;
 	@Override
-	public PropertySet<String, Object> getProperties() {
-	    return propertySet;
+	public void setScript(com.star4droid.template.Utils.ItemScript script){
+	    this.itemScript = script;
 	}
-
+	
+	@Override
+	public <T extends com.star4droid.template.Utils.ItemScript> T getScript(){
+	    return (T) itemScript;
+	}
+	
 	@Override
 	public PlayerItem getClone(String newName) {
-		PropertySet<String,Object> set = new PropertySet<>();
-		set.putAll(propertySet);
-		set.put("old",getParentName());
-		set.put("name",newName);
-	    PlayerItem item = create(stage,set,elementEvent);
-		if(set.getScript()!=null){
+		TextDef newDef = textDef.getClone(newName);
+	    PlayerItem item = create(stage,textDef,elementEvent);
+		if(getScript()!=null){
 			try {
-				ItemScript script = (ItemScript)(set.getScript().getClass().getConstructor(PlayerItem.class).newInstance(item));
+				ItemScript script = (ItemScript)(getScript().getClass().getConstructor(PlayerItem.class).newInstance(item));
 				script.setItem(item).setStage(stage);
 				item.setScript(script);
 			} catch(Exception ex){}
@@ -143,12 +149,6 @@ public class TextItem extends Label implements PlayerItem {
 		
 	}
 	
-	public TextItem setPropertySet(PropertySet<String,Object> set){
-		propertySet = set;
-		setup();
-		return this;
-	}
-	
 	@Override
 	public void setY(float y) {
 		super.setY(y);//stage.getViewport().getWorldHeight()-getHeight()-y);
@@ -162,28 +162,27 @@ public class TextItem extends Label implements PlayerItem {
 	}
 	
 	private void setup(){
-		if(propertySet==null) return;
-		setName(propertySet.getString("name"));
-		boolean UI = getProperties().getString("type").equals("UI");
-		float width = propertySet.getFloat("width"),
-    		height = propertySet.getFloat("height"),
-    		x = propertySet.getFloat("x"),
-    		y = propertySet.getFloat("y");
+		if(textDef==null) return;
+		setName(textDef.name);
+		boolean UI = textDef.type.equals("UI");
+		float width = textDef.width,
+    		height = textDef.height,
+    		x = textDef.x,
+    		y = textDef.y;
 		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
 		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * (stage.getViewport().getWorldHeight()-height-y));
-		setZIndex(propertySet.getInt("z"));
-		setRotation(-propertySet.getFloat("rotation"));
-		setVisible(propertySet.getString("Visible").equals("true"));
+		setZIndex((int) textDef.z);
+		setRotation(-textDef.rotation);
+		setVisible(textDef.Visible);
 		//setText(propertySet.get("Text").toString());
 		//Utils.showMessage(getContext(),propertySet.get("Text").toString());
-		font = propertySet.getString("font");
+		font = textDef.font;
 		if(!font.equals("")){
 			getStyle().font = stage.getFont(stage.project.getPath()+"/"+font);
 		}
-		getStyle().fontColor = propertySet.getColor("Text Color");
+		getStyle().fontColor = textDef.getColor(textDef.Text_Color);
 		setStyle(getStyle());
-		if(propertySet.containsKey("Font Scale"))
-			setFontScale((UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("Font Scale"));
+		setFontScale((UI ? 1 : StageImp.WORLD_SCALE) * textDef.Font_Scale);
 		if(getStage()==null)
 		    stage.addActor(this);
 		if(elementEvent!=null)
@@ -196,6 +195,11 @@ public class TextItem extends Label implements PlayerItem {
 	public void draw(Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
 		update();
+	}
+	
+	@Override
+	public com.star4droid.star2d.ElementDefs.ItemDef getProperties(){
+	    return textDef;
 	}
 	
 	@Override

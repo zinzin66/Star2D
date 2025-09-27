@@ -36,8 +36,26 @@ public class SettingsDialog extends VisDialog {
 		
 		SpinnerInput lang = new SpinnerInput();
 		lang.setNameText(getTrans("language"));
-		lang.setData("English","العربيه");
-		lang.setValue(preferences.getString("lang","en").equals("ar") ? "العربيه" : "English");
+		lang.setData("English","العربيه","Français","Português");
+		String language = preferences.getString("lang","en");
+		
+		switch(language){
+		    case "en":
+		        language="English";
+		        break;
+		    case "ar":
+		        language= "العربيه";
+		        break;
+		    case "fr":
+		        language = "Français";
+		        break;
+		    case "br":
+		        language = "Português";
+		        break;
+		    default:
+		        language="English";
+		}
+		lang.setValue(language);
 		table.add(lang).padTop(10).row();
 		
 		CheckInput autoSave = new CheckInput();
@@ -83,7 +101,10 @@ public class SettingsDialog extends VisDialog {
 			    try {
 			        worldScalef = Utils.getFloat(worldScale.getValue());
 			    } catch(Exception ex){}
-				String newLang = lang.getValue().substring(0,2).toLowerCase().equals("en") ? "en" : "ar";
+				String code = lang.getValue().substring(0,2).toLowerCase();
+				String newLang = code.equals("en") ? "en" : "ar";
+				if(code.equals("fr")) newLang = "fr";
+				if(code.equals("po")) newLang = "br";
 				preferences.putBoolean("Auto Completion",codeCompletion.getValue().equals("true"))
 					.putBoolean("SaveUndoRedo",saveUndoRedo.getValue().equals("true"))
 					.putBoolean("AutoSave",autoSave.getValue().equals("true"))

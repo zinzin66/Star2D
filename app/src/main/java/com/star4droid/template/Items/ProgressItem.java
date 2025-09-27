@@ -15,15 +15,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.star4droid.template.Utils.ChildsHolder;
 import com.star4droid.template.Utils.ItemScript;
 import com.star4droid.template.Utils.PlayerItem;
-import com.star4droid.template.Utils.PropertySet;
+import com.star4droid.star2d.ElementDefs.ProgressDef;
 import com.star4droid.star2d.ElementDefs.ElementEvent;
 
 public class ProgressItem extends Group implements PlayerItem {
 	StageImp stage;
 	float max=100,progress=0,progressY=0;
 	Image backgroundImg,progressImg;
+	ProgressDef progressDef;
 	ElementEvent elementEvent;
-	PropertySet<String,Object> propertySet;
 	
 	public ProgressItem(StageImp st){
 		super();
@@ -66,21 +66,21 @@ public class ProgressItem extends Group implements PlayerItem {
 	}
 	
 	private void setup(){
-	    boolean UI = getProperties().getString("type").equals("UI");
-		float width = propertySet.getFloat("width"),
-		height = propertySet.getFloat("height"),
-		x = propertySet.getFloat("x"),
-		y = propertySet.getFloat("y");
-		setZIndex(propertySet.getInt("z"));
-		setVisible(propertySet.getString("Visible").equals("true"));
+	    boolean UI = progressDef.type.equals("UI");
+		float width = progressDef.width,
+		height = progressDef.height,
+		x = progressDef.x,
+		y = progressDef.y;
+		setZIndex((int) progressDef.z);
+		setVisible(progressDef.Visible);
 		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
 		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * (stage.getGameStage().getViewport().getWorldHeight()-height-y));
-		setRotation(-propertySet.getFloat("rotation"));
-		setBackColor(propertySet.getString("Background Color"));
-		setProgressColor(propertySet.getString("Progress Color"));
-		setMax(propertySet.getInt("Max"));
-		setProgress(propertySet.getInt("Progress"));
-		setName(propertySet.getString("name"));
+		setRotation(-progressDef.rotation);
+		setBackColor(progressDef.Background_Color);
+		setProgressColor(progressDef.Progress_Color);
+		setMax(progressDef.Max);
+		setProgress(progressDef.Progress);
+		setName(progressDef.name);
 		if(getStage()==null)
 		    stage.addActor(this);
 	}
@@ -90,8 +90,8 @@ public class ProgressItem extends Group implements PlayerItem {
 		return this;
 	}
 	
-	public ProgressItem setPropertySet(PropertySet<String,Object> set){
-		propertySet = set;
+	public ProgressItem setDef(ProgressDef def){
+		progressDef = def;
 		setup();
 		return this;
 	}
@@ -211,10 +211,6 @@ public class ProgressItem extends Group implements PlayerItem {
 	
 	@Override
 	public void update() {
-	    if(propertySet!=null&&propertySet.getString("do update").equals("true")){
-		    setPropertySet(propertySet);
-		    propertySet.remove("do update");
-		}
 		if(getScript()!=null)
 			getScript().bodyUpdate();
 		else if(elementEvent!=null) elementEvent.onBodyUpdate(this);
@@ -235,22 +231,25 @@ public class ProgressItem extends Group implements PlayerItem {
 			return childsHolder;
 		}
 	}
-
+	
+	com.star4droid.template.Utils.ItemScript itemScript;
 	@Override
-	public PropertySet<String, Object> getProperties() {
-	    return propertySet;
+	public void setScript(com.star4droid.template.Utils.ItemScript script){
+	    this.itemScript = script;
 	}
-
+	
+	@Override
+	public <T extends com.star4droid.template.Utils.ItemScript> T getScript(){
+	    return (T) itemScript;
+	}
+	
 	@Override
 	public PlayerItem getClone(String newName) {
-		PropertySet<String,Object> set = new PropertySet<>();
-		set.putAll(propertySet);
-		set.put("old",getParentName());
-		set.put("name",newName);
-	    ProgressItem item = new ProgressItem(stage).setElementEvent(elementEvent).setPropertySet(set);
-		if(set.getScript()!=null){
+		ProgressDef newDef = progressDef.getClone(newName);
+	    ProgressItem item = new ProgressItem(stage).setElementEvent(elementEvent).setDef(newDef);
+		if(getScript()!=null){
 			try {
-				ItemScript script = (ItemScript)(set.getScript().getClass().getConstructor(PlayerItem.class).newInstance(item));
+				ItemScript script = (ItemScript)(getScript().getClass().getConstructor(PlayerItem.class).newInstance(item));
 				script.setItem(item).setStage(stage);
 				item.setScript(script);
 			} catch(Exception ex){}
@@ -262,6 +261,11 @@ public class ProgressItem extends Group implements PlayerItem {
 	public void draw(Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
 		update();
+	}
+	
+	@Override
+	public com.star4droid.star2d.ElementDefs.ItemDef getProperties(){
+	    return progressDef;
 	}
 	
 	@Override

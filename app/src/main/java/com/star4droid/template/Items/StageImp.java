@@ -255,9 +255,9 @@ public class StageImp extends ApplicationAdapter {
 		for (Actor actor:GameStage.getActors()) {
 		    boolean item = false;
 		    if(actor instanceof PlayerItem){
-		        PropertySet ps = ((PlayerItem)actor).getProperties();
+		        com.star4droid.star2d.ElementDefs.ItemDef ps = ((PlayerItem)actor).getProperties();
 		        if(ps != null){
-			        zValues.add(new Pair<>(ps.getInt("z"),actor));
+			        zValues.add(new Pair<>(ps.getZ(),actor));
 			        item = true;
 			    }
 			}
@@ -267,9 +267,9 @@ public class StageImp extends ApplicationAdapter {
 		for (Actor actor:UiStage.getActors()) {
 		    boolean item = false;
 		    if(actor instanceof PlayerItem){
-		        PropertySet ps = ((PlayerItem)actor).getProperties();
+		        com.star4droid.star2d.ElementDefs.ItemDef ps = ((PlayerItem)actor).getProperties();
 		        if(ps != null){
-			        zValues.add(new Pair<>(ps.getInt("z"),actor));
+			        zValues.add(new Pair<>(ps.getZ(),actor));
 			        item = true;
 			    }
 			}
@@ -683,8 +683,8 @@ public class StageImp extends ApplicationAdapter {
 				try {
 					PlayerItem body1 = (PlayerItem)fixture1.getUserData();
 					PlayerItem body2 = (PlayerItem)fixture2.getUserData();
-					boolean b1= body1.getProperties().getString("Collision").contains(body2.getParentName());
-					boolean b2= body2.getProperties().getString("Collision").contains(body1.getParentName());
+					boolean b1= body1.getProperties().getCollision().contains(body2.getParentName());
+					boolean b2= body2.getProperties().getCollision().contains(body1.getParentName());
 					return !(b1||b2);
 					/*
 					debug(
@@ -1061,7 +1061,7 @@ public class StageImp extends ApplicationAdapter {
 	}
 	
 	public void addActor(Actor actor) {
-		if(actor instanceof PlayerItem&&((PlayerItem)actor).getProperties()!=null&&((PlayerItem)actor).getProperties().containsKey("type")&&((PlayerItem)actor).getProperties().getString("type").equals("UI"))
+		if(actor instanceof PlayerItem&&((PlayerItem)actor).getProperties()!=null&&((PlayerItem)actor).getProperties().getType().equals("UI"))
 			UiStage.addActor(actor);
 		else
 		    GameStage.addActor(actor);

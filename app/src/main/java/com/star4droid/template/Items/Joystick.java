@@ -14,11 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.star4droid.star2d.ElementDefs.JoyStickDef;
 import com.star4droid.star2d.ElementDefs.ElementEvent;
 import com.star4droid.template.Utils.ChildsHolder;
 import com.star4droid.template.Utils.ItemScript;
 import com.star4droid.template.Utils.PlayerItem;
-import com.star4droid.template.Utils.PropertySet;
 import com.star4droid.template.Utils.Utils;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -28,7 +28,7 @@ public class Joystick extends Touchpad implements PlayerItem {
 	StageImp stage;
 	float joystickY=0;
 	ElementEvent elementEvent;
-	PropertySet<String,Object> propertySet;
+	JoyStickDef joystickDef;
 	ChildsHolder childsHolder = new ChildsHolder(this);
 	
 	public Joystick(TouchpadStyle style,StageImp st){
@@ -61,19 +61,18 @@ public class Joystick extends Touchpad implements PlayerItem {
 	}
 	
 	private void setup(){
-		if(propertySet==null) return;
-		boolean UI = getProperties().getString("type").equals("UI");
-		float width = propertySet.getFloat("width"),
-			height = propertySet.getFloat("height"),
-		x = propertySet.getFloat("x"),
-		y = propertySet.getFloat("y");
+		if(joystickDef==null) return;
+		boolean UI = joystickDef.type.equals("UI");
+		float width = joystickDef.width,
+			height = joystickDef.height,
+		x = joystickDef.x,
+		y = joystickDef.y;
 		y = stage.getViewport().getWorldHeight()-height-y;
 		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
-		setZIndex(propertySet.getInt("z"));
-		//setRotation(propertySet.getFloat("rotation"));
-		setVisible(propertySet.getString("Visible").equals("true"));
+		setZIndex((int) joystickDef.z);
+		setVisible(joystickDef.Visible);
 		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
-		setName(propertySet.getString("name"));
+		setName(joystickDef.name);
 		if(getStage()==null)
 		    stage.addActor(this);
 	}
@@ -124,12 +123,11 @@ public class Joystick extends Touchpad implements PlayerItem {
 		return this;
 	}
 	
-	public Joystick setPropertySet(PropertySet<String,Object> set){
-		propertySet = set;
-		setup();
+	public Joystick setDef(JoyStickDef def){
+		joystickDef = def;
 		return this;
 	}
-
+	
 	@Override
 	public void setPosition(float x, float y) {
 		super.setX(x);
@@ -149,10 +147,6 @@ public class Joystick extends Touchpad implements PlayerItem {
 	
 	@Override
 	public void update() {
-	    if(propertySet!=null&&propertySet.getString("do update").equals("true")){
-		    setPropertySet(propertySet);
-		    propertySet.remove("do update");
-		}
 		if(getScript()!=null)
 			getScript().bodyUpdate();
 		else if(elementEvent!=null) elementEvent.onBodyUpdate(this);
@@ -172,24 +166,26 @@ public class Joystick extends Touchpad implements PlayerItem {
 			return childsHolder;
 		}
 	}
-
+	
+	com.star4droid.template.Utils.ItemScript itemScript;
 	@Override
-	public PropertySet<String, Object> getProperties() {
-	    return propertySet;
+	public void setScript(com.star4droid.template.Utils.ItemScript script){
+	    this.itemScript = script;
 	}
-
+	
+	@Override
+	public <T extends com.star4droid.template.Utils.ItemScript> T getScript(){
+	    return (T) itemScript;
+	}
+	
 	@Override
 	public PlayerItem getClone(String newName) {
-	    PropertySet<String,Object> set = new PropertySet<>();
-		set.putAll(propertySet);
-		set.put("old",getParentName());
-		set.put("name",newName);
-		Joystick joystick = Joystick.create(stage,propertySet.getString("Button Image"),propertySet.getString("Pad Image"))
-				.setElementEvent(elementEvent)
-				.setPropertySet(set);
-		if(set.getScript()!=null){
+	    JoyStickDef newDef = joystickDef.getClone(newName);
+		Joystick joystick = Joystick.create(stage,joystickDef.Button_Image,joystickDef.Pad_Image)
+				.setElementEvent(elementEvent).setDef(newDef);
+		if(getScript()!=null){
 			try {
-				ItemScript script = (ItemScript)(set.getScript().getClass().getConstructor(PlayerItem.class).newInstance(joystick));
+				ItemScript script = (ItemScript)(getScript().getClass().getConstructor(PlayerItem.class).newInstance(joystick));
 				script.setItem(joystick).setStage(stage);
 				joystick.setScript(script);
 			} catch(Exception ex){}
@@ -241,7 +237,12 @@ public class Joystick extends Touchpad implements PlayerItem {
 		super.draw(batch, parentAlpha);
 		update();
 	}
-
+	
+	@Override
+	public com.star4droid.star2d.ElementDefs.ItemDef getProperties(){
+	    return joystickDef;
+	}
+	
 	@Override
 	public ElementEvent getElementEvents() {
 		return elementEvent;

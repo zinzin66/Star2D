@@ -14,20 +14,20 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.star4droid.star2d.ElementDefs.ElementEvent;
+import com.star4droid.star2d.ElementDefs.CircleDef;
 import com.star4droid.template.Utils.ChildsHolder;
 import com.star4droid.template.Utils.ItemScript;
-import com.star4droid.template.Utils.PropertySet;
 import com.star4droid.template.Utils.PlayerItem;
 import com.star4droid.template.Utils.Utils;
 
 public class CircleItem extends Image implements PlayerItem {
 	StageImp stage;
 	ElementEvent elementEvent;
+	CircleDef circleDef;
 	float circleY=0;
 	float[] offset = new float[]{0,0};
 	Body body;
 	String tint = "#FFFFFF";
-	PropertySet<String,Object> propertySet;
 	public CircleItem(StageImp stageImp,Drawable drawable){
 		super(drawable);
 		stage = stageImp;
@@ -62,8 +62,8 @@ public class CircleItem extends Image implements PlayerItem {
 		return this;
 	}
 	
-	public CircleItem setPropertySet(PropertySet<String,Object> set){
-		propertySet = set;
+	public CircleItem setDef(CircleDef def){
+		circleDef = def;
 		if(body!=null) {
 		    body.getWorld().destroyBody(body);
 		    body = null;
@@ -73,35 +73,35 @@ public class CircleItem extends Image implements PlayerItem {
 	}
 	
 	private void setup(){
-		int rx = propertySet.getInt("tileX"),
-		    ry = propertySet.getInt("tileY");
-		boolean UI = getProperties().getString("type").equals("UI");
-		float width = propertySet.getFloat("radius")*2,
-		     height = propertySet.getFloat("radius")*2;
-		float x = propertySet.getFloat("x"),
-		y = propertySet.getFloat("y");
+		int rx = (int) circleDef.tileX,
+		    ry = (int) circleDef.tileY;
+		boolean UI = circleDef.type.equals("UI");
+		float width = circleDef.radius*2,
+		     height = circleDef.radius*2;
+		float x = circleDef.x ,
+		y = circleDef.y;
 		y = stage.getViewport().getWorldHeight()-height-y;
-		String imgPath=propertySet.getString("image");
+		String imgPath=circleDef.image;
 		
 		setDrawable(Utils.getDrawable(Utils.internal("images/logo.png")));
-		stage.setImage(this,propertySet.getString("image"));
+		stage.setImage(this,circleDef.image);
 		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
 		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
-		if(!propertySet.getString("Tint").equals(tint)){
-		    setColor(propertySet.getColor("Tint"));
-		    tint = propertySet.getString("Tint");
+		if(!circleDef.Tint.equals(tint)){
+		    setColor(circleDef.getColor(circleDef.Tint));
+		    tint = circleDef.Tint;
 		}
-		setZIndex(propertySet.getInt("z"));
-		setRotation(-propertySet.getFloat("rotation"));
-		setScale(propertySet.getFloat("Scale X"),propertySet.getFloat("Scale Y"));
-		setVisible(propertySet.getString("Visible").equals("true"));
-		setName(propertySet.getString("name"));
-		if(!propertySet.getString("type").equals("UI")){
-			String bt= String.valueOf(propertySet.getString("type").charAt(0)).toUpperCase();
+		setZIndex((int) circleDef.z);
+		setRotation(-circleDef.rotation);
+		setScale(circleDef.Scale_X,circleDef.Scale_Y);
+		setVisible(circleDef.Visible);
+		setName(circleDef.name);
+		if(!circleDef.type.equals("UI")){
+			String bt= String.valueOf(circleDef.type.charAt(0)).toUpperCase();
 			BodyDef.BodyType type = bt.equals("K")?BodyDef.BodyType.KinematicBody:(bt.equals("S")?BodyDef.BodyType.StaticBody:BodyDef.BodyType.DynamicBody);
 			//creating the body
-			offset[0] = propertySet.getFloat("ColliderX")*-1;
-			offset[1] = propertySet.getFloat("ColliderY")*-1;
+			offset[0] = circleDef.ColliderX *-1;
+			offset[1] = circleDef.ColliderY *-1;
 			if(body==null){
     			BodyDef def = new BodyDef();
     			def.type = type;
@@ -116,23 +116,23 @@ public class CircleItem extends Image implements PlayerItem {
 			}
 			//define its properties
 			CircleShape shape = new CircleShape();
-			shape.setRadius(StageImp.WORLD_SCALE * propertySet.getFloat("Collider Radius"));
+			shape.setRadius(StageImp.WORLD_SCALE * circleDef.Collider_Radius);
 			FixtureDef fx = new FixtureDef();
 			fx.shape = shape;
-			fx.friction=propertySet.getFloat("friction");
-			fx.density=propertySet.getFloat("density");
-			fx.restitution=propertySet.getFloat("restitution");
-			fx.isSensor = propertySet.getString("isSensor").equals("true");
+			fx.friction=circleDef.friction;
+			fx.density=circleDef.density;
+			fx.restitution=circleDef.restitution;
+			fx.isSensor = circleDef.isSensor;
 			body.createFixture(fx).setUserData(this);
-			body.setFixedRotation(propertySet.getString("Fixed Rotation").equals("true"));
-			body.setActive(propertySet.getString("Active").equals("true"));
-			body.setBullet(propertySet.getString("Bullet").equals("true"));
-			body.setGravityScale(propertySet.getFloat("Gravity Scale"));
+			body.setFixedRotation(circleDef.Fixed_Rotation);
+			body.setActive(circleDef.Active);
+			body.setBullet(circleDef.Bullet);
+			body.setGravityScale(circleDef.Gravity_Scale);
 			// TODO : Need to fix (check the solution)
 			Vector2 pos = new Vector2((offset[0]+x+(width/2)),(offset[1]+y+(height/2)));
 			pos.x = StageImp.WORLD_SCALE * pos.x;
 			pos.y = StageImp.WORLD_SCALE * pos.y;
-			body.setTransform(pos ,(float)Math.toRadians(-propertySet.getFloat("rotation")));
+			body.setTransform(pos ,(float)Math.toRadians(-circleDef.rotation));
 			
 		}
 		//if it's not added to stage ....
@@ -156,28 +156,24 @@ public class CircleItem extends Image implements PlayerItem {
 	protected void sizeChanged() {
 		super.sizeChanged();
 		//if(getStage()!=null) setY(circleY);
-		if(!getProperties().getString("type").equals("UI"))
+		if(!circleDef.type.equals("UI"))
 		    setOrigin(getWidth()*0.5f,getHeight()*0.5f);
 	}
 	
 	@Override
 	public void update() {
-	    if(propertySet!=null&&propertySet.getString("do update").equals("true")){
-		    setPropertySet(propertySet);
-		    propertySet.remove("do update");
-		}
 		if(body!=null){
-		    offset[0] = StageImp.WORLD_SCALE * propertySet.getFloat("ColliderX")*-1;
-			offset[1] = StageImp.WORLD_SCALE * propertySet.getFloat("ColliderY")*-1;
+		    offset[0] = StageImp.WORLD_SCALE * circleDef.ColliderX *-1;
+			offset[1] = StageImp.WORLD_SCALE * circleDef.ColliderY*-1;
 			float x = body.getPosition().x,
 				y = body.getPosition().y;
 			setPosition(x - offset[0] - getWidth()*0.5f,
 						y - offset[1] - getHeight()*0.5f);
 			setRotation((float)Math.toDegrees(body.getAngle()));
 		}
-		if(!propertySet.getString("Tint").equals(tint)){
-		    setColor(propertySet.getColor("Tint"));
-		    tint = propertySet.getString("Tint");
+		if(!circleDef.Tint.equals(tint)){
+		    setColor(circleDef.getColor(circleDef.Tint));
+		    tint = circleDef.Tint;
 		}
 		if(getScript()!=null)
 			getScript().bodyUpdate();
@@ -194,22 +190,25 @@ public class CircleItem extends Image implements PlayerItem {
 	public ChildsHolder getChildsHolder() {
 	    return childsHolder;
 	}
-
+	
+	com.star4droid.template.Utils.ItemScript itemScript;
 	@Override
-	public PropertySet<String, Object> getProperties() {
-	    return propertySet;
+	public void setScript(com.star4droid.template.Utils.ItemScript script){
+	    this.itemScript = script;
+	}
+	
+	@Override
+	public <T extends com.star4droid.template.Utils.ItemScript> T getScript(){
+	    return (T) itemScript;
 	}
 
 	@Override
 	public PlayerItem getClone(String newName) {
-		PropertySet<String,Object> set = new PropertySet<>();
-		set.putAll(propertySet);
-		set.put("old",getParentName());
-		set.put("name",newName);
-	    CircleItem item = new CircleItem(stage,null).setElementEvent(elementEvent).setPropertySet(set);
-		if(set.getScript()!=null){
+		CircleDef newDef = circleDef.getClone(newName);
+	    CircleItem item = new CircleItem(stage,null).setElementEvent(elementEvent).setDef(newDef);
+		if(getScript()!=null){
 			try {
-				ItemScript script = (ItemScript)(set.getScript().getClass().getConstructor(PlayerItem.class).newInstance(item));
+				ItemScript script = (ItemScript)(getScript().getClass().getConstructor(PlayerItem.class).newInstance(item));
 				script.setItem(item).setStage(stage);
 				item.setScript(script);
 			} catch(Exception ex){}
@@ -231,6 +230,11 @@ public class CircleItem extends Image implements PlayerItem {
 	    } catch(Exception e){}
 	    if(stage!=null) stage.updateActors();
 	    return b;
+	}
+	
+	@Override
+	public com.star4droid.star2d.ElementDefs.ItemDef getProperties(){
+	    return circleDef;
 	}
 	
 	@Override

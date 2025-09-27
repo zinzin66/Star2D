@@ -70,7 +70,7 @@ public class star2dApp extends Application {
 				//Process.killProcess(Process.myPid());
 				//System.exit(1);
 				//Logger.initialize(this);
-				star2dApp.this.uncaughtExceptionHandler.uncaughtException(thread, throwable);
+				star2dApp.uncaughtExceptionHandler.uncaughtException(thread, throwable);
 			}
 		});
         

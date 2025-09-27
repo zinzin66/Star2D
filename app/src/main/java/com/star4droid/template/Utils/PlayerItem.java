@@ -17,35 +17,49 @@ public interface PlayerItem {
 	default public void scaleEffect(float sx,float sy){}
 	default public ParticleEffect getParticleEffect(){return null;};
 	default public String getName(){
-		return getProperties().getString("name");
+		try {
+		    if(getActor().getName()!=null)
+		        return getActor().getName();
+		    java.lang.reflect.Field defName = getProperties().getClass().getDeclaredField("name");
+            defName.setAccessible(true);
+            Object nameV = defName.get(getProperties());
+            return nameV != null ? nameV.toString() : "";
+		} catch(Error | Exception ex){}
+		return "";
 	};
 	default public void setTint(Color color){
-	    if(getProperties().containsKey("Tint")){
-	        getProperties().put("Tint",color.toString().toUpperCase());
-	        update();
-	    }
+	    getActor().setColor(color);
 	}
 	default public void setTint(String hexColor){
-	    if(getProperties().containsKey("Tint")){
-	        getProperties().put("Tint",hexColor);
-	        update();
-	    }
+	    getActor().setColor(Color.valueOf(hexColor));
 	}
-	default public String getParentName(){
-		return getProperties().containsKey("Script")?getProperties().getString("Script"):(getProperties().containsKey("old")?getProperties().getString("old"):getName());
-	}
+	default public String getParentName() {
+        String actorN = getActor().getName();
+        if(actorN==null)
+            actorN = "";
+        try {
+            java.lang.reflect.Field field = getProperties().getClass().getDeclaredField("parentName");
+            field.setAccessible(true);
+            Object value = field.get(getProperties());
+            String fValue = value != null ? value.toString() : null;
+            if(value == null || value.equals("")){
+                java.lang.reflect.Field defName = getProperties().getClass().getDeclaredField("name");
+                defName.setAccessible(true);
+                Object nameV = defName.get(getProperties());
+                return nameV != null ? nameV.toString() : actorN;
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            com.badlogic.gdx.Gdx.files.external("logs/reflection.txt").writeString("Error : "+Utils.getStackTraceString(e),false);
+        }
+        return actorN;
+    }
 	default public PlayerItem getChild(String child){
 		ChildsHolder holder= getChildsHolder().getChild(child);
 		if(holder!=null) return holder.getPlayerItem();
 		return null;
 	}
-	default public void setScript(ItemScript script){
-		getProperties().setScript(script);
-	}
-	default public <T extends ItemScript> T getScript(){
-	    if(getProperties()==null) return null;
-		return (T)getProperties().getScript();
-	}
+	public void setScript(ItemScript script);
+	public <T extends ItemScript> T getScript();
 	public ChildsHolder getChildsHolder();
 	default public void setParent(PlayerItem item){
 		getChildsHolder().setParent(item.getChildsHolder());
@@ -53,7 +67,7 @@ public interface PlayerItem {
 	default public void addChild(PlayerItem item){
 		getChildsHolder().addChild(item);
 	}
-	public PropertySet<String,Object> getProperties();
+	public com.star4droid.star2d.ElementDefs.ItemDef getProperties();
 	public PlayerItem getClone(String newName);
 	default public void setItemText(String text){};
 	default public void setProgress(int progress){

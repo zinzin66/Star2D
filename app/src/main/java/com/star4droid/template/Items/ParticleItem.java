@@ -14,20 +14,20 @@ import com.star4droid.template.Utils.ChildsHolder;
 import com.star4droid.template.Utils.ItemScript;
 import com.star4droid.template.Utils.PlayerItem;
 import com.star4droid.template.Utils.Utils;
-import com.star4droid.template.Utils.PropertySet;
 import com.star4droid.star2d.ElementDefs.ElementEvent;
+import com.star4droid.star2d.ElementDefs.ParticleDef;
 
 public class ParticleItem extends Image implements PlayerItem {
+	ParticleDef particleDef;
 	ElementEvent elementEvent;
-	PropertySet<String,Object> propertySet;
 	ChildsHolder childsHolder = new ChildsHolder(this);
-	StageImp stageImp;
+	StageImp stage;
 	ParticleEffect particleEffect;
 	
 	public ParticleItem(StageImp stage){
 		super();
 		setSize(75,75);
-		this.stageImp = stage;
+		this.stage = stage;
 		this.particleEffect = new ParticleEffect();
 		addListener(new InputListener(){
 			@Override
@@ -56,8 +56,8 @@ public class ParticleItem extends Image implements PlayerItem {
 	
 	@Override
 	public void scaleEffect(float sx,float sy){
-	    propertySet.put("Scale X",sx);
-	    propertySet.put("Scale Y",sy);
+	    particleDef.Scale_X = sx;
+	    particleDef.Scale_Y = sy;
 	}
 	
 	@Override
@@ -87,45 +87,6 @@ public class ParticleItem extends Image implements PlayerItem {
 	public Body getBody() {
 		return null;
 	}
-
-	@Override
-	public PropertySet<String, Object> getProperties() {
-	    return propertySet;
-	}
-	
-	public ParticleItem setPropertySet(PropertySet<String,Object> set){
-		this.propertySet = set;
-		if(getStage()==null)
-			stageImp.addActor(this);
-		if(propertySet == null) return this;
-		if(propertySet.containsKey("file") && !propertySet.getString("file").equals("")){
-			FileHandle fileHandle = Gdx.files.absolute(stageImp.project.get("files")+propertySet.getString("file").replace(Utils.seperator,"/"));
-			if(fileHandle.exists()){
-				particleEffect.load(fileHandle,fileHandle.parent());
-				particleEffect.start();
-			} else loadDefault();
-		} else loadDefault();
-		boolean UI = getProperties().getString("type").equals("UI");
-		float x = propertySet.getFloat("x"),
-			  y = getStage().getHeight()-getHeight()-propertySet.getFloat("y");
-		String name = propertySet.getString("name");
-		if(!name.equals(""))
-			setName(name);
-		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
-		setZIndex(propertySet.getInt("z"));
-		//setRotation(-propertySet.getFloat("rotation"));
-		setVisible(propertySet.getString("Visible").equals("true"));
-		particleEffect.setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
-		particleEffect.scaleEffect((UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("Scale X"),(UI ? 1 : StageImp.WORLD_SCALE) * propertySet.getFloat("Scale Y"));
-		int dur = propertySet.getInt("Duration");
-		if(dur>0)
-			particleEffect.setDuration(dur);
-		if(elementEvent!=null)
-			elementEvent.onBodyCreated(this);
-		if(getScript()!=null)
-			getScript().bodyCreated();
-		return this;
-	}
 	
 	@Override
 	public ParticleEffect getParticleEffect(){
@@ -137,13 +98,44 @@ public class ParticleItem extends Image implements PlayerItem {
 		return this;
 	}
 	
+	public ParticleItem setDef(ParticleDef def){
+		this.particleDef = def;
+		if(getStage()==null)
+			stage.addActor(this);
+		if(particleDef == null) return this;
+		if(!particleDef.file.equals("")){
+			FileHandle fileHandle = Gdx.files.absolute(stage.project.get("files")+particleDef.file.replace(Utils.seperator,"/"));
+			if(fileHandle.exists()){
+				particleEffect.load(fileHandle,fileHandle.parent());
+				particleEffect.start();
+			} else loadDefault();
+		} else loadDefault();
+		boolean UI = particleDef.type.equals("UI");
+		float x = particleDef.x,
+			  y = getStage().getHeight()-getHeight()-particleDef.y;
+		String name = particleDef.name;
+		if(!name.equals(""))
+			setName(name);
+		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
+		setZIndex((int) particleDef.z);
+		setVisible(particleDef.Visible);
+		particleEffect.setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
+		particleEffect.scaleEffect((UI ? 1 : StageImp.WORLD_SCALE) * particleDef.Scale_X,(UI ? 1 : StageImp.WORLD_SCALE) * particleDef.Scale_Y);
+		int dur = (int) particleDef.Duration;
+		if(dur>0)
+			particleEffect.setDuration(dur);
+		if(elementEvent!=null)
+			elementEvent.onBodyCreated(this);
+		if(getScript()!=null)
+			getScript().bodyCreated();
+		return this;
+	}
+	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
-		//if(propertySet != null && stageImp != null)
-		    //particleEffect.scaleEffect(propertySet.getFloat("Scale X") * stageImp.getZooming(),propertySet.getFloat("Scale Y")*stageImp.getZooming());
 		particleEffect.draw(batch,Gdx.graphics.getDeltaTime());
-		if(particleEffect.isComplete() && propertySet != null && propertySet.getString("Loop").equals("true")){
+		if(particleEffect.isComplete() && particleDef != null && particleDef.Loop){
 			particleEffect.reset();
 		}
 	}
@@ -151,21 +143,29 @@ public class ParticleItem extends Image implements PlayerItem {
 	@Override
 	protected void scaleChanged() {
 		super.scaleChanged();
-		if(propertySet!=null)
-			particleEffect.scaleEffect(propertySet.getFloat("Scale X") * getScaleX(),propertySet.getFloat("Scale Y") * getScaleY());
+		if(particleDef!=null)
+			particleEffect.scaleEffect(particleDef.Scale_X * getScaleX(),particleDef.Scale_Y * getScaleY());
+	}
+	
+	com.star4droid.template.Utils.ItemScript itemScript;
+	@Override
+	public void setScript(com.star4droid.template.Utils.ItemScript script){
+	    this.itemScript = script;
+	}
+	
+	@Override
+	public <T extends com.star4droid.template.Utils.ItemScript> T getScript(){
+	    return (T) itemScript;
 	}
 
 	@Override
 	public PlayerItem getClone(String newName) {
-	    PropertySet<String,Object> set = new PropertySet<>();
-		set.putAll(propertySet);
-		set.put("old",getParentName());
-		set.put("name",newName);
-		ParticleItem item = new ParticleItem(stageImp).setElementEvent(elementEvent).setPropertySet(set);
-		if(set.getScript()!=null){
+	    ParticleDef newDef = particleDef.getClone(newName);
+		ParticleItem item = new ParticleItem(stage).setElementEvent(elementEvent).setDef(newDef);
+		if(getScript()!=null){
 			try {
-				ItemScript script = (ItemScript)(set.getScript().getClass().getConstructor(PlayerItem.class).newInstance(item));
-				script.setItem(item).setStage(stageImp);
+				ItemScript script = (ItemScript)(getScript().getClass().getConstructor(PlayerItem.class).newInstance(item));
+				script.setItem(item).setStage(stage);
 				item.setScript(script);
 			} catch(Exception ex){}
 		}
@@ -173,7 +173,7 @@ public class ParticleItem extends Image implements PlayerItem {
 	}
 	
 	private void loadDefault(){
-		String filesPath = stageImp.project.get("files");
+		String filesPath = stage.project.get("files");
 		FileHandle smoke = Gdx.files.absolute(filesPath+"smoke/smoke.p"),
 					particle = Gdx.files.absolute(filesPath+"smoke/particle-cloud.png");
 		if(!(smoke.exists()&&particle.exists())){
@@ -182,6 +182,11 @@ public class ParticleItem extends Image implements PlayerItem {
 		}
 		particleEffect.load(smoke,smoke.parent());
 		particleEffect.start();
+	}
+	
+	@Override
+	public com.star4droid.star2d.ElementDefs.ItemDef getProperties(){
+	    return particleDef;
 	}
 	
 	@Override

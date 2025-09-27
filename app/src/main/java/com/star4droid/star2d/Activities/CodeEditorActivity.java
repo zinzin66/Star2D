@@ -126,7 +126,7 @@ public class CodeEditorActivity extends AppCompatActivity {
 			Content content=ContentIO.createFrom(fis);
 			editor.setText(content);
 		}// else editor.setText("Hello To Star2D..");
-		} catch(java.io.IOException ex){
+		} catch(Error | Exception ex){
 			
 		}
 		findViewById(R.id.rotate).setOnClickListener(new View.OnClickListener(){

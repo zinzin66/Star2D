@@ -14,11 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.star4droid.star2d.ElementDefs.BoxDef;
 import com.star4droid.star2d.ElementDefs.ElementEvent;
 import com.star4droid.template.Utils.ChildsHolder;
 import com.star4droid.template.Utils.ItemScript;
 import com.star4droid.template.Utils.PlayerItem;
-import com.star4droid.template.Utils.PropertySet;
 import com.star4droid.template.Utils.Utils;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -30,7 +30,7 @@ public class BoxBody extends Image implements PlayerItem {
 	int tileX=1,tileY=1;
 	String tint = "#FFFFFF";
 	ElementEvent elementEvent;
-	PropertySet<String,Object> propertySet;
+	com.star4droid.star2d.ElementDefs.BoxDef boxDef;
 	float[] offset=new float[]{0,0};
 	Body body;
 	ChildsHolder childsHolder = new ChildsHolder(this);
@@ -70,12 +70,8 @@ public class BoxBody extends Image implements PlayerItem {
 		return this;
 	}
 	
-	public BoxBody setPropertySet(PropertySet<String,Object> set){
-		propertySet = set;
-		/*if(body!=null) {
-		    body.getWorld().destroyBody(body);
-		    body = null;
-		}*/
+	public BoxBody setDef(com.star4droid.star2d.ElementDefs.BoxDef def){
+		boxDef = def;
 		createBody();
 		return this;
 	}
@@ -96,25 +92,24 @@ public class BoxBody extends Image implements PlayerItem {
 	protected void sizeChanged() {
 		super.sizeChanged();
 		//if(getStage()!=null) setY(boxY);
-		if(!getProperties().getString("type").equals("UI"))
+		if(!boxDef.type.equals("UI"))
 		    setOrigin(getWidth()*0.5f,getHeight()*0.5f);
 	}
 	
 	private void createBody(){
-	    boolean UI = getProperties().getString("type").equals("UI");
-		int rx = propertySet.getInt("tileX"),
-			ry = propertySet.getInt("tileY");
-		float width = propertySet.getFloat("width"),
-		    height = propertySet.getFloat("height");
+	    boolean UI = boxDef.type.equals("UI");
+		int rx = (int)boxDef.tileX,
+			ry = (int)boxDef.tileY;
+		float width = boxDef.width,
+		    height = boxDef.height;
 		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
 		setOrigin(getWidth()*0.5f,getHeight()*0.5f);
-		float x = propertySet.getFloat("x"),
-		    y = propertySet.getFloat("y");
+		float x = boxDef.x,
+		    y = boxDef.y;
 		    y = stage.getViewport().getWorldHeight()-height-y;
-		//setDrawable(Utils.getDrawable(Utils.absolute(propertySet.getString("image"))));
 		tileX = Math.max(rx ,1);
 		tileY = Math.max(ry, 1);
-		if(!stage.setImage(this,propertySet.getString("image"))){
+		if(!stage.setImage(this,boxDef.image)){
 		    setDrawable(Utils.getDrawable(Utils.internal("images/logo.png")));
 		}
 		
@@ -131,22 +126,22 @@ public class BoxBody extends Image implements PlayerItem {
 		    }
 		}
 		
-		setName(propertySet.getString("name"));
+		setName(boxDef.name);
 		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
-		if(!propertySet.getString("Tint").equals(tint)){
-		    setColor(propertySet.getColor("Tint"));
-		    tint = propertySet.getString("Tint");
+		if(!boxDef.Tint.equals(tint)){
+		    setColor(boxDef.getColor(boxDef.Tint));
+		    tint = boxDef.Tint;
 		}
-		setZIndex(propertySet.getInt("z"));
-		setRotation(-propertySet.getFloat("rotation"));
-		setScale(propertySet.getFloat("Scale X"),propertySet.getFloat("Scale Y"));
-		setVisible(propertySet.getString("Visible").equals("true"));
-		if(!propertySet.getString("type").equals("UI")){
-			String bt = String.valueOf(propertySet.getString("type").charAt(0)).toUpperCase();
+		setZIndex((int) boxDef.z);
+		setRotation(-boxDef.rotation);
+		setScale(boxDef.Scale_X,boxDef.Scale_Y);
+		setVisible(boxDef.Visible);
+		if(!boxDef.type.equals("UI")){
+			String bt = String.valueOf(boxDef.type.charAt(0)).toUpperCase();
 			BodyDef.BodyType type = bt.equals("K")?BodyDef.BodyType.KinematicBody:(bt.equals("S")?BodyDef.BodyType.StaticBody:BodyDef.BodyType.DynamicBody);
 			//creating the body
-			offset[0] = propertySet.getFloat("ColliderX")*-1;
-			offset[1] = propertySet.getFloat("ColliderY")*-1;
+			offset[0] = boxDef.ColliderX*-1;
+			offset[1] = boxDef.ColliderY*-1;
 			if(body==null){
     			BodyDef def = new BodyDef();
     			def.type = type;
@@ -161,61 +156,41 @@ public class BoxBody extends Image implements PlayerItem {
 			}
 			//define its properties
 			PolygonShape shape = new PolygonShape();
-			shape.setAsBox( StageImp.WORLD_SCALE * propertySet.getFloat("Collider Width")*0.5f, StageImp.WORLD_SCALE * propertySet.getFloat("Collider Height")*0.5f);
+			shape.setAsBox( StageImp.WORLD_SCALE * boxDef.Collider_Width *0.5f, StageImp.WORLD_SCALE * boxDef.Collider_Height *0.5f);
 			FixtureDef fx = new FixtureDef();
 			fx.shape = shape;
-			fx.friction=propertySet.getFloat("friction");
-			fx.density=propertySet.getFloat("density");
-			fx.restitution=propertySet.getFloat("restitution");
-			fx.isSensor = propertySet.getString("isSensor").equals("true");
+			fx.friction= boxDef.friction;
+			fx.density= boxDef.density;
+			fx.restitution= boxDef.restitution;
+			fx.isSensor = boxDef.isSensor;
 			body.createFixture(fx).setUserData(this);
-			body.setFixedRotation(propertySet.getString("Fixed Rotation").equals("true"));
-			body.setActive(propertySet.getString("Active").equals("true"));
-			body.setBullet(propertySet.getString("Bullet").equals("true"));
-			body.setGravityScale(propertySet.getFloat("Gravity Scale"));
+			body.setFixedRotation(boxDef.Fixed_Rotation);
+			body.setActive(boxDef.Active);
+			body.setBullet(boxDef.Bullet);
+			body.setGravityScale(boxDef.Gravity_Scale);
 			Vector2 pos = new Vector2(offset[0]+x+(width*0.5f),offset[1]+y+(height*0.5f));
 			pos.x = StageImp.WORLD_SCALE * pos.x;
 			pos.y = StageImp.WORLD_SCALE * pos.y;
-			body.setTransform( pos ,(float)Math.toRadians(-propertySet.getFloat("rotation")));
+			body.setTransform( pos ,(float)Math.toRadians(-boxDef.rotation));
 		}
 		if(getStage()==null)
 		    stage.addActor(this);
 	}
 	
-	/*@Override
-	public void setImage(Texture texture) {
-		if(propertySet!=null){
-			int tx = Math.max(1,propertySet.getInt("tileX")),
-				ty = Math.max(1,propertySet.getInt("tileY"));
-			if(tx != 1 || ty != 1){
-				texture.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.MirroredRepeat);
-				TextureRegion textureRegion = new TextureRegion(texture);
-				textureRegion.setRegion(0,0,texture.getWidth()*tx,texture.getHeight()*ty);
-				setDrawable(new TextureRegionDrawable(textureRegion));
-			} else setDrawable(Utils.getDrawable(texture));
-		}
-	}*/
-	
 	@Override
 	public void update() {
-		//body_x = offset + x + (width/2)
-		//x = body_x - offset - (width/2)
-		if(propertySet!=null&&propertySet.getString("do update").equals("true")){
-		    setPropertySet(propertySet);
-		    propertySet.remove("do update");
-		}
 		if(body!=null){
-		    offset[0] = StageImp.WORLD_SCALE * propertySet.getFloat("ColliderX")*-1;
-			offset[1] = StageImp.WORLD_SCALE * propertySet.getFloat("ColliderY")*-1;
+		    offset[0] = StageImp.WORLD_SCALE * boxDef.ColliderX*-1;
+			offset[1] = StageImp.WORLD_SCALE * boxDef.ColliderY*-1;
 			float x = body.getPosition().x,
 				y = body.getPosition().y;
 			setPosition(x - offset[0] - getWidth()*0.5f,
 					y - offset[1] - getHeight()*0.5f);
 			setRotation((float)Math.toDegrees(body.getAngle()));
 		}
-		if(!propertySet.getString("Tint").equals(tint)){
-		    setColor(propertySet.getColor("Tint"));
-		    tint = propertySet.getString("Tint");
+		if(!boxDef.Tint.equals(tint)){
+		    setColor(boxDef.getColor(boxDef.Tint));
+		    tint = boxDef.Tint;
 		}
 		if(getScript()!=null)
 			getScript().bodyUpdate();
@@ -237,23 +212,25 @@ public class BoxBody extends Image implements PlayerItem {
 			return childsHolder;
 		}
 	}
-
-
+	
+	com.star4droid.template.Utils.ItemScript itemScript;
 	@Override
-	public PropertySet<String, Object> getProperties() {
-	    return propertySet;
+	public void setScript(com.star4droid.template.Utils.ItemScript script){
+	    this.itemScript = script;
+	}
+	
+	@Override
+	public <T extends com.star4droid.template.Utils.ItemScript> T getScript(){
+	    return (T) itemScript;
 	}
 
 	@Override
 	public PlayerItem getClone(String newName) {
-	    PropertySet<String,Object> set = new PropertySet<>();
-		set.putAll(propertySet);
-		set.put("old",getParentName());
-		set.put("name",newName);
-		BoxBody body = new BoxBody(stage,null).setElementEvent(elementEvent).setPropertySet(set);
-		if(set.getScript()!=null){
+		BoxDef newDef = boxDef.getClone(newName);
+		BoxBody body = new BoxBody(stage,null).setElementEvent(elementEvent).setDef(newDef);
+		if(getScript()!=null){
 			try {
-				ItemScript script = (ItemScript)(set.getScript().getClass().getConstructor(PlayerItem.class).newInstance(body));
+				ItemScript script = (ItemScript)(getScript().getClass().getConstructor(PlayerItem.class).newInstance(body));
 				script.setItem(body).setStage(stage);
 				body.setScript(script);
 			} catch(Exception ex){}
@@ -269,11 +246,6 @@ public class BoxBody extends Image implements PlayerItem {
 	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-	    /*
-	    if(propertySet.getString("type").equals("UI"))
-	        stage.ui(batch);
-	    else stage.body(batch);
-	    */
 		super.draw(batch, parentAlpha);
 		if(animation!=null)
 			super.setDrawable(animation.getKeyFrame(animationTime,true));
@@ -285,6 +257,11 @@ public class BoxBody extends Image implements PlayerItem {
 	@Override
 	public void removeAnimation() {
 		animation = null;
+	}
+	
+	@Override
+	public com.star4droid.star2d.ElementDefs.ItemDef getProperties(){
+	    return boxDef;
 	}
 	
 	@Override

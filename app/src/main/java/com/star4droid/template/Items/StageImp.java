@@ -1009,7 +1009,7 @@ public class StageImp extends ApplicationAdapter {
 		    drawDebug();
 		if(playing) for(int x=0;x<steps;x++)
 						world.step(getDelta(),8,3);
-		rayHandler.setCombinedMatrix(GameStage.getViewport().getCamera().combined,0,0,1,1);
+		rayHandler.setCombinedMatrix(GameStage.getViewport().getCamera().combined);
 		rayHandler.updateAndRender();
 		onDraw();
 		if(sceneScript!=null)

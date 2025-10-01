@@ -25,10 +25,10 @@ public class LightDef {
 		        light = new DirectionalLight(rayHandler,(int)rays, Color.valueOf(color),-rotation);
 		   break;
 		   case "cone":
-		        light = new ConeLight(rayHandler,(int)rays, Color.valueOf(color),Distance,x, height - Distance - y + Distance*0.5f,-rotation,Cone_Degree);
+		        light = new ConeLight(rayHandler,(int)rays, Color.valueOf(color),Distance * StageImp.WORLD_SCALE,x * StageImp.WORLD_SCALE, (height - Distance - y + Distance*0.5f) * StageImp.WORLD_SCALE,-rotation,Cone_Degree);
 		   break;
 	        default:
-		        light = new PointLight(rayHandler,(int)rays,Color.valueOf(color),Distance,x+Distance*0.5f, height - Distance - y + Distance*0.5f);
+		        light = new PointLight(rayHandler,(int)rays,Color.valueOf(color),Distance * StageImp.WORLD_SCALE,(x+Distance*0.5f) * StageImp.WORLD_SCALE, (height - Distance - y + Distance*0.5f) * StageImp.WORLD_SCALE);
 		}
 		if(light!=null){
 		    stageImp.addLight(name,light);

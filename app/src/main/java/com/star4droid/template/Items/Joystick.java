@@ -125,6 +125,7 @@ public class Joystick extends Touchpad implements PlayerItem {
 	
 	public Joystick setDef(JoyStickDef def){
 		joystickDef = def;
+		setup();
 		return this;
 	}
 	

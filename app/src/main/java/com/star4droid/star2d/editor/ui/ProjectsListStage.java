@@ -192,7 +192,7 @@ public class ProjectsListStage extends Stage {
         
         VisTable githubTable = new VisTable();
         githubTable.setBackground(drawable("border"));
-        githubTable.add(new VisImage(drawable("gitHub"))).size(48, 48).row();
+        githubTable.add(new VisImage(drawable("github"))).size(48, 48).row();
         githubTable.add(new VisLabel("GitHub")).padTop(5);
         githubTable.addListener(new ClickListener() {
             @Override

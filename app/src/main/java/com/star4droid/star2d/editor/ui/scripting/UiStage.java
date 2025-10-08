@@ -235,8 +235,11 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
     public void loadFrom(String file){
         serializer.loadFromFile(file);
         visible = false;
-        if(sidePanel != null)
+        
+        if(sidePanel != null){
             sidePanel.setPosition(Gdx.graphics.getWidth(), 0);
+            sidePanel.setSize(panelWidth, Gdx.graphics.getHeight());
+        }
         this.savePath = file;
     }
     
@@ -277,7 +280,6 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
     @Override
     public void act(float delta) {
         super.act(delta);
-
         // Two-finger pinch zoom
         if (Gdx.input.isTouched(0) && Gdx.input.isTouched(1)) {
             float gx1 = Gdx.input.getX(1), gx0 = Gdx.input.getX(0);

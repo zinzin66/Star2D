@@ -343,6 +343,9 @@ public class ControlLayer extends Table {
 				return;
 			}
 			app.getEditor().getProject().save(app.getEditor());
+			CodeGenerator.generateFor(app.getEditor(), cd -> {
+    			Gdx.files.absolute(app.getEditor().getProject().getCodesPath(app.getEditor().getScene())).writeString(cd,false);
+    		});
 			//btn.setScale(0);
 			//btn.addAction(Actions.scaleTo(1,1,300));
 			app.toast(getTrans("saved"));
@@ -614,15 +617,6 @@ public class ControlLayer extends Table {
 	private void openScene(String name){
 		CodeGenerator.generateFor(app.getEditor(), cd -> {
 			Gdx.files.absolute(app.getEditor().getProject().getCodesPath(app.getEditor().getScene())).writeString(cd,false);
-			/*
-			app.getEditor().setScene(name);
-			app.getEditor().loadFromPath();
-			//generate code for the new scene and save it
-			CodeGenerator.generateFor(app.getEditor(), code -> {
-				Gdx.files.absolute(app.getEditor().getProject().getCodesPath(app.getEditor().getScene())).writeString(code,false);
-			});
-			bodiesList.update();
-			*/
 			app.openSceneInNewEditor(name);
 		});
 	}

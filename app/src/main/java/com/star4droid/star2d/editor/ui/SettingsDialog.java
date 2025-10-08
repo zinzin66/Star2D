@@ -36,7 +36,7 @@ public class SettingsDialog extends VisDialog {
 		
 		SpinnerInput lang = new SpinnerInput();
 		lang.setNameText(getTrans("language"));
-		lang.setData("English","العربيه","Français","Português");
+		lang.setData("English","العربيه","Français","Português","Русский","Español");
 		String language = preferences.getString("lang","en");
 		
 		switch(language){
@@ -51,6 +51,12 @@ public class SettingsDialog extends VisDialog {
 		        break;
 		    case "br":
 		        language = "Português";
+		        break;
+		    case "es":
+		        language = "Español";
+		        break;
+		    case "ru":
+		        language = "Русский";
 		        break;
 		    default:
 		        language="English";
@@ -105,6 +111,8 @@ public class SettingsDialog extends VisDialog {
 				String newLang = code.equals("en") ? "en" : "ar";
 				if(code.equals("fr")) newLang = "fr";
 				if(code.equals("po")) newLang = "br";
+				if(code.equals("Ру")) newLang = "es";
+				if(code.equals("es")) newLang = "es";
 				preferences.putBoolean("Auto Completion",codeCompletion.getValue().equals("true"))
 					.putBoolean("SaveUndoRedo",saveUndoRedo.getValue().equals("true"))
 					.putBoolean("AutoSave",autoSave.getValue().equals("true"))

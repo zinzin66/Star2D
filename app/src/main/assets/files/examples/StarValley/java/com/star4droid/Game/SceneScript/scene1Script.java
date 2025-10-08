@@ -24,12 +24,14 @@ public class scene1Script extends SceneScript {
     public void create(){
         joystick = getStage().findItem("Joystick1");
         player = getStage().findItem("player");
-        
     }
     public void debug(String str){
         getStage().debug(str);
     }
 	public void draw(){
+        if(joystick.getPower()!=0)
+            player.getBody().setTransform(player.getBody().getPosition(),(float)Math.toRadians(joystick.getAngleDegrees() - 180));
+	    player.getBody().setLinearVelocity(new Vector2(joystick.getJoyStickX()*250,joystick.getJoyStickY()*250));
         
 	}
 	public void pause(){

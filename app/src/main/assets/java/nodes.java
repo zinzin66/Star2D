@@ -64,7 +64,7 @@ Timer.Task %2$s = Timer.schedule(new Timer.Task(){
     public void run(){
         %3$s
     }
-},(int)(%1$s));
+},(float)(%1$s));
 split
 -color:#018253•
 cancelTimer name
@@ -76,9 +76,9 @@ _repeatEvery delay name
 <<=>>
 Timer.Task %2$s = Timer.schedule(new Timer.Task(){
     public void run(){
-        %4$s
+        %3$s
     }
-},(int)(%1$s),(int)(%3$s));
+},(int)(%1$s),(int)(%1$s));
 split
 -color:#018253•
 writeToFile path string
@@ -190,28 +190,34 @@ setGravity(%1$s,%2$s);
 split
 --Debug
 split
+-color:#88213B•
 Toast message
 <<=>>
 toast(%1$s);
 %2$s
 split
+-color:#88213B•
 debug message
 <<=>>
 debug(%1$s);
 %2$s
 split
+-color:#88213B•
 --Ui Nodes
 split
+-color:#88213B•
 setVisibility item(Body) visibility(Boolean)
 <<=>>
 %1$s.getActor().setVisible(%2$s);
 %3$s
 split
+-color:#88213B•
 setText ui(Body) text
 <<=>>
 %1$s.setItemText(%2$s);
 %3$s
 split
+-color:#88213B•
 setAlpha body(Body) alpha
 <<=>>
 //%1$s.setAlpha(%2$s);
@@ -221,16 +227,19 @@ setAlpha body(Body) alpha
 //later ≈≈
 %3$s
 split
+-color:#88213B•
 setProgress progress(Body) value
 <<=>>
 %1$s.setProgress((int)(%2$s));
 %3$s
 split
+-color:#88213B•
 setMax progress(Body) max
 <<=>>
 %1$s.setMax((int)(%2$s));
 %3$s
 split
+-color:#88213B•
 --BodyModify
 split
 -color:#4A7814•

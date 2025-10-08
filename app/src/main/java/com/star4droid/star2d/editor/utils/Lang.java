@@ -24,6 +24,14 @@ public class Lang {
 		        key = "br";
 		        code = "US";
 		    break;
+		    case "ru" :
+		        key = "ru";
+		        code = "US";
+		    break;
+		    case "es" :
+		        key = "es";
+		        code = "US";
+		    break;
 		}
 		if(map.containsKey(key)){
 			currentLang = map.get(key);

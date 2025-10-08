@@ -24,6 +24,7 @@ import com.star4droid.star2d.Items.Editor;
 import com.star4droid.star2d.Utils;
 import com.star4droid.star2d.Views.VisualScriptingView;
 import java.util.ArrayList;
+import com.star4droid.star2d.editor.ui.scripting.FieldSuggestionList;
 
 public class VisualScriptingDialog {
 	
@@ -107,6 +108,11 @@ public class VisualScriptingDialog {
 			hintsList.addAll(editor.getBodiesList());
 		if(hintsList.size() > 0 && !fromOther)
 			hintsList.add(0,"- Items");
+		String[] bodies = new String[hintsList.size()];
+		for(int i = 1; i < hintsList.size(); i++){
+		    bodies [i - 1] = hintsList.get(i);
+		}
+		FieldSuggestionList.bodies = bodies;
 		ArrayList<String> files = new ArrayList<>();
 		FileUtil.listDir(editor.getProject().getImagesPath(),files);
 		int x=0;
@@ -120,38 +126,78 @@ public class VisualScriptingDialog {
 		}
 		if(files.size()>0) files.add(0,"- Images");
 		hintsList.addAll(files);
+		FieldSuggestionList.images = new String[files.size()];
+		for(int i = 1; i < files.size(); i++){
+		    FieldSuggestionList.images[i - 1] = files.get(i);
+		}
+		
 		files.clear();
 		FileUtil.listDir(editor.getProject().get("scenes"),files);
+		FieldSuggestionList.scenes = new String[files.size()];
 		for(int pos=0;pos<files.size();pos++){
 		    files.set(pos,Uri.parse(files.get(pos)).getLastPathSegment());
+		    FieldSuggestionList.scenes[pos] = files.get(pos);
 		}
 		if(files.size()>0)
 		    hintsList.add("- Scenes");
 		hintsList.addAll(files);
+		
+		//joints
+		files.clear();
+		FileUtil.listDir(editor.getProject().get("joints"),files);
+		FieldSuggestionList.joints = new String[files.size()];
+		for(int pos=0;pos<files.size();pos++){
+		    String jName = Uri.parse(files.get(pos)).getLastPathSegment();
+		    files.set(pos,jName.contains("-") ? jName.split("-")[0] : jName);
+		    FieldSuggestionList.joints[pos] = files.get(pos);
+		}
+		if(files.size()>0)
+		    hintsList.add("- Joints");
+		hintsList.addAll(files);
+		
 		files.clear();
 		//files
 		FileUtil.listDir(editor.getProject().get("files"),files);
+		FieldSuggestionList.files = new String[files.size()];
 		for(int i=0;i<files.size();i++) {
 			files.set(i,Uri.parse(files.get(i)).getLastPathSegment());
+			FieldSuggestionList.files[i] = files.get(i);
 		}
 		if(files.size()>0) hintsList.add("- Files");
 		hintsList.addAll(files);
+		
 		//animations
 		files.clear();
 		FileUtil.listDir(editor.getProject().get("anims"),files);
+		FieldSuggestionList.animations = new String[files.size()];
 		for(int i=0;i<files.size();i++) {
 			files.set(i,Uri.parse(files.get(i)).getLastPathSegment());
+			FieldSuggestionList.animations[i] = files.get(i);
 		}
 		if(files.size()>0) hintsList.add("- Animations");
 		hintsList.addAll(files);
+		
 		//sounds
 		files.clear();
 		FileUtil.listDir(editor.getProject().get("sounds"),files);
+		FieldSuggestionList.sounds = new String[files.size()];
 		for(int i=0;i<files.size();i++) {
 			files.set(i,Uri.parse(files.get(i)).getLastPathSegment());
+			FieldSuggestionList.sounds[i] = files.get(i);
 		}
 		if(files.size()>0) hintsList.add("- Sounds");
 		hintsList.addAll(files);
+		
+		if(true){
+		    String all = ""; // all hints in one string line by line
+		    for(String string : hintsList){
+		        if(all == "")
+		            all = string;
+		        else all = all + "\n" + string;
+		    }
+		    com.star4droid.star2d.editor.TestApp.getCurrentApp().loadVisual(codePath+".visual",all);
+		    return;
+		}
 		
 		final AlertDialog dl = Utils.showMessage(context,"please wait...");
 		

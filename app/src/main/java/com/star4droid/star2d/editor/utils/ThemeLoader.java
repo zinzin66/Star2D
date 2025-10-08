@@ -18,9 +18,10 @@ import java.util.HashMap;
 
 public class ThemeLoader {
   public static BitmapFont noRtlFont;
+  private static Skin orangeSkin;
   public static void loadTheme() {
     if (VisUI.isLoaded()) return;
-
+    orangeSkin = new Skin(Gdx.files.internal("files/skins/uiskin.json"));
     /*
     HashMap<String,int[]> splitsMap = new HashMap<>();
     FileHandle orange = Gdx.files.internal("files/skins/orange");
@@ -119,6 +120,10 @@ public class ThemeLoader {
     // load all images from assets...
     loadTheme(Gdx.files.internal("images"), "", null);
 	Lang.loadTrans(TestApp.getCurrentApp().preferences.getString("lang","en"));
+  }
+  
+  public static Skin getOrangeSkin(){
+    return orangeSkin;
   }
   
   public static BitmapFont getNoRtlFont(){

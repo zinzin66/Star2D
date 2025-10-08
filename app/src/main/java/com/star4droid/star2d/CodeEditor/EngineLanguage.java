@@ -42,7 +42,7 @@ public class EngineLanguage extends EmptyLanguage {
 		codeCompletionHelper = new CodeCompletionHelper(file,editor);
 		//mTextMateLanguage = TextMateLanguage.create("source.java", true);
 		String scope=GrammarRegistry.getInstance().loadGrammars("editor/languages.json").get(0).getScopeName();
-		mTextMateLanguage = TextMateLanguage.create(scope, true);
+		mTextMateLanguage = TextMateLanguage.create(scope, false);
 		mIndentationRules = GrammarRegistry.getInstance().findLanguageConfiguration(scope).getIndentationRules();
 		//mIndentationRules = LanguageConfiguration.load(new ContentReference(new Content(Utils.readAssetFile("editor/language-configuration.json",editor.getContext()))).createReader()).getIndentationRules();
 		/*

@@ -31,6 +31,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.Array;
 import com.star4droid.star2d.Helpers.Project;
 import com.star4droid.template.LoadingStage;
+import com.kotcrab.vis.ui.util.ToastManager;
 import com.star4droid.template.Utils.*;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -47,6 +48,7 @@ public class StageImp extends ApplicationAdapter {
 	int steps=6,backgroundColor=0xFFFFFF;
     public Box2DDebugRenderer debugRenderer;
 	SceneScript sceneScript;
+	ToastManager toastManager;
 	Color backgroundColorGdx= Color.WHITE;
 	public Project project;
 	public PropertySet<String,Object> propertySet;
@@ -132,6 +134,7 @@ public class StageImp extends ApplicationAdapter {
 		preferences = Gdx.app.getPreferences("prefs");
 		Gdx.input.setCatchKey(4,true);//back key
 		UiStage = new Stage(new FitViewport(width,height));
+		toastManager = new ToastManager(UiStage);
 		GameStage = new Stage(viewport){
 			@Override
 			public boolean keyDown(int key){
@@ -302,6 +305,15 @@ public class StageImp extends ApplicationAdapter {
 			if(lightInfo.name.equals(name))
 				return lightInfo.light;
 		return null;
+	}
+	
+	public void toast(String message,int duration){
+		toastManager.toFront();
+		toastManager.show(message,duration);
+	}
+	
+	public void toast(String message){
+		toast(message,2);
 	}
 	
 	public Project getProject(){

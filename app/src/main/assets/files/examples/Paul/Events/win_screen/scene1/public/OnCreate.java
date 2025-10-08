@@ -1,1 +1,0 @@
-setAnimation(player,"idle");

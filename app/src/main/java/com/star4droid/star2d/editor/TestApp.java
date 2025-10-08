@@ -19,7 +19,6 @@ import com.star4droid.star2d.editor.ui.ControlLayer;
 import com.star4droid.star2d.editor.ui.FileBrowser;
 import com.star4droid.star2d.editor.ui.FilePicker;
 import com.star4droid.star2d.editor.ui.ProjectsListStage;
-import com.star4droid.star2d.editor.ui.scripting.VisualScripting;
 import com.star4droid.star2d.editor.ui.sub.BodyScriptSelector;
 import com.star4droid.star2d.editor.ui.sub.ConfirmDialog;
 import com.star4droid.star2d.editor.ui.sub.LanguageDialog;
@@ -29,11 +28,13 @@ import com.star4droid.star2d.editor.utils.ThemeLoader;
 import com.star4droid.template.Items.StageImp;
 import com.star4droid.template.LoadingStage;
 import com.star4droid.template.Utils.ProjectAssetLoader;
+import com.star4droid.star2d.editor.ui.scripting.NodeEditorApp;
 import static com.star4droid.star2d.editor.utils.Lang.*;
 
 public class TestApp implements ApplicationListener {
 	LibgdxEditor editor;
 	public static TestApp currentApp;
+	NodeEditorApp visualScripting;
 	Project project;
 	ToastManager toastManager;
 	SimpleNote simpleNote;
@@ -55,9 +56,8 @@ public class TestApp implements ApplicationListener {
 	FileBrowser fileBrowser;
 	LibgdxEditor.OrienationChangeListener orienationChangeListener;
 	public Array<LibgdxEditor> editors = new Array<>();
-	boolean canExitFromProject = true;
+	boolean canExitFromProject = true, showVisual = false;
 	BodyScriptSelector bodyScriptSelector;
-	public VisualScripting visualScripting;
 	public TestApp(){}
 	
 	public TestApp(Project project){
@@ -67,11 +67,14 @@ public class TestApp implements ApplicationListener {
 	@Override
 	public void create() {
 		//Gdx.files.external("logs/testapp.txt").writeString("test app created\n"+"_".repeat(10)+"\n",true);
-		preferences = Gdx.app.getPreferences("prefs");
 		currentApp = this;
+		preferences = Gdx.app.getPreferences("prefs");
 		ThemeLoader.loadTheme();
+		visualScripting = new NodeEditorApp();
+		visualScripting.create();
+		
 		bodyScriptSelector = new BodyScriptSelector(this);
-		visualScripting = new VisualScripting(this);
+		
 		simpleNote = new SimpleNote(getTrans("info"),"No Message");
 		loadingStage = new LoadingStage();
 		uncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
@@ -105,6 +108,22 @@ public class TestApp implements ApplicationListener {
 			new LanguageDialog(this).show(projectsListStage).toFront();
 		}
 		
+	}
+	
+	public void loadVisual(String file, String all){
+	    visualScripting.loadFrom(file);
+	    visualScripting.setHints(all);
+	    showVisualScripting(true);
+	}
+	
+	public void showVisualScripting(boolean bool){
+	    this.showVisual = bool;
+	    if(bool)
+	        visualScripting.setInput();
+	    else {
+	        Gdx.input.setCatchKey(4,true);
+		    Gdx.input.setInputProcessor(multiplexer);
+	    }
 	}
 	
 	public void setOrienation(boolean isLandscape){
@@ -436,6 +455,8 @@ public class TestApp implements ApplicationListener {
 	public void resize(int width, int height) {
 		this.width = width;
 		this.height = height;
+		if(visualScripting!=null)
+		    visualScripting.resize(width, height);
 		if(projectsListStage!=null){
 			projectsListStage.getViewport().update(width,height,true);
 			projectsListStage.getViewport().setScreenWidth(Gdx.graphics.getWidth());
@@ -517,6 +538,7 @@ public class TestApp implements ApplicationListener {
 					this.stageImp.GameStage.dispose();
 					this.stageImp.UiStage.dispose();
 					this.stageImp.assetLoader.dispose();
+					com.badlogic.gdx.utils.Timer.instance().clear();
 				}
 				Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler);
 				Gdx.input.setCatchKey(4,true);
@@ -538,6 +560,10 @@ public class TestApp implements ApplicationListener {
 	public void render() {
 		if(!VisUI.isLoaded())
 			ThemeLoader.loadTheme();
+		if(showVisual){
+		    visualScripting.render();
+		    return;
+		}
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glClearColor(0,0,0,0);
 		if(projectAssetLoader!=null)
@@ -590,7 +616,10 @@ public class TestApp implements ApplicationListener {
 	public void dispose() {
 		if(VisUI.isLoaded())
 			VisUI.dispose();
-		
+	    visualScripting.dispose();
+		try {
+		    ThemeLoader.getOrangeSkin().dispose();
+		} catch(Error | Exception ex){}
 		if(projectAssetLoader!=null){
 			projectAssetLoader.setAssetsLoadListener(null);
 			projectAssetLoader.dispose();

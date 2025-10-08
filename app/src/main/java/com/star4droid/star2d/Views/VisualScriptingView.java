@@ -407,9 +407,7 @@ public class VisualScriptingView extends LinearLayout {
                   };
               tm.schedule(tsk, 150);
               nd.setText(split[0].replace("__star__if__", ""));
-              if (split[0].contains("__star__if__")) {
-                nd.setAsIf(true);
-              }
+              nd.setAsIf(split[0].contains("__star__if__"));
               for (int x = 1; x < split.length; x++) {
                 ValueSetter nf = new ValueSetter(getContext());
                 nf.setName(split[x]);
@@ -585,7 +583,7 @@ public class VisualScriptingView extends LinearLayout {
       }
     }
 
-    code = p.getCode();
+    code = p == null ? "" : p.getCode();
     if (!loopDetect) {
       dl = new AlertDialog.Builder(getContext());
       final String result = code;
@@ -655,7 +653,7 @@ public class VisualScriptingView extends LinearLayout {
         }
       }
     }
-    code = p.getCode();
+    code = p == null ? "" : p.getCode();
     if (!loopDetect) {
       FileUtil.writeFile(json_path, new Gson().toJson(lm));
       FileUtil.writeFile(code_path, code);

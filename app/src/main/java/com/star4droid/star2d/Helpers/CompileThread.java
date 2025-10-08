@@ -67,6 +67,7 @@ public class CompileThread extends Thread {
 		}
         //Utils.extractAssetFile(context,"java/PlayerItem.java",filesPath+"/com/star4droid/star2d/player/PlayerItem.java");
         Gdx.files.internal("java/PlayerItem.java").copyTo(Gdx.files.absolute(filesPath+"/com/star4droid/star2d/player/PlayerItem.java"));
+        Gdx.files.internal("java/Timer.java").copyTo(Gdx.files.absolute(filesPath+"/com/badlogic/gdx/utils/Timer.java"));
 		//FileUtil.deleteFile(filesPath+"/com/star4droid/star2d/player/PlayerItem.java");
 		//Utils.extractAssetFile(context,"java/game.zip",dataDir+"/bin/addition.jar");
 		Gdx.files.internal("java/game.zip").copyTo(Gdx.files.absolute(dataDir+"/bin/addition.jar"));
@@ -82,13 +83,13 @@ public class CompileThread extends Thread {
 			opt.add("-sourcepath");
 			opt.add("ignore");
 			addJavaFilesFrom(filesPath,opt);
-			PrintWriter printWriter = new PrintWriter(new OutputStream() {
-				@Override
-				public void write(int p1) throws IOException
-				{
-					//do nothing
-				}
-			});
+			// PrintWriter printWriter = new PrintWriter(new OutputStream() {
+				// @Override
+				// public void write(int p1) throws IOException
+				// {
+					// //do nothing
+				// }
+			// });
 			
 			final StringBuilder errs = new StringBuilder();
 			

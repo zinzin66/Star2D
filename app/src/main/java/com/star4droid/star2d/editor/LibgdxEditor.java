@@ -961,7 +961,7 @@ public class LibgdxEditor extends Stage {
         float distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         if (Gdx.input.isTouched(1) && prevDistance != -1) {
             camera.zoom -= 0.001f * (distance - prevDistance);
-            camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 3f);
+            camera.zoom = MathUtils.clamp(camera.zoom, 0.01f, 6f);
         }
 		
 		//two finger movement

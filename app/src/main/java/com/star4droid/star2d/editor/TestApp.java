@@ -245,6 +245,7 @@ public class TestApp implements ApplicationListener {
 		UiStage.addActor(controlLayer);
 		editor.setControlLayer(controlLayer);
 		controlLayer.getJointsList().refresh();
+		controlLayer.getVarsItem().setFileHandle(Gdx.files.absolute(project.getVariables("scene1")));
 		editor.setUiStage(UiStage);
 		if(fileBrowser==null)
 			fileBrowser = new FileBrowser(project.getPath(),projectAssetLoader).setToastManager(toastManager);
@@ -297,6 +298,7 @@ public class TestApp implements ApplicationListener {
 		editor.setTouchMode(getTouchMode(controlLayer.getTouchMode()));
 		editor.setControlLayer(controlLayer);
 		controlLayer.getJointsList().refresh();
+		controlLayer.getVarsItem().setFileHandle(Gdx.files.absolute(project.getVariables(scene)));
 		editor.setUiStage(UiStage);
 		
 		/*

@@ -143,7 +143,59 @@ public class ProjectsListStage extends Stage {
 
         smallButtonsTable.add(settingsTable).size(150, 100).padRight(20);
         smallButtonsTable.add(examplesTable).size(150, 100).padRight(20);
-        smallButtonsTable.add(projectsTableBtn).size(150, 100);
+        smallButtonsTable.add(projectsTableBtn).size(150, 100).row();
+        
+        // social media...
+        VisTable facebookTable = new VisTable();
+        facebookTable.setBackground(drawable("border"));
+        facebookTable.add(new VisImage(drawable("facebook"))).size(48, 48).row();
+        facebookTable.add(new VisLabel("Facebook")).padTop(5);
+        facebookTable.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.net.openURI("https://facebook.com/groups/995354408402399/");
+            }
+        });
+        
+        VisTable whatsAppTable = new VisTable();
+        whatsAppTable.setBackground(drawable("border"));
+        whatsAppTable.add(new VisImage(drawable("whatsapp"))).size(48, 48).row();
+        whatsAppTable.add(new VisLabel("Whatsapp")).padTop(5);
+        whatsAppTable.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.net.openURI("https://chat.whatsapp.com/Bxu3kM0b1oE9UL0iZhti4E?mode=ems_copy_c");
+            }
+        });
+        
+        VisTable telegramTable = new VisTable();
+        telegramTable.setBackground(drawable("border"));
+        telegramTable.add(new VisImage(drawable("telegram"))).size(48, 48).row();
+        telegramTable.add(new VisLabel("Telegram")).padTop(5);
+        telegramTable.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.net.openURI("https://t.me/+pE4VREnP04s5NDNk");
+            }
+        });
+        
+        VisTable discordTable = new VisTable();
+        discordTable.setBackground(drawable("border"));
+        discordTable.add(new VisImage(drawable("discord"))).size(48, 48).row();
+        discordTable.add(new VisLabel("Discord")).padTop(5);
+        discordTable.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.net.openURI("https://discord.gg/9gxPUTEP");
+            }
+        });
+        
+        smallButtonsTable.add(whatsAppTable).size(150, 100).padRight(20).padTop(100);
+        smallButtonsTable.add(facebookTable).size(150, 100).padRight(20).padTop(100).row();
+        
+        smallButtonsTable.add(telegramTable).size(150, 100).padRight(20).padTop(100);
+        smallButtonsTable.add(discordTable).size(150, 100).padRight(20).padTop(100).row();
+        
         smallButtonsTable.add().growX();
         table.add(smallButtonsTable).growX().row();
 

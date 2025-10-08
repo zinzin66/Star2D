@@ -44,6 +44,7 @@ import com.star4droid.star2d.editor.ui.sub.EventsItem;
 import com.star4droid.star2d.editor.ui.sub.JointsList;
 import com.star4droid.star2d.editor.ui.sub.PropertiesItem;
 import com.star4droid.star2d.editor.ui.sub.TabsItem;
+import com.star4droid.star2d.editor.ui.sub.VarsItem;
 import com.star4droid.star2d.editor.ui.sub.TextShow;
 import com.star4droid.star2d.editor.utils.EditorAction;
 import java.util.concurrent.Executors;
@@ -68,6 +69,7 @@ public class ControlLayer extends Table {
 	EventsItem eventsItem;
 	PropertiesItem propertiesItem;
 	PopupMenu xyMenu;
+	VarsItem varsItem;
 	VisLabel indexingLabel;
 	JointsList jointsList;
 	FileHandle fileBroweserDir;
@@ -136,11 +138,13 @@ public class ControlLayer extends Table {
 		VisImageButton bodiesListBtn = new VisImageButton(drawable("layer.png")),
 				eventsBtn = new VisImageButton(drawable("pointer-icon.png")),
 				jointsBtn = new VisImageButton(drawable("link.png")),
-				propsBtn = new VisImageButton(drawable("events/properties.png"));
+				propsBtn = new VisImageButton(drawable("events/properties.png")),
+				varsBtn = new VisImageButton(drawable("x.png"));
 		bodiesListBtn.setName("Bodies-List");
 		eventsBtn.setName("Events");
 		jointsBtn.setName("Joints");
 		propsBtn.setName("Properties");
+		varsBtn.setName("Variables");
 		bodiesList = new BodiesList(app){
 			@Override
 			public boolean remove(){
@@ -169,6 +173,14 @@ public class ControlLayer extends Table {
 				return super.remove();
 			}
 		};
+		
+		varsItem = new VarsItem(){
+		    @Override
+		    public boolean remove(){
+		        setVisible(false);
+		        return super.remove();
+		    }
+		};
         
 		centerTable.right();
 		//centerTable.setFillParent(true);
@@ -181,7 +193,8 @@ public class ControlLayer extends Table {
 		btnsTable.add(bodiesListBtn).size(iconSize+2).row();
 		btnsTable.add(propsBtn).size(iconSize+2).padTop(2).row();
 		btnsTable.add(jointsBtn).size(iconSize+2).padTop(2).row();
-		btnsTable.add(eventsBtn).size(iconSize+2).padTop(2);
+		btnsTable.add(eventsBtn).size(iconSize+2).padTop(2).row();
+		btnsTable.add(varsBtn).size(iconSize+2).padTop(2);
 		
 		/*
 		bodiesList.setVisible(false);
@@ -193,6 +206,7 @@ public class ControlLayer extends Table {
 		addListenerToWindow(eventsItem,eventsBtn);
 		addListenerToWindow(jointsList,jointsBtn);
 		addListenerToWindow(propertiesItem,propsBtn);
+		addListenerToWindow(varsItem,varsBtn);
 		left();
 		if(controlType == ControlType.TOP_AND_BOTTOM){
         	add(topScrollPane).height(iconSize + 10).growX().padBottom(1).row();
@@ -690,6 +704,10 @@ public class ControlLayer extends Table {
 	
 	public enum SceneAction {
 		RENAME,DELETE,CREATE,COPY
+	}
+	
+	public VarsItem getVarsItem(){
+	    return varsItem;
 	}
 	
 	public void updateUndoRedo(){

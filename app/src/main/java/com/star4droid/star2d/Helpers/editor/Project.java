@@ -23,6 +23,10 @@ public class Project {
 	    return path+"/java/com/star4droid/Game/Scripts/"+scene+"/";
 	}
 	
+	public String getVariables(String scene){
+	    return path+"/Events/"+scene+"/public/variables.json";
+	}
+	
 	public String getBodyScriptPath(String body,String scene){
 		return getBodiesScripts(scene)+body+"Script.java";
 	}
@@ -130,6 +134,7 @@ public class Project {
 		arrayList.add(getScriptsPath(scene));
 		arrayList.add(getSceneScript(scene));
 		arrayList.add(getBodiesScripts(scene));
+		arrayList.add(getVariables(scene));
 		return arrayList;
 	}
 	

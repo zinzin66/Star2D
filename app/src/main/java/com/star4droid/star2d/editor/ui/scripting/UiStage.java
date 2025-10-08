@@ -19,6 +19,8 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
     private final NodeEditor editor;
     private final NodeSerializer serializer;
     private final float MOVEMENT_SPEED = 0.75f;
+    VisTable sidePanel;
+    private boolean visible = false;
     private Vector2 dragStart = new Vector2();
     private String savePath = "", hints = "";
     private Vector2 camStart = new Vector2();
@@ -172,7 +174,7 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
                 });
 
         /* ------------ NodeTreeParser Side Panel ------------ */
-        final VisTable sidePanel = new VisTable();
+        sidePanel = new VisTable();
         sidePanel.setBackground(VisUI.getSkin().getDrawable("window-bg"));
         sidePanel.setSize(panelWidth, Gdx.graphics.getHeight());
         sidePanel.top().left();
@@ -200,8 +202,6 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
         // Slide panel in/out on button press
         toggleSidePanel.addListener(
                 new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
-                    private boolean visible = false;
-
                     @Override
                     public void changed(
                             ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
@@ -234,6 +234,9 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
     
     public void loadFrom(String file){
         serializer.loadFromFile(file);
+        visible = false;
+        if(sidePanel != null)
+            sidePanel.setPosition(Gdx.graphics.getWidth(), 0);
         this.savePath = file;
     }
     

@@ -11,7 +11,7 @@ import com.star4droid.star2d.Items.*;
 import com.star4droid.star2d.editor.LibgdxEditor;
 import com.star4droid.star2d.editor.Utils;
 import com.star4droid.star2d.editor.items.EditorItem;
-
+import com.star4droid.star2d.editor.ui.variables.VarModel;
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -342,7 +342,14 @@ public class CodeGenerator {
                 String sceneScript = FileUtil.isExistFile(project.getSceneScript(scene)) ? ("\nsetScript(new com.star4droid.game.SceneScript."+scene.toLowerCase()+"Script().setStage(this));") : "";
                 // Prepare final code and variables
                 final String code = itemsCode + sceneScript;
-                final String variables = vars + "\n" + jointVars + "\n" + lightsVar;
+                final String userVarsJsonPath = project.getVariables(scene);
+                final StringBuilder userVars = new StringBuilder();
+                try {
+                    String json = Gdx.files.absolute(userVarsJsonPath).readString();
+                    java.util.ArrayList<VarModel> varModelList = new Gson().fromJson(json, new TypeToken<ArrayList<VarModel>>() {}.getType());
+                    varModelList.forEach(model -> userVars.append(model.getCode()).append("\n"));
+                } catch(Error | Exception ex){}
+                final String variables = userVars.toString() + vars + "\n" + jointVars + "\n" + lightsVar;
                 final boolean replaceImportOfTheScript = (!thereIsScript);
                 
                 // Return generated code through callback

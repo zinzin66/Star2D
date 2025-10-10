@@ -142,7 +142,7 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
                         new ConfirmDialog(getTrans("exit"),getTrans("areYouSure"),ok->{
 						if(ok)
 							com.star4droid.star2d.editor.TestApp.getCurrentApp().showVisualScripting(false);
-					}).show(UiStage);
+					}).show(UiStage.this);
                     }
                 });
 

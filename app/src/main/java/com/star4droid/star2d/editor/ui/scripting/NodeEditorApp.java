@@ -30,7 +30,7 @@ public class NodeEditorApp implements ApplicationListener {
 					new ConfirmDialog(getTrans("exit"),getTrans("areYouSure"),ok->{
 						if(ok)
 							com.star4droid.star2d.editor.TestApp.getCurrentApp().showVisualScripting(false);
-					}).show(UiStage);
+					}).show(uiStage);
 					return true;
 				}
 				return false;

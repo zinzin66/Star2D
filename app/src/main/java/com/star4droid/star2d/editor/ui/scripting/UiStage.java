@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.*;
+import com.star4droid.star2d.editor.ui.sub.ConfirmDialog;
+import static com.star4droid.star2d.editor.utils.Lang.*;
 
 public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
 
@@ -137,9 +139,10 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
                     @Override
                     public void changed(
                             ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
-                        // TODO : Show confirmation dialog...
-                        // Gdx.app.exit();
-                        com.star4droid.star2d.editor.TestApp.getCurrentApp().showVisualScripting(false);
+                        new ConfirmDialog(getTrans("exit"),getTrans("areYouSure"),ok->{
+						if(ok)
+							com.star4droid.star2d.editor.TestApp.getCurrentApp().showVisualScripting(false);
+					}).show(UiStage);
                     }
                 });
 

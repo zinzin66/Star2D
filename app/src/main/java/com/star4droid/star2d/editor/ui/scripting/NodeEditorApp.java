@@ -9,6 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.kotcrab.vis.ui.VisUI;
+import com.star4droid.star2d.editor.ui.sub.ConfirmDialog;
+import static com.star4droid.star2d.editor.utils.Lang.*;
 
 public class NodeEditorApp implements ApplicationListener {
 
@@ -21,7 +23,19 @@ public class NodeEditorApp implements ApplicationListener {
         //VisUI.load(VisUI.SkinScale.X2);
         orangeSkin = com.star4droid.star2d.editor.utils.ThemeLoader.getOrangeSkin();// new Skin(Gdx.files.internal("files/skins/uiskin.json"));
         editorStage = new NodeEditor();
-		uiStage   = new UiStage(editorStage);
+		uiStage   = new UiStage(editorStage){
+			@Override
+			public boolean keyDown(int key){
+				if(key == 4){
+					new ConfirmDialog(getTrans("exit"),getTrans("areYouSure"),ok->{
+						if(ok)
+							com.star4droid.star2d.editor.TestApp.getCurrentApp().showVisualScripting(false);
+					}).show(UiStage);
+					return true;
+				}
+				return false;
+			}
+		};
         
         //FieldSuggestionList.bodies=new String[] {"body1","body2"};
         // Hatsune Miku 🤓🎉🎊

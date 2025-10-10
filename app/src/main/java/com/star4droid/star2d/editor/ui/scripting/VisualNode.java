@@ -441,10 +441,12 @@ public class VisualNode extends VisWindow {
 
     private void insertTextAtCursor(String text) {
       String currentText = targetTextArea.getText();
-      String newText =
-          currentText.substring(0, cursorPosition) + text + currentText.substring(cursorPosition);
+      String newText = currentText + text;
       targetTextArea.setText(newText);
-      cursorPosition += text.length();
+      /*
+          newText = currentText.substring(0, cursorPosition) + text + currentText.substring(cursorPosition);
+      targetTextArea.setText(newText);
+      cursorPosition += text.length();*/
     }
   }
 

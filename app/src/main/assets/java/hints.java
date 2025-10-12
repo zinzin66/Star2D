@@ -5,7 +5,6 @@ false
 current
 body1
 body2
-data
 worldX
 worldY
 random(1,100)

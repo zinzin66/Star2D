@@ -62,6 +62,7 @@ Math.tan(
 toInt(
 toFloat(
 Math.toRadians(
+Math.toDegrees(
 - Files
 read(
 readInternal(

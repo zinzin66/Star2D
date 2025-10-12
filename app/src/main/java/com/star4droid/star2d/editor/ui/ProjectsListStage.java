@@ -201,12 +201,24 @@ public class ProjectsListStage extends Stage {
             }
         });
         
+        VisTable youtubeTable = new VisTable();
+        youtubeTable.setBackground(drawable("border"));
+        youtubeTable.add(new VisImage(drawable("youtube"))).size(48, 48).row();
+        youtubeTable.add(new VisLabel("YouTube")).padTop(5);
+        youtubeTable.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.net.openURI("https://youtube.com/@star4droid?si=wNDqN_fbRIzf3KSQ");
+            }
+        });
+        
         smallButtonsTable.add(whatsAppTable).size(150, 100).padRight(20).padTop(100);
         smallButtonsTable.add(facebookTable).size(150, 100).padRight(20).padTop(100).row();
         
         smallButtonsTable.add(telegramTable).size(150, 100).padRight(20).padTop(8);
         smallButtonsTable.add(discordTable).size(150, 100).padRight(20).padTop(8).row();
         
+        smallButtonsTable.add(youtubeTable).size(150, 100).padRight(20).padTop(8);
         smallButtonsTable.add(githubTable).size(150, 100).padRight(20).padTop(8).row();
         
         smallButtonsTable.add().growX();

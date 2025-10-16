@@ -115,7 +115,10 @@ public class CustomColliderEditor extends VisDialog {
 	addPoint.addListener(new ClickListener() {
 		@Override
 		public void clicked(InputEvent event, float x, float y) {
-			addPoint(20, 20);
+			Point newPoint = addPoint(20, 20);
+			if(selectedPoint!=null)
+				selectedPoint.unselect();
+			newPoint.select();
 		}
 	});
 	deletePoint.addListener(new ClickListener() {
@@ -221,7 +224,7 @@ public class CustomColliderEditor extends VisDialog {
     }
   }
 
-  public void addPoint(float x, float y) {
+  public Point addPoint(float x, float y) {
 	Point point = new Point(false);
 	point.setPosition(x,y);
     pointsGroup.addActor(point);
@@ -230,6 +233,7 @@ public class CustomColliderEditor extends VisDialog {
 	scrollPane.layout();
 	if(selectedPoint==null)
 		selectedPoint = point;
+    return point;
   }
 
   public void deletePoint() {
@@ -239,8 +243,10 @@ public class CustomColliderEditor extends VisDialog {
 		pointsGroup.getChildren().forEach(actor->{
 			Point point = (Point)actor;
 			point.setText((point.getZIndex()+1)+"");
-			if(selectedPoint == null)
+			if(selectedPoint == null){
 				selectedPoint = point;
+				selectedPoint.select();
+			}
 		});
 	}
   }

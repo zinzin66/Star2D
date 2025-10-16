@@ -391,7 +391,9 @@ public class VisualNode extends VisWindow {
                 new ClickListener() {
                   @Override
                   public void clicked(InputEvent event, float x, float y) {
-                    handleKeyPress(keyText);
+                    try {
+                        handleKeyPress(keyText);
+                    } catch(Exception ex){}
                   }
                 });
 
@@ -415,7 +417,6 @@ public class VisualNode extends VisWindow {
 
     private void handleKeyPress(String key) {
       String currentText = targetTextArea.getText();
-
       switch (key) {
         case "X":
           targetTextArea.setText("");

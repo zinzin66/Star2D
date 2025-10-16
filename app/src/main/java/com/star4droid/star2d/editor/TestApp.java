@@ -212,7 +212,11 @@ public class TestApp implements ApplicationListener {
 				Timer.schedule(new Timer.Task(){
 					@Override
 					public void run() {
-						onLoad(project);
+						try {
+						    onLoad(project);
+						} catch(Exception ex){
+						    Gdx.files.external("logs/load.error.txt").writeString(ex.toString(),false);
+						}
 					}
 				},1.5f);
 			}
@@ -560,6 +564,14 @@ public class TestApp implements ApplicationListener {
 
 	@Override
 	public void render() {
+	    try {
+	        renderIn();
+	    } catch(Exception ex){
+	        Gdx.files.external("logs/renderIn.error.txt").writeString(ex.toString()+"\n",false);
+	    }
+	}
+	
+	private void renderIn(){
 		if(!VisUI.isLoaded())
 			ThemeLoader.loadTheme();
 		if(showVisual){

@@ -297,62 +297,65 @@ public class NodeSerializer {
     return code.toString();
 }
 
-private void generateCodeRecursive(
-        VisualNode node, StringBuilder code, int indent, Set<VisualNode> visited) {
-
-    if (node == null || visited.contains(node)) return;
-    visited.add(node);
-
-    String indentStr = "    ".repeat(indent);
-
-    // Get node code template
-    String template = node.getCode();
-    if (template == null || template.isEmpty()) {
-        //template = node.getTitleLabel().getText().toString() + "(%1$s);\n%2$s"; // fallback
-        throw new RuntimeException("no code found!!");
-    }
-
-    // Collect field values
-    List<String> args = new ArrayList<>();
-    for (Actor actor : node.getFieldsTable().getChildren()) {
-        if (actor instanceof VisualNode.NodeField) {
-            args.add(((VisualNode.NodeField) actor).value);
+    private void generateCodeRecursive(
+            VisualNode node, StringBuilder code, int indent, Set<VisualNode> visited) {
+    
+        if (node == null || visited.contains(node)) return;
+        visited.add(node);
+    
+        String indentStr = "    ".repeat(indent);
+    
+        // Get node code template
+        String template = node.getCode();
+        if (template == null || template.isEmpty()) {
+            //template = node.getTitleLabel().getText().toString() + "(%1$s);\n%2$s"; // fallback
+            throw new RuntimeException("no code found!!");
         }
+    
+        // Collect field values
+        List<String> args = new ArrayList<>();
+        for (Actor actor : node.getFieldsTable().getChildren()) {
+            if (actor instanceof VisualNode.NodeField) {
+                args.add(((VisualNode.NodeField) actor).value);
+            }
+        }
+    
+        // Recursive branches
+        String trueCode = "";
+        if (node.getTrueNode() != null) {
+            StringBuilder trueBuilder = new StringBuilder();
+            generateCodeRecursive(node.getTrueNode(), trueBuilder, indent + 1, visited);
+            trueCode = trueBuilder.toString();
+        }
+    
+        String falseCode = "";
+        if (node.getFalseNode() != null) {
+            StringBuilder falseBuilder = new StringBuilder();
+            generateCodeRecursive(node.getFalseNode(), falseBuilder, indent + 1, visited);
+            falseCode = falseBuilder.toString();
+        }
+    
+        String nextCode = "";
+        if (node.getNextNode() != null) {
+            StringBuilder nextBuilder = new StringBuilder();
+            generateCodeRecursive(node.getNextNode(), nextBuilder, indent, visited);
+            nextCode = nextBuilder.toString();
+        }
+    
+        // Add branch codes as arguments (order matters for %3$s, %4$s, %5$s etc.)
+        if(node.isBooleanNode()){
+            args.add(trueCode);
+            args.add(falseCode);
+        }
+        args.add(nextCode);
+    
+        // Format final code
+        String formatted = "";
+        try {
+            formatted = String.format(template, args.toArray());
+        } catch(Exception ex){}
+        code.append(indentStr).append(formatted.replace("\n", "\n" + indentStr));
     }
-
-    // Recursive branches
-    String trueCode = "";
-    if (node.getTrueNode() != null) {
-        StringBuilder trueBuilder = new StringBuilder();
-        generateCodeRecursive(node.getTrueNode(), trueBuilder, indent + 1, visited);
-        trueCode = trueBuilder.toString();
-    }
-
-    String falseCode = "";
-    if (node.getFalseNode() != null) {
-        StringBuilder falseBuilder = new StringBuilder();
-        generateCodeRecursive(node.getFalseNode(), falseBuilder, indent + 1, visited);
-        falseCode = falseBuilder.toString();
-    }
-
-    String nextCode = "";
-    if (node.getNextNode() != null) {
-        StringBuilder nextBuilder = new StringBuilder();
-        generateCodeRecursive(node.getNextNode(), nextBuilder, indent, visited);
-        nextCode = nextBuilder.toString();
-    }
-
-    // Add branch codes as arguments (order matters for %3$s, %4$s, %5$s etc.)
-    if(node.isBooleanNode()){
-        args.add(trueCode);
-        args.add(falseCode);
-    }
-    args.add(nextCode);
-
-    // Format final code
-    String formatted = String.format(template, args.toArray());
-    code.append(indentStr).append(formatted.replace("\n", "\n" + indentStr));
-}
 
     /** Find the entry node (node with no incoming connections) */
     private VisualNode findEntryNode() {

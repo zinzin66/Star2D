@@ -540,15 +540,18 @@ public class LibgdxEditor extends Stage {
 	// set editor to landscape mode (Invert logic width/height)
 	public void setLandscape(boolean b){
 		if(b == this.LANDSCAPE) return;
-		this.LANDSCAPE = b;
-		getConfig().put("or",b ? "":"portrait");
-		for(Actor actor:getActors()){
-			if(actor instanceof EditorItem)
-				((EditorItem)actor).update();
-		}
-		saveConfig();
-		if(orienationChangeListener!=null)
-			orienationChangeListener.onChange(b);
+		try {
+    		getConfig().put("or",b ? "":"portrait");
+    		for(Actor actor:getActors()){
+    			if(actor instanceof EditorItem)
+    				((EditorItem)actor).update();
+    		}
+    		saveConfig();
+    		if(orienationChangeListener!=null)
+    			orienationChangeListener.onChange(b);
+	    } catch(Exception ex){
+	        Gdx.files.external("logs/config.error.txt").writeString(ex.toString(),false);
+	    }
 	}
 	
 	public boolean isLandscape(){

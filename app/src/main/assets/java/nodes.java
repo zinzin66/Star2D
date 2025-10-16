@@ -430,7 +430,7 @@ split
 loopSound Sound(sound) repeat?
 <<=>>
 loopSound("%1$s",%2$s);
-%4$s
+%3$s
 split
 -color:#BE9333•
 playSound Sound(sound)
@@ -474,7 +474,7 @@ split
 setSpringDampingRatio joint ratio
 <<=>>
 %1$s.setSpringDampingRatio(%2$s);
-%4$s
+%3$s
 split
 -color:#BE9333•
 setSpringFrequencyHz joint frequency

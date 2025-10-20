@@ -98,7 +98,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
           packageName: com.star4droid.star2d.evo
           releaseFiles: app/build/outputs/bundle/release/*.aab
-          track: qa
+          track: internal
           status: completed
           whatsNewDirectory: whatsNewDirectory
           changesNotSentForReview: ${{ github.event.inputs.changes_not_sent_for_review == 'true' }}

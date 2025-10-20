@@ -46,13 +46,13 @@
 		android:textColor="@color/text_color"
 		/>
 		<com.google.android.material.button.MaterialButton
-		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
-		android:text="@string/cancel"
-		android:id="@+id/cancel"
-		android:layout_marginLeft="6dp"
-		app:cornerRadius="5dp"
-		android:textColor="@color/text_color"
-		/>
+    		android:layout_height="wrap_content"
+    		android:layout_width="wrap_content"
+    		android:text="@string/cancel"
+    		android:id="@+id/cancel"
+    		android:layout_marginLeft="6dp"
+    		app:cornerRadius="5dp"
+    		android:textColor="@color/text_color"
+    		/>
 		</LinearLayout>
 </LinearLayout>

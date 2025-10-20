@@ -219,7 +219,7 @@ public class ProjectsListStage extends Stage {
         donateTable.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //app.openDonate.run();
+                app.openDonate.run();
             }
         });
         

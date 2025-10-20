@@ -33,7 +33,6 @@ public class DonateActivity extends AppCompatActivity implements PurchasesUpdate
     private BillingClient billingClient;
     private TextView tvStatus;
 
-    // استبدل هذه الـ IDs بما أنشأته في Play Console
     private final String ID_1 = "donation_1_usd";
     private final String ID_3 = "donation_3_usd";
     private final String ID_5 = "donation_5_usd";
@@ -76,14 +75,13 @@ public class DonateActivity extends AppCompatActivity implements PurchasesUpdate
                     queryProducts();
                 } else {
                     log("Billing setup failed: " + billingResult.getDebugMessage());
-                    tvStatus.setText("خطأ في إعداد خدمة الدفع: " + billingResult.getDebugMessage());
+                    tvStatus.setText("Payment service setup error: " + billingResult.getDebugMessage());
                 }
             }
 
             @Override
             public void onBillingServiceDisconnected() {
                 log("Billing service disconnected. Try reconnect.");
-                // يمكنك إعادة المحاولة تلقائياً هنا
             }
         });
     }
@@ -108,22 +106,22 @@ public class DonateActivity extends AppCompatActivity implements PurchasesUpdate
                 for (ProductDetails pd : productDetailsList) {
                     productDetailsMap.put(pd.getProductId(), pd);
                 }
-                runOnUiThread(() -> tvStatus.setText("المنتجات جاهزة للشراء"));
+                runOnUiThread(() -> tvStatus.setText("Products are ready for purchase"));
             }
-        } else runOnUiThread(() -> tvStatus.setText("فشل جلب تفاصيل المنتجات"));
+        } else runOnUiThread(() -> tvStatus.setText("Failed to fetch product details"));
     });
     }
 
     private void purchaseProduct(String productId) {
         ProductDetails pd = productDetailsMap.get(productId);
         if (pd == null) {
-            Toast.makeText(this, "تفاصيل المنتج غير متاحة الآن", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Product details are not available now.", Toast.LENGTH_SHORT).show();
             return;
         }
 
         ProductDetails.OneTimePurchaseOfferDetails offer = pd.getOneTimePurchaseOfferDetails();
         if (offer == null) {
-            Toast.makeText(this, "عرض الشراء غير متاح للمنتج", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Purchase offer is not available for this product.", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -148,19 +146,17 @@ public class DonateActivity extends AppCompatActivity implements PurchasesUpdate
                 handlePurchase(purchase);
             }
         } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
-            Toast.makeText(this, "تم إلغاء الشراء", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Purchase cancelled", Toast.LENGTH_SHORT).show();
         } else {
             log("onPurchasesUpdated error: " + billingResult.getDebugMessage());
-            Toast.makeText(this, "خطأ أثناء الشراء: " + billingResult.getDebugMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Purchase error: " + billingResult.getDebugMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
     private void handlePurchase(Purchase purchase) {
-        // 1) تحقق محلياً من حالة الشراء ثم الأفضل تحقق على الخادم باستخدام Google Play Developer API
-        // 2) عند تحقق صالح، امنح المستخدم الفائدة أو سجّل التبرع في الخادم
-        // 3) استهلك المنتج حتى يمكن شراؤه مرة أخرى (consumable)
-
-        // هنا سنفترض نجاح التحقق. في إنتاج حقيقي قم بالتحقق في الخادم.
+        // 1) Verify the purchase status locally, then, preferably, verify it on the server using the Google Play Developer API.
+        // 2) When the verification is valid, award the user the benefit or record the donation on the server.
+        // 3) Consume the product.
         consumePurchase(purchase.getPurchaseToken());
     }
 
@@ -172,10 +168,10 @@ public class DonateActivity extends AppCompatActivity implements PurchasesUpdate
         ConsumeResponseListener listener = (billingResult, outToken) -> {
             if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                 log("Consume OK");
-                runOnUiThread(() -> tvStatus.setText("شكراً لتبرعك. يمكنك التبرع مرة أخرى."));
+                runOnUiThread(() -> tvStatus.setText("Thank you for your donation. You can donate again.."));
             } else {
                 log("Consume failed: " + billingResult.getDebugMessage());
-                runOnUiThread(() -> tvStatus.setText("فشل استهلاك الشراء: " + billingResult.getDebugMessage()));
+                runOnUiThread(() -> tvStatus.setText("Purchase consumption failure: " + billingResult.getDebugMessage()));
             }
         };
 

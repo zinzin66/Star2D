@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center"
     android:padding="24dp">
 
     <TextView
@@ -14,25 +15,28 @@
         android:textSize="20sp"
         android:gravity="center"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnDonate1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="$1 — Donate"
+        app:cornerRadius="5dp"
         android:layout_marginTop="16dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnDonate3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="$3 — Donate"
+        app:cornerRadius="5dp"
         android:layout_marginTop="12dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnDonate5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="$5 — Donate"
+        app:cornerRadius="5dp"
         android:layout_marginTop="12dp"/>
 
     <TextView

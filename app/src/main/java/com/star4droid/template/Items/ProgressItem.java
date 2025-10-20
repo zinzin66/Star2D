@@ -74,7 +74,7 @@ public class ProgressItem extends Group implements PlayerItem {
 		setZIndex((int) progressDef.z);
 		setVisible(progressDef.Visible);
 		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
-		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * (stage.getGameStage().getViewport().getWorldHeight()-height-y));
+		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
 		setRotation(-progressDef.rotation);
 		setBackColor(progressDef.Background_Color);
 		setProgressColor(progressDef.Progress_Color);
@@ -83,6 +83,10 @@ public class ProgressItem extends Group implements PlayerItem {
 		setName(progressDef.name);
 		if(getStage()==null)
 		    stage.addActor(this);
+		if(elementEvent!=null)
+			elementEvent.onBodyCreated(this);
+		if(getScript()!=null)
+			getScript().bodyCreated();
 	}
 	
 	public ProgressItem setElementEvent(ElementEvent event){

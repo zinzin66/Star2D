@@ -107,7 +107,6 @@ public class CustomBody extends Image implements PlayerItem {
 		setOrigin(getWidth()*0.5f,getHeight()*0.5f);
 		float x = customDef.x,
 		y = customDef.y;
-		y = stage.getViewport().getWorldHeight()-height-y;
 		tileX = Math.max((int) customDef.tileX,1);
 		tileY = Math.max((int) customDef.tileY,1);
 		if(!stage.setImage(this,customDef.image)){
@@ -194,6 +193,10 @@ public class CustomBody extends Image implements PlayerItem {
 		}
 		if(getStage()==null)
 		    stage.addActor(this);
+		if(elementEvent!=null)
+			elementEvent.onBodyCreated(this);
+		if(getScript()!=null)
+			getScript().bodyCreated();
 	}
 	
 	@Override

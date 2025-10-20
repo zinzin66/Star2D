@@ -9,6 +9,8 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.star4droid.star2d.Helpers.Project;
 import java.io.File;
 import com.badlogic.gdx.assets.loaders.resolvers.AbsoluteFileHandleResolver;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
 public class ProjectAssetLoader extends AssetManager {
 	Project project;
@@ -16,6 +18,7 @@ public class ProjectAssetLoader extends AssetManager {
 	boolean isListenerCalled = false;
 	public ProjectAssetLoader(Project p){
 	    super(new AbsoluteFileHandleResolver());
+	    setLoader(TiledMap.class, new TmxMapLoader(new AbsoluteFileHandleResolver()));
 		load(p);
 	}
 	
@@ -25,6 +28,7 @@ public class ProjectAssetLoader extends AssetManager {
 			Utils.Log("assets load error : \nfile : "+descriptor.fileName,Utils.getStackTraceString(error));
 		});
 		load(new File(project.getImagesPath()),Texture.class);
+		load(new File(project.getImagesPath()),TiledMap.class);
 		//load(new File(project.get("files")),null);
 		load(new File(project.get("sounds")),Music.class);
 	}
@@ -57,12 +61,12 @@ public class ProjectAssetLoader extends AssetManager {
 	}
 	
 	public void loadFile(String file,Class<?> Type){
-		if(Type!=null){
-			load(file,Type);
-			return;
-		}
 		if(endsWith(file,".jpg",".png",".jpeg")){
 			load(file,Texture.class);
+			return;
+		}
+		if(endsWith(file,".tmx")){
+			load(file,TiledMap.class);
 			return;
 		}
 		if(endsWith(file,".fnt")){
@@ -71,6 +75,10 @@ public class ProjectAssetLoader extends AssetManager {
 		}
 		if(endsWith(file,".p",".particle")){
 			load(file,ParticleEffect.class);
+			return;
+		}
+		if(Type!=null){
+			load(file,Type);
 			return;
 		}
 	}

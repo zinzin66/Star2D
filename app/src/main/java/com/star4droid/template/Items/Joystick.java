@@ -67,7 +67,6 @@ public class Joystick extends Touchpad implements PlayerItem {
 			height = joystickDef.height,
 		x = joystickDef.x,
 		y = joystickDef.y;
-		y = stage.getViewport().getWorldHeight()-height-y;
 		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
 		setZIndex((int) joystickDef.z);
 		setVisible(joystickDef.Visible);
@@ -75,6 +74,10 @@ public class Joystick extends Touchpad implements PlayerItem {
 		setName(joystickDef.name);
 		if(getStage()==null)
 		    stage.addActor(this);
+		if(elementEvent!=null)
+			elementEvent.onBodyCreated(this);
+		if(getScript()!=null)
+			getScript().bodyCreated();
 	}
 	
 	public static Joystick create(StageImp stageImp,Texture button,Texture background){

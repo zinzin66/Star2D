@@ -59,7 +59,7 @@ public class StageImp extends ApplicationAdapter {
 	public ProjectAssetLoader assetLoader;
 	LoadingStage loadingStage;
 	public Preferences preferences;
-	PlayerItem followX,followY;
+	PlayerItem followX,followY,followRotation;
 	float[] cameraOffset = new float[]{0,0};
 	FPSCalc fPSCalc=new FPSCalc();
 	StageImp currentStage;
@@ -69,6 +69,7 @@ public class StageImp extends ApplicationAdapter {
 	boolean loadComplete=false,onCreateCalled=false;
 	public SpriteSheetLoader spriteSheetLoader;
 	public InputMultiplexer multiplexer;
+	CameraItem cameraItem;
 	private PropertySet<String,BitmapFont> bitmapFonts = new PropertySet<>();
 	ArrayList<LightInfo> lights= new ArrayList<>();
 	HashMap<String, Joint> joints = new HashMap<>();
@@ -249,6 +250,19 @@ public class StageImp extends ApplicationAdapter {
 	    actors = null;
 	    orderBodies();
 	}
+	
+	public void setCamera(PlayerItem item){
+	    if(item instanceof CameraItem)
+	        this.cameraItem = (CameraItem) item;
+	}
+	
+	public void setCamera(CameraItem camera){
+	    this.cameraItem = camera;
+	    setCameraXY(camera);
+		cameraFollowX(camera);
+		cameraFollowY(camera);
+		setZoom(1f/(camera.getCameraDef().Zoom*WORLD_SCALE));
+    }
 	
 	public ArrayList<Actor> orderBodies(){
 	    if(actors!=null) return actors;
@@ -581,10 +595,17 @@ public class StageImp extends ApplicationAdapter {
 	
 	public void cameraFollowX(PlayerItem playerItem){
 		followX = playerItem;
+		cameraItem = null;
+	}
+	
+	public void cameraFollowRotation(PlayerItem playerItem){
+		followRotation = playerItem;
+		cameraItem = null;
 	}
 	
 	public void cameraFollowY(PlayerItem playerItem){
 		followY = playerItem;
+		cameraItem = null;
 	}
 	
 	public void openUrl(String url){
@@ -887,6 +908,8 @@ public class StageImp extends ApplicationAdapter {
 	
 	public void setZoom(float zoom){
 		((OrthographicCamera)getCamera()).zoom = 1/zoom;
+		if(cameraItem !=null)
+		    cameraItem.getCameraDef().Zoom = 1f/zoom;
 		/*
 		for(Actor actor:GameStage.getActors()){
 				if(actor==null) continue;
@@ -943,27 +966,33 @@ public class StageImp extends ApplicationAdapter {
 	
 	public void setCameraX(float x){
 		getCamera().position.x = x;
+		cameraItem = null;
 	}
 	
 	public void setCameraXY(float x,float y){
 		getCamera().position.x = x;
 		getCamera().position.y = y;
+		cameraItem = null;
 	}
 	
 	public void setCameraXY(PlayerItem playerItem){
 		getCamera().position.set(playerItem.getActorX()+playerItem.getActor().getWidth()*0.5f,playerItem.getActorY()+playerItem.getActor().getHeight()*0.5f,0);
+		cameraItem = null;
 	}
 	
 	public void setCameraY(float y){
 		getCamera().position.y = y;
+		cameraItem = null;
 	}
 	
 	public void setCameraX(PlayerItem playerItem){
 		getCamera().position.x = playerItem.getActorX()+playerItem.getActor().getWidth()*0.5f;
+		cameraItem = null;
 	}
 	
 	public void setCameraY(PlayerItem playerItem){
 		getCamera().position.y = playerItem.getActorY()+playerItem.getActor().getHeight()*0.5f;
+		cameraItem = null;
 	}
 	
 	// boolean isDrawingUi=false;
@@ -994,6 +1023,11 @@ public class StageImp extends ApplicationAdapter {
 		} else if(followY!=null){
 			getCamera().position.y = followY.getActorY()+followY.getActor().getWidth()*0.5f+cameraOffset[1];
 		}
+		if(followRotation!=null){
+		    ((OrthographicCamera)getCamera()).rotate(followRotation.getActor().getRotation());
+		}
+		if(cameraItem!=null)
+		    setZoom(cameraItem.getCameraDef().Zoom);
 		//GameStage.draw();
 		//UiStage.draw();
 		// TODO : This can cause bad performance, need to fix..
@@ -1043,10 +1077,12 @@ public class StageImp extends ApplicationAdapter {
 	
 	public void setCameraCenterX(float x){
 		getCamera().position.x = x;
+		cameraItem = null;
 	}
 	
 	public void setCameraCenterY(float y){
 		getCamera().position.y = y;
+		cameraItem = null;
 	}
 	
 	public void setCameraOffset(float x,float y){

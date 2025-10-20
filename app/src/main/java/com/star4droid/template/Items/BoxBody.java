@@ -106,7 +106,6 @@ public class BoxBody extends Image implements PlayerItem {
 		setOrigin(getWidth()*0.5f,getHeight()*0.5f);
 		float x = boxDef.x,
 		    y = boxDef.y;
-		    y = stage.getViewport().getWorldHeight()-height-y;
 		tileX = Math.max(rx ,1);
 		tileY = Math.max(ry, 1);
 		if(!stage.setImage(this,boxDef.image)){
@@ -175,6 +174,10 @@ public class BoxBody extends Image implements PlayerItem {
 		}
 		if(getStage()==null)
 		    stage.addActor(this);
+		if(elementEvent!=null)
+			elementEvent.onBodyCreated(this);
+		if(getScript()!=null)
+			getScript().bodyCreated();
 	}
 	
 	@Override

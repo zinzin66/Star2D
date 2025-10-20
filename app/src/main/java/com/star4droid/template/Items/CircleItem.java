@@ -80,7 +80,6 @@ public class CircleItem extends Image implements PlayerItem {
 		     height = circleDef.radius*2;
 		float x = circleDef.x ,
 		y = circleDef.y;
-		y = stage.getViewport().getWorldHeight()-height-y;
 		String imgPath=circleDef.image;
 		
 		setDrawable(Utils.getDrawable(Utils.internal("images/logo.png")));
@@ -138,6 +137,10 @@ public class CircleItem extends Image implements PlayerItem {
 		//if it's not added to stage ....
 		if(getStage()==null)
 		    stage.addActor(this);
+		if(elementEvent!=null)
+			elementEvent.onBodyCreated(this);
+		if(getScript()!=null)
+			getScript().bodyCreated();
 	}
 	
 	@Override

@@ -170,7 +170,7 @@ public class TextItem extends Label implements PlayerItem {
     		x = textDef.x,
     		y = textDef.y;
 		setSize((UI ? 1 : StageImp.WORLD_SCALE) * width,(UI ? 1 : StageImp.WORLD_SCALE) * height);
-		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * (stage.getViewport().getWorldHeight()-height-y));
+		setPosition((UI ? 1 : StageImp.WORLD_SCALE) * x,(UI ? 1 : StageImp.WORLD_SCALE) * y);
 		setZIndex((int) textDef.z);
 		setRotation(-textDef.rotation);
 		setVisible(textDef.Visible);

@@ -112,7 +112,7 @@ public class ParticleItem extends Image implements PlayerItem {
 		} else loadDefault();
 		boolean UI = particleDef.type.equals("UI");
 		float x = particleDef.x,
-			  y = getStage().getHeight()-getHeight()-particleDef.y;
+			  y = particleDef.y;
 		String name = particleDef.name;
 		if(!name.equals(""))
 			setName(name);

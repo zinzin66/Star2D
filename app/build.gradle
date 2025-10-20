@@ -27,8 +27,8 @@ android {
         applicationId "com.star4droid.star2d.evo"
         minSdk 23
         targetSdk 36
-        versionCode 40
-        versionName "0.4.0Beta"
+        versionCode 41
+        versionName "0.4.1Beta"
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"

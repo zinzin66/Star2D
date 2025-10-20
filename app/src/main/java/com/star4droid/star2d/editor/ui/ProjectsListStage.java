@@ -212,14 +212,27 @@ public class ProjectsListStage extends Stage {
             }
         });
         
-        smallButtonsTable.add(whatsAppTable).size(150, 100).padRight(20).padTop(100);
-        smallButtonsTable.add(facebookTable).size(150, 100).padRight(20).padTop(100).row();
+        VisTable donateTable = new VisTable();
+        donateTable.setBackground(drawable("border"));
+        donateTable.add(new VisImage(drawable("donate"))).size(48, 48).row();
+        donateTable.add(new VisLabel("Donate")).padTop(5);
+        donateTable.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                //app.openDonate.run();
+            }
+        });
         
-        smallButtonsTable.add(telegramTable).size(150, 100).padRight(20).padTop(8);
-        smallButtonsTable.add(discordTable).size(150, 100).padRight(20).padTop(8).row();
+        smallButtonsTable.add(whatsAppTable).size(150, 100).padRight(20).padTop(8);
+        smallButtonsTable.add(facebookTable).size(150, 100).padRight(20).padTop(8);
+        
+        smallButtonsTable.add(telegramTable).size(150, 100).padRight(20).padTop(8).row();
+        smallButtonsTable.add(discordTable).size(150, 100).padRight(20).padTop(8);
         
         smallButtonsTable.add(youtubeTable).size(150, 100).padRight(20).padTop(8);
         smallButtonsTable.add(githubTable).size(150, 100).padRight(20).padTop(8).row();
+        
+        smallButtonsTable.add(donateTable).growX().padTop(8).colspan(3).padLeft(9).padRight(9);
         
         smallButtonsTable.add().growX();
         table.add(smallButtonsTable).growX().row();

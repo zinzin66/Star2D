@@ -250,6 +250,11 @@ public class EditorActivity extends AppCompatActivity implements AndroidFragment
 			//String ex = android.util.Log.getStackTraceString(new Exception("Landscape : "+landscape+"\n"))+"\n"+"__".repeat(10)+"\n";
 			//Gdx.files.external("logs/landscape.txt").writeString(ex,true);
 		});
+		editor.getApp().openDonate = ()->{
+		    Intent intent = new Intent();
+    		intent.setClass(getApplicationContext(), com.star4droid.star2d.Activities.DonateActivity.class);
+    		startActivity(intent);
+		};
 		editor.getApp().getProjectsStage().setExportRunnable(()->{
 			exported_project = editor.getApp().getProjectsStage().getSelectedProject().file().getAbsolutePath();
 			saveType = "export";

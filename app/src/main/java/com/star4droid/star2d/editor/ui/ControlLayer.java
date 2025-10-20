@@ -753,7 +753,7 @@ public class ControlLayer extends Table {
 				@Override
 				public void changed (ChangeEvent event, Actor actor) {
 				    if(pos == 8){
-				        toast("sorry, not ready yet...");
+				        app.toast("sorry, not ready yet...");
 				        return;
 				    }
 					try {

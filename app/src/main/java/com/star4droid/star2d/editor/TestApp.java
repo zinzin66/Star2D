@@ -47,6 +47,7 @@ public class TestApp implements ApplicationListener {
 	int width=-1,height = -1,currentEditorPos = 0;
 	Stage UiStage;
 	FilePicker filePicker;
+	public Runnable openDonate;
 	ControlLayer controlLayer;
 	Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 	public Preferences preferences;

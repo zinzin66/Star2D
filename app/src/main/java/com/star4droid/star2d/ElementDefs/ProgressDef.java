@@ -16,6 +16,8 @@ public class ProgressDef extends ItemDef {
 	
 	public ProgressItem build(StageImp stageImp){
 		if(name.equals("")) throw new RuntimeException("set name to the item..!!");
+		if(Version.equals(""))
+		    throw new RuntimeException("Version of this scene is old, repoen the scene and click run to fix that");
 		if(parentName!=null && parentName.equals(""))
 		    parentName = name;
 		return new ProgressItem(stageImp)
@@ -43,11 +45,4 @@ public class ProgressDef extends ItemDef {
         clone.Max = this.Max;
         return clone;
     }
-    
-    public com.badlogic.gdx.graphics.Color getColor(String color){
-	    try {
-    	    return com.badlogic.gdx.graphics.Color.valueOf(color);
-	    } catch(Exception ex){}
-	    return com.badlogic.gdx.graphics.Color.WHITE;
-	}
 }

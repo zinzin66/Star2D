@@ -1,6 +1,7 @@
 package com.star4droid.star2d.ElementDefs;
 
 public abstract class ItemDef {
+    public String Version = "";
     public float getZF() {
         if (this instanceof BoxDef)
             return ((BoxDef) this).z;
@@ -51,4 +52,11 @@ public abstract class ItemDef {
             return ((TextDef) this).type;
         return "";
     }
+    
+    public com.badlogic.gdx.graphics.Color getColor(String color){
+	    try {
+    	    return com.badlogic.gdx.graphics.Color.valueOf(color);
+	    } catch(Exception ex){}
+	    return com.badlogic.gdx.graphics.Color.WHITE;
+	}
 }

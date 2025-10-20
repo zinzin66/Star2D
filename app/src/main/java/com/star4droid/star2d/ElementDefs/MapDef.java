@@ -1,47 +1,41 @@
 package com.star4droid.star2d.ElementDefs;
 
 import com.star4droid.template.Items.StageImp;
-import com.star4droid.template.Items.TextItem;
+import com.star4droid.template.Items.MapItem;
 import java.lang.reflect.Field;
 
-public class TextDef extends ItemDef {
+public class MapDef extends ItemDef {
 	public ElementEvent elementEvents;
-	public static final String TYPE="TEXT";
-	public String name="",parentName ="",font="",Text="TextItem",Text_Color="#FFFFFF",Script="",type="UI";
+	public static final String TYPE="MAP";
+	public String name="",Map="",parentName ="",Script="",type="DYNAMIC";
 	public boolean Visible=true;
-	public float x=0,y=0,z=0,width=50,height=50,rotation=0,Font_Scale=1;
+	public float x=0,y=0,z=0,rotation=0;
 	
-	public TextDef(){
+	public MapDef(){
 		
 	}
 	
-	public TextItem build(StageImp stageImp){
+	public MapItem build(StageImp stageImp){
 		if(name.equals("")) throw new RuntimeException("set name to the item..!!");
 		if(Version.equals(""))
 		    throw new RuntimeException("Version of this scene is old, repoen the scene and click run to fix that");
 		if(parentName!=null && parentName.equals(""))
 		    parentName = name;
-		return TextItem.create(stageImp,this,elementEvents);
+		return MapItem.create(stageImp,this,elementEvents);
 	}
 	
-	public TextDef getClone(String newName) {
-        TextDef clone = new TextDef();
+	public MapDef getClone(String newName) {
+        MapDef clone = new MapDef();
         clone.elementEvents = this.elementEvents;
         clone.type = this.type;
         clone.name = newName;
         clone.parentName = (parentName != null && parentName.equals("")) ? parentName : name;
-        clone.font = this.font;
-        clone.Text = this.Text;
-        clone.Text_Color = this.Text_Color;
         clone.Script = this.Script;
         clone.Visible = this.Visible;
         clone.x = this.x;
         clone.y = this.y;
         clone.z = this.z;
-        clone.width = this.width;
-        clone.height = this.height;
         clone.rotation = this.rotation;
-        clone.Font_Scale = this.Font_Scale;
         return clone;
     }
 }

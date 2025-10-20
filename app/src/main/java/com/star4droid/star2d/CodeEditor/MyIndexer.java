@@ -109,7 +109,7 @@ public class MyIndexer extends Indexer {
 			jars.clear();
 		}*/
 		
-		if((!FileUtil.isExistFile(idx2))||new java.io.File(idx2).length()==0||!EngineSettings.get().getString("JAR_FILE_VERSION","").equals("1.9")){
+		if((!FileUtil.isExistFile(idx2))||new java.io.File(idx2).length()==0||!EngineSettings.get().getString("JAR_FILE_VERSION","").equals("2.0")){
     		FileUtil.writeFile(idx2,"");
     		Utils.extractAssetFile(editor.getContext(),"java/game.zip",data+"/bin/addition.jar");
     		Utils.unzipf(data+"/bin/addition.jar",data+"/bin/add/","");
@@ -117,7 +117,7 @@ public class MyIndexer extends Indexer {
     		run(jars,idx2,Collections.emptyList(),Collections.emptyList(),data+"/bin/add/");
     		FileUtil.deleteFile(data+"/bin/add/");
     		jars.clear();
-    		EngineSettings.set("JAR_FILE_VERSION","1.9");
+    		EngineSettings.set("JAR_FILE_VERSION","2.0");
 		}
 	    
 	    /*
@@ -146,7 +146,7 @@ public class MyIndexer extends Indexer {
 		ArrayList<String> list=new ArrayList<>();
 		while(editor.getProject()==null){}
 		String logPath=editor.getProject().get("log")+"/autocomplete.log";
-		if(!FileUtil.isExistFile(logPath)) FileUtil.writeFile(logPath,"");
+		if(!FileUtil.isExistFile(logPath)) com.badlogic.gdx.Gdx.files.absolute(logPath).writeString("",false);
 		JavaCompletionOptionsImpl options = new JavaCompletionOptionsImpl(
 		logPath,
 		Level.ALL,

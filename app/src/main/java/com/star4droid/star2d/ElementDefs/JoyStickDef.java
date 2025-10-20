@@ -13,12 +13,12 @@ public class JoyStickDef extends ItemDef {
 	public boolean Visible=true;
 	public float x=0,y=0,z=0,width=50,height=50,rotation=0;
 	
-	public JoyStickDef(){
-		
-	}
+	public JoyStickDef(){}
 	
 	public Joystick build(StageImp stageImp){
 		if(name.equals("")) throw new RuntimeException("set name to the item..!!");
+		if(Version.equals(""))
+		    throw new RuntimeException("Version of this scene is old, repoen the scene and click run to fix that");
 		if(parentName!=null && parentName.equals(""))
 		    parentName = name;
 		String imgsPath = stageImp.getProject().getImagesPath();
@@ -49,10 +49,4 @@ public class JoyStickDef extends ItemDef {
         return clone;
     }
     
-    public com.badlogic.gdx.graphics.Color getColor(String color){
-	    try {
-    	    return com.badlogic.gdx.graphics.Color.valueOf(color);
-	    } catch(Exception ex){}
-	    return com.badlogic.gdx.graphics.Color.WHITE;
-	}
 }

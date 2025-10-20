@@ -78,13 +78,20 @@ public class ExamplesDialog extends VisDialog {
 					saveDir.mkdirs();
 					app.toast(getTrans("importing"));
 					Executors.newSingleThreadExecutor().execute(()->{
-						for(FileHandle file:fileHandle.list()){
-							file.copyTo(saveDir);
+					    try {
+    						for(FileHandle file:fileHandle.list()){
+    							file.copyTo(saveDir);
+    						}
+    						Gdx.app.postRunnable(()->{
+    							app.toast(getTrans("exampleImported")+" : "+name);
+    							app.getProjectsStage().refresh();
+    						});
+						} catch(Exception | Error ex){
+						    Gdx.app.postRunnable(()->{
+    							app.toast("failed to save example : "+ ex.toString());
+    							app.getProjectsStage().refresh();
+    						});
 						}
-						Gdx.app.postRunnable(()->{
-							app.toast(getTrans("exampleImported")+" : "+name);
-							app.getProjectsStage().refresh();
-						});
 					});
 				}).show(getStage());
 			}

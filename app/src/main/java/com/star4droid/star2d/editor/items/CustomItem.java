@@ -25,6 +25,7 @@ public class CustomItem extends Image implements EditorItem {
     Body body;
     String tint = "#FFFFFF";
     ShapeRenderer shapeRenderer;
+    boolean needFix = false;
 	float[] offset=new float[]{0,0};
     ArrayList<Vector2> points = new ArrayList<>();
 
@@ -79,7 +80,11 @@ public class CustomItem extends Image implements EditorItem {
         setOrigin(width * 0.5f, height * 0.5f);
         
         float x = propertySet.getFloat("x");
-        float y = getStage().getHeight() - propertySet.getFloat("y") - height;
+        float y = needFix ? (getStage().getHeight() - propertySet.getFloat("y") - height) : propertySet.getFloat("y");
+		if(needFix){
+		    propertySet.put("y", y);
+		    needFix = false;
+		}
         setPosition(x, y);
         
         // Common properties
@@ -153,7 +158,7 @@ public class CustomItem extends Image implements EditorItem {
     public void setProperties(PropertySet<String, Object> propertySet) {
         this.propertySet = propertySet;
         PropertySet<String, Object> temp = PropertySet.getDefualt(this, "custom.json");
-		
+		needFix = propertySet.getString("Version").equals("");
 		if(!propertySet.getString("Shape").equals("Custom")){
 		    if(editor!=null){
 		        try {

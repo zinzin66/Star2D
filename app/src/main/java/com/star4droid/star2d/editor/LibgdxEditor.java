@@ -116,6 +116,10 @@ public class LibgdxEditor extends Stage {
 		//((OrthographicCamera)getCamera()).zoom = 0.5f;
 	}
 	
+	public ShapeRenderer getShapeRenderer(){
+	    return shapeRenderer;
+	}
+	
 	// file picker
 	public void setFilePicker(FilePicker picker){
 		this.filePicker = picker;
@@ -768,6 +772,12 @@ public class LibgdxEditor extends Stage {
 					case "PARTICLE":
 					item = new ParticleItem(this);
 					break;
+					case "CAMERA":
+					item = new EditorCameraItem(this);
+					break;
+					case "MAP":
+					item = new EditorMapItem(this);
+					break;
 				}
 				
 				if (item == null)
@@ -905,8 +915,8 @@ public class LibgdxEditor extends Stage {
 				//movement
 				camera.translate(deltaX,deltaY);
 			} else if(touch_mode == TOUCHMODE.MOVE){
-				propertySet.put("x",propertySet.getFloat("x")-deltaX);
-				propertySet.put("y",propertySet.getFloat("y")+deltaY);
+				propertySet.put("x",propertySet.getFloat("x") - deltaX);
+				propertySet.put("y",propertySet.getFloat("y") - deltaY);
 				((EditorItem)selectedActor).update();
 				
 				//selectedActor.setPosition(selectedActor.getX()+deltaX,selectedActor.getY()+deltaX);

@@ -18,6 +18,8 @@ public class CustomDef extends ItemDef {
 	
 	public CustomBody build(StageImp stage){
 		if(name.equals("")) throw new RuntimeException("CustomDef error : set name to the item..!!");
+		if(Version.equals(""))
+		    throw new RuntimeException("Version of this scene is old, repoen the scene and click run to fix that");
 		if(parentName!=null && parentName.equals(""))
 		    parentName = name;
 		try {
@@ -60,10 +62,4 @@ public class CustomDef extends ItemDef {
         return clone;
     }
     
-    public com.badlogic.gdx.graphics.Color getColor(String color){
-	    try {
-    	    return com.badlogic.gdx.graphics.Color.valueOf(color);
-	    } catch(Exception ex){}
-	    return com.badlogic.gdx.graphics.Color.WHITE;
-	}
 }

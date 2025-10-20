@@ -17,7 +17,8 @@ public class EditorProgressItem extends Group implements EditorItem {
     private LibgdxEditor editor;
     private PropertySet<String, Object> propertySet;
     private float max = 100, progress = 0;
-
+    boolean needFix = false;
+    
     public EditorProgressItem(LibgdxEditor editor) {
         this.editor = editor;
         setupVisuals();
@@ -48,8 +49,12 @@ public class EditorProgressItem extends Group implements EditorItem {
         float width = propertySet.getFloat("width");
         float height = propertySet.getFloat("height");
         float x = propertySet.getFloat("x");
-        float y = editor.getHeight() - propertySet.getFloat("y") - height;
-
+        float y = needFix ? (editor.getHeight() - propertySet.getFloat("y") - height) : propertySet.getFloat("y");
+        if(needFix){
+		    propertySet.put("y", y);
+		    needFix = false;
+		}
+        
         setSize(width, height);
         setPosition(x, y);
         setZIndex(propertySet.getInt("z"));
@@ -69,7 +74,7 @@ public class EditorProgressItem extends Group implements EditorItem {
     public void setProperties(PropertySet<String, Object> properties) {
         this.propertySet = properties;
         PropertySet<String, Object> defaults = PropertySet.getDefualt(this, "progress.json");
-
+        needFix = propertySet.getString("Version").equals("");
         // Merge properties
         for (String key : defaults.keySet()) {
             if (!propertySet.containsKey(key)) {

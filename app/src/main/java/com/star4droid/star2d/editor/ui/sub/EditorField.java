@@ -115,8 +115,8 @@ public class EditorField {
 			((DefaultInput)inputField).value.addListener(new ClickListener() {
 				@Override
 				public void clicked(InputEvent event, float x, float y) {
-				    String root = getName().equals("font") ? app.getEditor().getProject().getPath() : app.getEditor().getProject().get("files");
-				    String[] ext = getName().equals("font") ? new String[]{"s2df","ttf","otf"} : new String[]{"p","particle"};
+				    String root = getName().equals("font") ? app.getEditor().getProject().getPath() : (getName().toLowerCase().equals("map") ? app.getEditor().getProject().getImagesPath() : app.getEditor().getProject().get("files"));
+				    String[] ext = getName().equals("font") ? new String[]{"s2df","ttf","otf"} : (getName().toLowerCase().equals("map") ? new String[]{"tmx"} : new String[]{"p","particle"});
 					app.getEditor().getFilePicker(true).setRoot(root).setExtensions(ext).setOnPick((fhandle,path)->{
 						PropertySet<String,Object> propertySet = PropertySet.getPropertySet(app.getEditor().getSelectedActor());
 						String old = propertySet.getString(getName());

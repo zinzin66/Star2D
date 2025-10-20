@@ -17,6 +17,7 @@ public class LightItem extends Image implements EditorItem {
 	LibgdxEditor editor;
 	String currentType ="";
 	Light light;
+	boolean needFix = false;
 	int rays = 0;
 	float rotation = -1,Distance = 0,Cone_Degree = 0;
 	String color = "";
@@ -37,7 +38,11 @@ public class LightItem extends Image implements EditorItem {
 	public void update() {
 		if(getStage()==null || propertySet == null) return;
 		float x = propertySet.getFloat("x"),
-			  y = getStage().getHeight()-getHeight()-propertySet.getFloat("y");
+			  y = needFix ? (getStage().getHeight()-getHeight()-propertySet.getFloat("y")) : propertySet.getFloat("y");
+		if(needFix){
+		    propertySet.put("y", y);
+		    needFix = false;
+		}
 		String name = propertySet.getString("name");
 		if(!name.equals(""))
 			setName(name);
@@ -131,6 +136,7 @@ public class LightItem extends Image implements EditorItem {
 	@Override
 	public void setProperties(PropertySet<String, Object> propertySet) {
 		this.propertySet = propertySet;
+		needFix = propertySet.getString("Version").equals("");
 		PropertySet<String,Object> temp = PropertySet.getDefualt(this, "Lights/"+propertySet.getString("Light Type")+".json");
 		for(String key:temp.keySet()){
 		    if(key.equals("Script")||key.equals("parent")) continue;

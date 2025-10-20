@@ -15,7 +15,7 @@ public class JoyStickItem extends Touchpad implements EditorItem {
     PropertySet<String, Object> propertySet;
     LibgdxEditor editor;
     float touchDownX, touchDownY;
-
+    boolean needFix = false;
     public JoyStickItem(LibgdxEditor editor) {
         super(5,createDefaultStyle(editor));
         this.editor = editor;
@@ -43,8 +43,11 @@ public class JoyStickItem extends Touchpad implements EditorItem {
         float width = propertySet.getFloat("width");
         float height = propertySet.getFloat("height");
         float x = propertySet.getFloat("x");
-        float y = editor.getHeight() - propertySet.getFloat("y") - height;
-
+        float y = needFix ? (editor.getHeight() - propertySet.getFloat("y") - height) : propertySet.getFloat("y");
+        if(needFix){
+		    propertySet.put("y", y);
+		    needFix = false;
+		}
         setSize(width, height);
         setPosition(x, y);
         setZIndex(propertySet.getInt("z"));
@@ -58,6 +61,7 @@ public class JoyStickItem extends Touchpad implements EditorItem {
     @Override
     public void setProperties(PropertySet<String, Object> properties) {
         this.propertySet = properties;
+        needFix = propertySet.getString("Version").equals("");
         PropertySet<String, Object> defaults = PropertySet.getDefualt(this, "joystick.json");
 
         // Merge properties

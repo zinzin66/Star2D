@@ -744,14 +744,18 @@ public class ControlLayer extends Table {
 	
 	private PopupMenu createBodiesMenu(){
 		PopupMenu menu = new PopupMenu();
-		String[] names={"Box Body","Circle Body","Text Item","Joystick Item","Progress Bar","Custom Body","Particle Effect"};
-		String[] icons={"box","circle","text","joystick","progress","custom","particle"};
+		String[] names={"Box Body","Circle Body","Text Item","Joystick Item","Progress Bar","Custom Body","Particle Effect","Camera","TiledMap"};
+		String[] icons={"box","circle","text","joystick","progress","custom","particle","camera","map"};
 		for(int x = 0; x < names.length; x++){
 			final String name = names[x];
 			final int pos = x;
 			MenuItem item = new MenuItem(getTrans(name),drawable("bodies/"+icons[x]+".png"),new ChangeListener() {
 				@Override
 				public void changed (ChangeEvent event, Actor actor) {
+				    if(pos == 8){
+				        toast("sorry, not ready yet...");
+				        return;
+				    }
 					try {
 						EditorItem item = getItem(pos);
                 		app.getEditor().addActor((Actor)item);
@@ -788,6 +792,8 @@ public class ControlLayer extends Table {
 			case 4: return new EditorProgressItem(app.getEditor());
 			case 5: return new CustomItem(app.getEditor());
 			case 6: return new ParticleItem(app.getEditor());
+			case 7: return new EditorCameraItem(app.getEditor());
+			case 8: return new EditorMapItem(app.getEditor());
 		}
 		return null;
 	}

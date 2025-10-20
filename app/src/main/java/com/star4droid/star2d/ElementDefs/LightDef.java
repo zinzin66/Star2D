@@ -6,7 +6,7 @@ import box2dLight.*;
 import com.badlogic.gdx.graphics.Color;
 import com.star4droid.template.Utils.PlayerItem;
 
-public class LightDef {
+public class LightDef extends ItemDef {
 	public ElementEvent elementEvents;
 	public static final String TYPE="LIGHT";
 	public String name="",parentName ="",Light_Type="point",color="#FFFFFF",attach_To="",Script="";
@@ -17,6 +17,8 @@ public class LightDef {
 	
 	public Light build(StageImp stageImp){
 		if(name.equals("")) throw new RuntimeException("set name to the item..!!");
+		if(Version.equals(""))
+		    throw new RuntimeException("Version of this scene is old, repoen the scene and click run to fix that");
 		RayHandler rayHandler=stageImp.getRayHandler();
 		Light light =null;
 		float height = stageImp.getViewport().getWorldHeight();
@@ -25,10 +27,10 @@ public class LightDef {
 		        light = new DirectionalLight(rayHandler,(int)rays, Color.valueOf(color),-rotation);
 		   break;
 		   case "cone":
-		        light = new ConeLight(rayHandler,(int)rays, Color.valueOf(color),Distance * StageImp.WORLD_SCALE,x * StageImp.WORLD_SCALE, (height - Distance - y + Distance*0.5f) * StageImp.WORLD_SCALE,-rotation,Cone_Degree);
+		        light = new ConeLight(rayHandler,(int)rays, Color.valueOf(color),Distance * StageImp.WORLD_SCALE,x, y * StageImp.WORLD_SCALE,-rotation,Cone_Degree);
 		   break;
 	        default:
-		        light = new PointLight(rayHandler,(int)rays,Color.valueOf(color),Distance * StageImp.WORLD_SCALE,(x+Distance*0.5f) * StageImp.WORLD_SCALE, (height - Distance - y + Distance*0.5f) * StageImp.WORLD_SCALE);
+		        light = new PointLight(rayHandler,(int)rays,Color.valueOf(color),Distance * StageImp.WORLD_SCALE,x * StageImp.WORLD_SCALE, y * StageImp.WORLD_SCALE);
 		}
 		if(light!=null){
 		    stageImp.addLight(name,light);
@@ -49,10 +51,4 @@ public class LightDef {
 		return light;
 	}
 	
-	public com.badlogic.gdx.graphics.Color getColor(String color){
-	    try {
-    	    return com.badlogic.gdx.graphics.Color.valueOf(color);
-	    } catch(Exception ex){}
-	    return com.badlogic.gdx.graphics.Color.WHITE;
-	}
 }

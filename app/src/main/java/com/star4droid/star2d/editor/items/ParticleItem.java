@@ -19,6 +19,7 @@ public class ParticleItem extends Image implements EditorItem,Disposable {
 	LibgdxEditor editor;
 	ParticleEffect particleEffect;
 	String loadPath = null;
+	boolean needFix = false;
 	
 	public ParticleItem(final LibgdxEditor libgdxEditor){
 		//super(new Texture(Gdx.files.internal("images/logo.png")));
@@ -41,7 +42,11 @@ public class ParticleItem extends Image implements EditorItem,Disposable {
 		//setSize(propertySet.getFloat("width"),propertySet.getFloat("height"));
 		//setOrigin(getWidth()*0.5f,getHeight()*0.5f);
 		float x = propertySet.getFloat("x"),
-			  y = getStage().getHeight()-getHeight()-propertySet.getFloat("y");
+			  y = needFix ? (getStage().getHeight()-getHeight()-propertySet.getFloat("y")) : propertySet.getFloat("y");
+		if(needFix){
+		    propertySet.put("y", y);
+		    needFix = false;
+		}
 		String name = propertySet.getString("name");
 		if(!name.equals(""))
 			setName(name);
@@ -103,6 +108,7 @@ public class ParticleItem extends Image implements EditorItem,Disposable {
 	public void setProperties(PropertySet<String, Object> propertySet) {
 		this.propertySet = propertySet;
 		if(propertySet==null) return;
+		needFix = propertySet.getString("Version").equals("");
 		
 		PropertySet<String,Object> temp = PropertySet.getDefualt(this,"particle.json");
 		for(String s:temp.keySet()){

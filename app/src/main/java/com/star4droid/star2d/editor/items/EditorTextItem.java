@@ -15,6 +15,8 @@ public class EditorTextItem extends Label implements EditorItem {
 	LibgdxEditor editor;
 	PropertySet<String,Object> propertySet;
 	String font = "";
+	boolean needFix = false;
+	
 	public EditorTextItem(LibgdxEditor editor){
 		super("TextItem",createDefaultStyle());
 		this.editor = editor;
@@ -50,8 +52,13 @@ public class EditorTextItem extends Label implements EditorItem {
 			height = propertySet.getFloat("height"),
 			x = propertySet.getFloat("x"),
 			y = propertySet.getFloat("y");
+		if(needFix) {
+		    y = getStage().getHeight()-height-y;
+		    propertySet.put("y", y);
+		    needFix = false;
+		}
 		setSize(width,height);
-		setPosition(x,getStage().getHeight()-height-y);
+		setPosition(x,y);
 		//if(!font.equals(propertySet.getString("font"))){
 			font = propertySet.getString("font");
 			if(!font.equals("")){
@@ -72,6 +79,7 @@ public class EditorTextItem extends Label implements EditorItem {
 	@Override
 	public void setProperties(PropertySet<String, Object> propertySet) {
 		this.propertySet = propertySet;
+		needFix = propertySet.getString("Version").equals("");
 		PropertySet<String,Object> temp = PropertySet.getDefualt(this,"text.json");
 		for(String s:temp.keySet()){
 			if(!propertySet.containsKey(s)){

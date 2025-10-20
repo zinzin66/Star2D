@@ -18,6 +18,8 @@ public class BoxDef extends ItemDef {
 	
 	public BoxBody build(StageImp stage){
 		if(name.equals("")) throw new RuntimeException("BoxDef error : set name to the item..!!");
+		if(Version.equals(""))
+		    throw new RuntimeException("Version of this scene is old, repoen the scene and click run to fix that");
 		if(parentName!=null && parentName.equals(""))
 		    parentName = name;
 		return new BoxBody(stage,null).setElementEvent(elementEvents).setDef(this);
@@ -59,10 +61,4 @@ public class BoxDef extends ItemDef {
         return clone;
 	}
 	
-	public com.badlogic.gdx.graphics.Color getColor(String color){
-	    try {
-    	    return com.badlogic.gdx.graphics.Color.valueOf(color);
-	    } catch(Exception ex){}
-	    return com.badlogic.gdx.graphics.Color.WHITE;
-	}
 }

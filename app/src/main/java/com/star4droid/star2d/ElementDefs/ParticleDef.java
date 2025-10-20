@@ -18,6 +18,8 @@ public class ParticleDef extends ItemDef {
 	
 	public ParticleItem build(StageImp stage){
 		if(name.equals("")) throw new RuntimeException("ParticleDef error : set name to the item..!!");
+		if(Version.equals(""))
+		    throw new RuntimeException("Version of this scene is old, repoen the scene and click run to fix that");
 		if(parentName!=null && parentName.equals(""))
 		    parentName = name;
 		return new ParticleItem(stage).setElementEvent(elementEvents)
@@ -43,11 +45,4 @@ public class ParticleDef extends ItemDef {
         clone.Scale_Y = this.Scale_Y;
         return clone;
     }
-    
-    public com.badlogic.gdx.graphics.Color getColor(String color){
-	    try {
-    	    return com.badlogic.gdx.graphics.Color.valueOf(color);
-	    } catch(Exception ex){}
-	    return com.badlogic.gdx.graphics.Color.WHITE;
-	}
 }

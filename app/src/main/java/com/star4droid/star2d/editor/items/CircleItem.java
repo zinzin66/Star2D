@@ -24,7 +24,8 @@ public class CircleItem extends Image implements EditorItem {
     Body body;
     String tint = "#FFFFFF";
     LibgdxEditor editor;
-
+    boolean needFix = false;
+    
     public CircleItem(final LibgdxEditor libgdxEditor) {
         super(new Texture(Gdx.files.internal("images/logo.png")));
         this.editor = libgdxEditor;
@@ -51,7 +52,11 @@ public class CircleItem extends Image implements EditorItem {
         
         // Position calculation
         float x = propertySet.getFloat("x");
-        float y = getStage().getHeight() - propertySet.getFloat("y") - getHeight();
+        float y = needFix ? (getStage().getHeight() - propertySet.getFloat("y") - getHeight()) : propertySet.getFloat("y");
+		if(needFix){
+		    propertySet.put("y", y);
+		    needFix = false;
+		}
         setPosition(x, y);
         
         // Common properties
@@ -111,7 +116,7 @@ public class CircleItem extends Image implements EditorItem {
     public void setProperties(PropertySet<String, Object> propertySet) {
         this.propertySet = propertySet;
         PropertySet<String, Object> temp = PropertySet.getDefualt(this, "circle.json");
-		
+		needFix = propertySet.getString("Version").equals("");
 		if(!propertySet.getString("Shape").equals("Circle")){
 			if(editor!=null){
 				try {

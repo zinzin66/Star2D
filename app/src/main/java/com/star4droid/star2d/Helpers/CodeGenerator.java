@@ -449,6 +449,8 @@ public class CodeGenerator {
             case "PROGRESS": return "ProgressDef";
             case "LIGHT": return "LightDef";
             case "PARTICLE": return "ParticleDef";
+            case "CAMERA": return "CameraDef";
+            case "MAP": return "MapDef";
             default: return "Unknown";
         }
     }

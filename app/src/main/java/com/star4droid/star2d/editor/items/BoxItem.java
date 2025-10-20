@@ -22,6 +22,7 @@ public class BoxItem extends Image implements EditorItem {
 	PropertySet<String,Object> propertySet;
 	float[] offset=new float[]{0,0};
 	String tint = "#FFFFFF";
+	boolean needFix = false;
 	Body body;
 	LibgdxEditor editor;
 	public BoxItem(final LibgdxEditor libgdxEditor){
@@ -46,7 +47,11 @@ public class BoxItem extends Image implements EditorItem {
 		setSize(propertySet.getFloat("width"),propertySet.getFloat("height"));
 		setOrigin(getWidth()*0.5f,getHeight()*0.5f);
 		float x = propertySet.getFloat("x"),
-			  y = getStage().getHeight()-getHeight()-propertySet.getFloat("y");
+			  y = needFix ? (getStage().getHeight()-getHeight()-propertySet.getFloat("y")) : propertySet.getFloat("y");
+		if(needFix){
+		    propertySet.put("y", y);
+		    needFix = false;
+		}
 		//Gdx.files.external("logs/box.txt").writeString("eh : "+getStage().getHeight()+", bxh : "+getHeight()+", y : "+y+" \n = "+getY()+"\n"+"_".repeat(10)+"\n",true);
 		String name = propertySet.getString("name");
 		if(!name.equals(""))
@@ -104,6 +109,7 @@ public class BoxItem extends Image implements EditorItem {
 	public void setProperties(PropertySet<String, Object> propertySet) {
 	    this.propertySet = propertySet;
 		if(propertySet==null) return;
+		needFix = propertySet.getString("Version").equals("");
 		if(!propertySet.getString("Shape").equals("Box")){
 		    if(editor!=null){
 		        try {

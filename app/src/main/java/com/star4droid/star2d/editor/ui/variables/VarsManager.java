@@ -68,7 +68,13 @@ public class VarsManager {
 
   public void load() {
     try {
-      String json = fileHandle.readString();
+      String str = fileHandle.exists() ? fileHandle.readString() : "";
+      if(str.equals("")){
+        varModelList = new ArrayList<VarModel>();
+        varsListTable.setList(varModelList);
+        return;
+      }
+      String json = str;
       varModelList = new Gson().fromJson(json, new TypeToken<ArrayList<VarModel>>() {}.getType());
       varsListTable.setList(varModelList);
     } catch (Exception e) {

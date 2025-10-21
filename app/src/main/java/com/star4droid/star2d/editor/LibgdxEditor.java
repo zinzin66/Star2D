@@ -406,8 +406,9 @@ public class LibgdxEditor extends Stage {
 			} else if(editorConfig!=null){
 				setLogicalWH(editorConfig.getFloat("logicWidth"),editorConfig.getFloat("logicHeight"));
 			}
+			LANDSCAPE = editorConfig.getString("or").equals("") || editorConfig.getString("or").equals("landscape");
 			if(orienationChangeListener!=null)
-				orienationChangeListener.onChange(editorConfig.getString("or").equals("") || editorConfig.getString("or").equals("landscape"));
+				orienationChangeListener.onChange(LANDSCAPE);
 		} catch(Exception e){
 			toast("update config error : "+e.toString());
 		}

@@ -17,7 +17,8 @@ import box2dLight.RayHandler;
 // import .....script_here;
 
 public class scene1 extends StageImp {
-  PlayerItem background, player, Box1, ground, jump, right, coin, coin1, left, text, coin2, Box2;
+  float force = 2000000;
+  PlayerItem background, player, Box1, ground, jump, right, coin, coin1, left, coin2, Box2, text;
 
   @Override
   public void onCreate() {
@@ -25,12 +26,14 @@ public class scene1 extends StageImp {
     BoxDef background_def = new BoxDef();
     background_def.type = "UI";
     background_def.Collider_Width = 1419.1006f;
+    background_def.Version = "1.0";
     background_def.height = 720.31305f;
     background_def.Script = "background";
     background_def.image = "/blue_grass.png";
     background_def.Collider_Height = 720.31305f;
     background_def.name = "background";
     background_def.width = 1419.1006f;
+    background_def.y = -0.31304932f;
     background_def.Tint = "#FFFFFF";
 
     background_def.elementEvents = new ElementEvent() {
@@ -64,6 +67,7 @@ public class scene1 extends StageImp {
 
     BoxDef player_def = new BoxDef();
     player_def.Collider_Width = 112.496086f;
+    player_def.Version = "1.0";
     player_def.height = 152.1776f;
     player_def.Script = "player";
     player_def.image = "/alienPink_stand.png";
@@ -72,8 +76,8 @@ public class scene1 extends StageImp {
     player_def.x = 338.59988f;
     player_def.name = "player";
     player_def.width = 112.496086f;
-    player_def.y = 373.95288f;
-    player_def.z = 1.0f;
+    player_def.y = 193.8695f;
+    player_def.z = 1f;
     player_def.Tint = "#FFFFFF";
     player_def.Fixed_Rotation = true;
 
@@ -112,6 +116,7 @@ public class scene1 extends StageImp {
     BoxDef Box1_def = new BoxDef();
     Box1_def.type = "STATIC";
     Box1_def.Collider_Width = 99.90719f;
+    Box1_def.Version = "1.0";
     Box1_def.height = 96.14049f;
     Box1_def.Script = "Box1";
     Box1_def.image = "/box.png";
@@ -120,8 +125,8 @@ public class scene1 extends StageImp {
     Box1_def.x = 1037.6382f;
     Box1_def.name = "Box1";
     Box1_def.width = 99.90719f;
-    Box1_def.y = 430.22916f;
-    Box1_def.z = 2.0f;
+    Box1_def.y = 193.63034f;
+    Box1_def.z = 2f;
     Box1_def.Tint = "#FFFFFF";
 
     Box1_def.elementEvents = new ElementEvent() {
@@ -159,6 +164,7 @@ public class scene1 extends StageImp {
     BoxDef ground_def = new BoxDef();
     ground_def.type = "STATIC";
     ground_def.Collider_Width = 1424.8556f;
+    ground_def.Version = "1.0";
     ground_def.height = 189.51807f;
     ground_def.Script = "ground";
     ground_def.image = "/ground.png";
@@ -166,8 +172,8 @@ public class scene1 extends StageImp {
     ground_def.restitution = 0.0f;
     ground_def.name = "ground";
     ground_def.width = 1424.8556f;
-    ground_def.y = 530.23505f;
-    ground_def.z = 3.0f;
+    ground_def.y = 0.2468872f;
+    ground_def.z = 3f;
     ground_def.Tint = "#FFFFFF";
 
     ground_def.elementEvents = new ElementEvent() {
@@ -202,6 +208,7 @@ public class scene1 extends StageImp {
     BoxDef jump_def = new BoxDef();
     jump_def.type = "UI";
     jump_def.Collider_Width = 221.48987f;
+    jump_def.Version = "1.0";
     jump_def.height = 130.4881f;
     jump_def.Script = "jump";
     jump_def.image = "/btn.png";
@@ -209,15 +216,15 @@ public class scene1 extends StageImp {
     jump_def.x = 1153.6604f;
     jump_def.name = "jump";
     jump_def.width = 221.48987f;
-    jump_def.y = 295.9888f;
-    jump_def.z = 4.0f;
+    jump_def.y = 293.5231f;
+    jump_def.z = 4f;
     jump_def.Tint = "#FFFFFF";
 
     jump_def.elementEvents = new ElementEvent() {
       @Override
       public void onClick(PlayerItem current) {
         if (checkCollision(player, ground)) {
-          player.getBody().applyForceToCenter((float) (0), (float) (45000000), true);
+          player.getBody().applyForceToCenter((float) (0), (float) (force), true);
 
         } else {
 
@@ -255,16 +262,17 @@ public class scene1 extends StageImp {
     BoxDef right_def = new BoxDef();
     right_def.type = "UI";
     right_def.Collider_Width = 185.40819f;
+    right_def.Version = "1.0";
     right_def.height = 143.67416f;
     right_def.Script = "right";
     right_def.image = "/btn.png";
     right_def.Collider_Height = 143.67416f;
     right_def.rotation = 90.0f;
-    right_def.x = 163.75273f;
+    right_def.x = 187.31534f;
     right_def.name = "right";
     right_def.width = 185.40819f;
-    right_def.y = 530.6951f;
-    right_def.z = 5.0f;
+    right_def.y = 47.443184f;
+    right_def.z = 5f;
     right_def.Tint = "#FFFFFF";
 
     right_def.elementEvents = new ElementEvent() {
@@ -273,7 +281,7 @@ public class scene1 extends StageImp {
 
       @Override
       public void onTouchStart(PlayerItem current, InputEvent event) {
-        player.getBody().setLinearVelocity((float) (250), (float) (0));
+        player.getBody().setLinearVelocity((float) (25), (float) (0));
         setAnimation(player, "walk");
         player.getActor().setScaleX((float) (1));
       }
@@ -306,6 +314,7 @@ public class scene1 extends StageImp {
     BoxDef coin_def = new BoxDef();
     coin_def.type = "KINAMATIC";
     coin_def.Collider_Width = 120.15493f;
+    coin_def.Version = "1.0";
     coin_def.height = 104.52431f;
     coin_def.Script = "coin";
     coin_def.image = "/coin.png";
@@ -314,8 +323,8 @@ public class scene1 extends StageImp {
     coin_def.x = 842.62f;
     coin_def.name = "coin";
     coin_def.width = 120.15493f;
-    coin_def.y = 425.80853f;
-    coin_def.z = 6.0f;
+    coin_def.y = 189.66718f;
+    coin_def.z = 6f;
     coin_def.Tint = "#FFFFFF";
 
     coin_def.elementEvents = new ElementEvent() {
@@ -353,6 +362,7 @@ public class scene1 extends StageImp {
     BoxDef coin1_def = new BoxDef();
     coin1_def.type = "KINAMATIC";
     coin1_def.Collider_Width = 120.15493f;
+    coin1_def.Version = "1.0";
     coin1_def.height = 104.52431f;
     coin1_def.Script = "coin";
     coin1_def.image = "/coin.png";
@@ -361,8 +371,8 @@ public class scene1 extends StageImp {
     coin1_def.x = 706.3846f;
     coin1_def.name = "coin1";
     coin1_def.width = 120.15493f;
-    coin1_def.y = 420.36316f;
-    coin1_def.z = 7.0f;
+    coin1_def.y = 195.11255f;
+    coin1_def.z = 7f;
     coin1_def.Tint = "#FFFFFF";
 
     coin1_def.elementEvents = new ElementEvent() {
@@ -400,6 +410,7 @@ public class scene1 extends StageImp {
     BoxDef left_def = new BoxDef();
     left_def.type = "UI";
     left_def.Collider_Width = 185.40819f;
+    left_def.Version = "1.0";
     left_def.height = 143.67416f;
     left_def.Script = "left";
     left_def.image = "/btn.png";
@@ -408,8 +419,8 @@ public class scene1 extends StageImp {
     left_def.x = 7.8352227f;
     left_def.name = "left";
     left_def.width = 185.40819f;
-    left_def.y = 535.5885f;
-    left_def.z = 8.0f;
+    left_def.y = 40.737305f;
+    left_def.z = 8f;
     left_def.Tint = "#FFFFFF";
 
     left_def.elementEvents = new ElementEvent() {
@@ -448,49 +459,10 @@ public class scene1 extends StageImp {
     };
     left = (PlayerItem) (left_def.build(this));
 
-    TextDef text_def = new TextDef();
-    text_def.Script = "coins : 0";
-    text_def.Font_Scale = 5.0f;
-    text_def.Text = "coins : 0";
-    text_def.x = 509.5199f;
-    text_def.name = "text";
-    text_def.width = 462.42343f;
-    text_def.y = 571.7612f;
-    text_def.z = 9.0f;
-    text_def.height = 122.9747f;
-
-    text_def.elementEvents = new ElementEvent() {
-      @Override
-      public void onClick(PlayerItem current) {}
-
-      @Override
-      public void onTouchStart(PlayerItem current, InputEvent event) {}
-
-      @Override
-      public void onTouchEnd(PlayerItem current, InputEvent event) {}
-
-      @Override
-      public void onBodyCreated(PlayerItem current) {}
-
-      @Override
-      public void onBodyUpdate(PlayerItem current) {}
-
-      @Override
-      public void onCollisionBegin(PlayerItem current, PlayerItem body2) {}
-
-      @Override
-      public void onCollisionEnd(PlayerItem current, PlayerItem body2) {}
-
-      @Override
-      public String getName() {
-        return "text";
-      }
-    };
-    text = (PlayerItem) (text_def.build(this));
-
     BoxDef coin2_def = new BoxDef();
     coin2_def.type = "KINAMATIC";
     coin2_def.Collider_Width = 120.15493f;
+    coin2_def.Version = "1.0";
     coin2_def.height = 104.52431f;
     coin2_def.Script = "coin";
     coin2_def.image = "/coin.png";
@@ -499,8 +471,8 @@ public class scene1 extends StageImp {
     coin2_def.x = 572.87415f;
     coin2_def.name = "coin2";
     coin2_def.width = 120.15493f;
-    coin2_def.y = 414.91776f;
-    coin2_def.z = 10.0f;
+    coin2_def.y = 200.55795f;
+    coin2_def.z = 9f;
     coin2_def.Tint = "#FFFFFF";
 
     coin2_def.elementEvents = new ElementEvent() {
@@ -538,6 +510,7 @@ public class scene1 extends StageImp {
     BoxDef Box2_def = new BoxDef();
     Box2_def.type = "STATIC";
     Box2_def.Collider_Width = 1280.6168f;
+    Box2_def.Version = "1.0";
     Box2_def.height = 183.70337f;
     Box2_def.Script = "Box2";
     Box2_def.image = "/ground.png";
@@ -546,8 +519,8 @@ public class scene1 extends StageImp {
     Box2_def.x = 1428.8195f;
     Box2_def.name = "Box2";
     Box2_def.width = 1280.6168f;
-    Box2_def.y = 533.5147f;
-    Box2_def.z = 11.0f;
+    Box2_def.y = 2.7819214f;
+    Box2_def.z = 10f;
     Box2_def.Tint = "#FFFFFF";
 
     Box2_def.elementEvents = new ElementEvent() {
@@ -579,6 +552,47 @@ public class scene1 extends StageImp {
     };
     Box2 = (PlayerItem) (Box2_def.build(this));
 
+    TextDef text_def = new TextDef();
+    text_def.Script = "coins : 0";
+    text_def.Font_Scale = 5.0f;
+    text_def.Text = "coins : 0";
+    text_def.Version = "1.0";
+    text_def.x = 509.5199f;
+    text_def.name = "text";
+    text_def.width = 462.42343f;
+    text_def.y = 25.264038f;
+    text_def.z = 11f;
+    text_def.height = 122.9747f;
+
+    text_def.elementEvents = new ElementEvent() {
+      @Override
+      public void onClick(PlayerItem current) {}
+
+      @Override
+      public void onTouchStart(PlayerItem current, InputEvent event) {}
+
+      @Override
+      public void onTouchEnd(PlayerItem current, InputEvent event) {}
+
+      @Override
+      public void onBodyCreated(PlayerItem current) {}
+
+      @Override
+      public void onBodyUpdate(PlayerItem current) {}
+
+      @Override
+      public void onCollisionBegin(PlayerItem current, PlayerItem body2) {}
+
+      @Override
+      public void onCollisionEnd(PlayerItem current, PlayerItem body2) {}
+
+      @Override
+      public String getName() {
+        return "text";
+      }
+    };
+    text = (PlayerItem) (text_def.build(this));
+
     background.getActor().setZIndex((int) (background_def.z));
 
     player.getActor().setZIndex((int) (player_def.z));
@@ -597,11 +611,11 @@ public class scene1 extends StageImp {
 
     left.getActor().setZIndex((int) (left_def.z));
 
-    text.getActor().setZIndex((int) (text_def.z));
-
     coin2.getActor().setZIndex((int) (coin2_def.z));
 
     Box2.getActor().setZIndex((int) (Box2_def.z));
+
+    text.getActor().setZIndex((int) (text_def.z));
     setCameraXY(player);
   }
 

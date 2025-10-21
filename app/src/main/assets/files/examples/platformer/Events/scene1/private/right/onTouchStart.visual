@@ -1,1 +1,58 @@
-[{"next":"1","code":"%1$s","color":-11056255,"else_id":"","else":"false","x":"-20.241837","nf":"[]","y":"98.67204","id":"0","title":"First \u003e ","close":"false","next_id":"null"},{"next":"2","code":"%1$s.getBody().setLinearVelocity((float)(%2$s),(float)(%3$s));\n%4$s","color":-16743563,"else_id":"","else":"false","x":"373.24536","nf":"[{\"name\":\"body(Body)\",\"value\":\"player\"},{\"name\":\"xVelocity\",\"value\":\"250\"},{\"name\":\"yVelocity\",\"value\":\"0\"}]","y":"217.20338","id":"1","title":"setLinearVelocity","close":"true","next_id":"null"},{"next":"3","code":"setAnimation(%1$s,\"%2$s\");\n%3$s","color":-11896812,"else_id":"","else":"false","x":"1028.6438","nf":"[{\"name\":\"body(Body)\",\"value\":\"player\"},{\"name\":\"animation(animation)\",\"value\":\"walk\"}]","y":"234.34344","id":"2","title":"setAnimation","close":"true","next_id":"null"},{"next":"null","code":"%1$s.getActor().setScaleX((float)(%2$s));\n%3$s","color":-11896812,"else_id":"","else":"false","x":"1612.7925","nf":"[{\"name\":\"item(Body)\",\"value\":\"player\"},{\"name\":\"scaleX\",\"value\":\"1\"}]","y":"576.046","id":"3","title":"setScaleX","close":"true","next_id":"null"}]
+[
+  {
+    "id": "0",
+    "title": "First \u003e ",
+    "x": "-20.0",
+    "y": "98.0",
+    "else": "false",
+    "next": "3",
+    "next_id": "null",
+    "else_id": "",
+    "nf": "[]",
+    "code": "%1$s",
+    "color": -1,
+    "close": "false"
+  },
+  {
+    "id": "1",
+    "title": "setAnimation",
+    "x": "1028.0",
+    "y": "234.0",
+    "else": "false",
+    "next": "2",
+    "next_id": "null",
+    "else_id": "",
+    "nf": "[\n  {\n    \"name\": \"body(Body)\",\n    \"value\": \"player\"\n  },\n  {\n    \"name\": \"animation(animation)\",\n    \"value\": \"walk\"\n  }\n]",
+    "code": "setAnimation(%1$s,\"%2$s\");\n%3$s",
+    "color": -1,
+    "close": "true"
+  },
+  {
+    "id": "2",
+    "title": "setScaleX",
+    "x": "1612.0",
+    "y": "576.0",
+    "else": "false",
+    "next": "null",
+    "next_id": "null",
+    "else_id": "",
+    "nf": "[\n  {\n    \"name\": \"item(Body)\",\n    \"value\": \"player\"\n  },\n  {\n    \"name\": \"scaleX\",\n    \"value\": \"1\"\n  }\n]",
+    "code": "%1$s.getActor().setScaleX((float)(%2$s));\n%3$s",
+    "color": -1,
+    "close": "true"
+  },
+  {
+    "id": "3",
+    "title": "setLinearVelocity",
+    "x": "373.0",
+    "y": "217.0",
+    "else": "false",
+    "next": "1",
+    "next_id": "null",
+    "else_id": "",
+    "nf": "[\n  {\n    \"name\": \"body(Body)\",\n    \"value\": \"player\"\n  },\n  {\n    \"name\": \"xVelocity\",\n    \"value\": \"25\"\n  },\n  {\n    \"name\": \"yVelocity\",\n    \"value\": \"0\"\n  }\n]",
+    "code": "%1$s.getBody().setLinearVelocity((float)(%2$s),(float)(%3$s));\n%4$s",
+    "color": -1,
+    "close": "true"
+  }
+]

@@ -19,6 +19,7 @@ import box2dLight.RayHandler;
 public class main extends StageImp {
   PlayerItem background,
       Car4,
+      Box4,
       Car2,
       Car1,
       Car,
@@ -37,7 +38,6 @@ public class main extends StageImp {
       Box2,
       Box3,
       Custom1,
-      Box4,
       clouds,
       back,
       front,
@@ -49,12 +49,12 @@ public class main extends StageImp {
       coin3,
       coin2,
       coin1;
-  WheelJoint fwj;
   WheelJoint bwj;
   WheelJoint bwj1;
   WheelJoint bwj2;
-  WheelJoint bwj5;
   WheelJoint bwj4;
+  WheelJoint bwj5;
+  WheelJoint fwj;
   WheelJoint fwj1;
   WheelJoint fwj2;
   WheelJoint fwj4;
@@ -66,12 +66,14 @@ public class main extends StageImp {
     BoxDef background_def = new BoxDef();
     background_def.type = "UI";
     background_def.Collider_Width = 719.976f;
+    background_def.Version = "1.0";
     background_def.height = 1548.6714f;
     background_def.Script = "background";
     background_def.image = "/blue_grass.png";
     background_def.Collider_Height = 1548.6714f;
     background_def.name = "background";
     background_def.width = 719.976f;
+    background_def.y = -0.6713867f;
     background_def.Tint = "#FFFFFF";
 
     background_def.elementEvents = new ElementEvent() {
@@ -105,6 +107,7 @@ public class main extends StageImp {
 
     BoxDef Car4_def = new BoxDef();
     Car4_def.Collider_Width = 183.22594f;
+    Car4_def.Version = "1.0";
     Car4_def.Visible = false;
     Car4_def.height = 100.22926f;
     Car4_def.Script = "Car";
@@ -115,7 +118,7 @@ public class main extends StageImp {
     Car4_def.x = 177.30434f;
     Car4_def.name = "Car4";
     Car4_def.width = 183.22594f;
-    Car4_def.y = 988.5397f;
+    Car4_def.y = 459.23108f;
     Car4_def.z = 1f;
     Car4_def.Tint = "#FFFFFF";
 
@@ -151,8 +154,54 @@ public class main extends StageImp {
     Car4.setScript(
         new com.star4droid.Game.Scripts.main.CarScript().setItem(Car4).setStage(this));
 
+    BoxDef Box4_def = new BoxDef();
+    Box4_def.type = "STATIC";
+    Box4_def.Collider_Width = 2800.0f;
+    Box4_def.Version = "1.0";
+    Box4_def.Script = "Box4";
+    Box4_def.image = "/ground.png";
+    Box4_def.Collider_Height = 50f;
+    Box4_def.friction = 1.0f;
+    Box4_def.x = 6.205269f;
+    Box4_def.name = "Box4";
+    Box4_def.width = 2800.0f;
+    Box4_def.y = 389.91577f;
+    Box4_def.z = 2f;
+    Box4_def.Tint = "#FFFFFF";
+    Box4_def.tileX = 1.038f;
+
+    Box4_def.elementEvents = new ElementEvent() {
+      @Override
+      public void onClick(PlayerItem current) {}
+
+      @Override
+      public void onTouchStart(PlayerItem current, InputEvent event) {}
+
+      @Override
+      public void onTouchEnd(PlayerItem current, InputEvent event) {}
+
+      @Override
+      public void onBodyCreated(PlayerItem current) {}
+
+      @Override
+      public void onBodyUpdate(PlayerItem current) {}
+
+      @Override
+      public void onCollisionBegin(PlayerItem current, PlayerItem body2) {}
+
+      @Override
+      public void onCollisionEnd(PlayerItem current, PlayerItem body2) {}
+
+      @Override
+      public String getName() {
+        return "Box4";
+      }
+    };
+    Box4 = (PlayerItem) (Box4_def.build(this));
+
     BoxDef Car2_def = new BoxDef();
     Car2_def.Collider_Width = 263.57828f;
+    Car2_def.Version = "1.0";
     Car2_def.Visible = false;
     Car2_def.height = 94.142f;
     Car2_def.Script = "Car";
@@ -163,7 +212,7 @@ public class main extends StageImp {
     Car2_def.x = 177.30434f;
     Car2_def.name = "Car2";
     Car2_def.width = 263.57828f;
-    Car2_def.y = 751.08276f;
+    Car2_def.y = 702.77527f;
     Car2_def.z = 3f;
     Car2_def.Tint = "#FFFFFF";
 
@@ -201,6 +250,7 @@ public class main extends StageImp {
 
     BoxDef Car1_def = new BoxDef();
     Car1_def.Collider_Width = 263.57828f;
+    Car1_def.Version = "1.0";
     Car1_def.Visible = false;
     Car1_def.height = 94.142f;
     Car1_def.Script = "Car";
@@ -211,7 +261,7 @@ public class main extends StageImp {
     Car1_def.x = 177.30434f;
     Car1_def.name = "Car1";
     Car1_def.width = 263.57828f;
-    Car1_def.y = 988.5397f;
+    Car1_def.y = 465.31836f;
     Car1_def.z = 4f;
     Car1_def.Tint = "#FFFFFF";
     Car1_def.Scale_X = -1.0f;
@@ -250,6 +300,7 @@ public class main extends StageImp {
 
     BoxDef Car_def = new BoxDef();
     Car_def.Collider_Width = 263.57828f;
+    Car_def.Version = "1.0";
     Car_def.Visible = false;
     Car_def.height = 94.142f;
     Car_def.Script = "Car";
@@ -260,7 +311,7 @@ public class main extends StageImp {
     Car_def.x = 177.30434f;
     Car_def.name = "Car";
     Car_def.width = 263.57828f;
-    Car_def.y = 988.5397f;
+    Car_def.y = 465.31836f;
     Car_def.z = 5f;
     Car_def.Tint = "#FFFFFF";
 
@@ -296,6 +347,7 @@ public class main extends StageImp {
     Car.setScript(new com.star4droid.Game.Scripts.main.CarScript().setItem(Car).setStage(this));
 
     CircleDef BW4_def = new CircleDef();
+    BW4_def.Version = "1.0";
     BW4_def.Visible = false;
     BW4_def.radius = 25.729733f;
     BW4_def.Script = "Circle1";
@@ -306,7 +358,7 @@ public class main extends StageImp {
     BW4_def.restitution = 0.0f;
     BW4_def.x = 183.83943f;
     BW4_def.name = "BW4";
-    BW4_def.y = 1055.7869f;
+    BW4_def.y = 440.75366f;
     BW4_def.z = 6f;
     BW4_def.Tint = "#FFFFFF";
 
@@ -340,6 +392,7 @@ public class main extends StageImp {
     BW4 = (PlayerItem) (BW4_def.build(this));
 
     CircleDef BW5_def = new CircleDef();
+    BW5_def.Version = "1.0";
     BW5_def.Visible = false;
     BW5_def.radius = 18.5f;
     BW5_def.Script = "Circle1";
@@ -350,7 +403,7 @@ public class main extends StageImp {
     BW5_def.restitution = 0.0f;
     BW5_def.x = 203.82123f;
     BW5_def.name = "BW5";
-    BW5_def.y = 965.4272f;
+    BW5_def.y = 545.5728f;
     BW5_def.z = 7f;
     BW5_def.Tint = "#FFFFFF";
 
@@ -384,6 +437,7 @@ public class main extends StageImp {
     BW5 = (PlayerItem) (BW5_def.build(this));
 
     CircleDef BW2_def = new CircleDef();
+    BW2_def.Version = "1.0";
     BW2_def.Visible = false;
     BW2_def.radius = 25.729733f;
     BW2_def.Script = "Circle1";
@@ -394,7 +448,7 @@ public class main extends StageImp {
     BW2_def.restitution = 0.0f;
     BW2_def.x = 204.85124f;
     BW2_def.name = "BW2";
-    BW2_def.y = 819.0303f;
+    BW2_def.y = 677.51025f;
     BW2_def.z = 8f;
     BW2_def.Tint = "#FFFFFF";
 
@@ -429,6 +483,7 @@ public class main extends StageImp {
 
     BoxDef Car5_def = new BoxDef();
     Car5_def.Collider_Width = 190.83786f;
+    Car5_def.Version = "1.0";
     Car5_def.Visible = false;
     Car5_def.height = 99.12422f;
     Car5_def.Script = "Car";
@@ -439,7 +494,7 @@ public class main extends StageImp {
     Car5_def.x = 185.54419f;
     Car5_def.name = "Car5";
     Car5_def.width = 190.83786f;
-    Car5_def.y = 876.59155f;
+    Car5_def.y = 572.2842f;
     Car5_def.z = 9f;
     Car5_def.Tint = "#FFFFFF";
 
@@ -476,6 +531,7 @@ public class main extends StageImp {
         new com.star4droid.Game.Scripts.main.CarScript().setItem(Car5).setStage(this));
 
     CircleDef BW1_def = new CircleDef();
+    BW1_def.Version = "1.0";
     BW1_def.Visible = false;
     BW1_def.radius = 25.729733f;
     BW1_def.Script = "Circle1";
@@ -486,7 +542,7 @@ public class main extends StageImp {
     BW1_def.restitution = 0.0f;
     BW1_def.x = 202.9971f;
     BW1_def.name = "BW1";
-    BW1_def.y = 1062.9982f;
+    BW1_def.y = 433.54236f;
     BW1_def.z = 10f;
     BW1_def.Tint = "#FFFFFF";
 
@@ -520,6 +576,7 @@ public class main extends StageImp {
     BW1 = (PlayerItem) (BW1_def.build(this));
 
     CircleDef FW5_def = new CircleDef();
+    FW5_def.Version = "1.0";
     FW5_def.Visible = false;
     FW5_def.radius = 18.519806f;
     FW5_def.Script = "Circle1";
@@ -530,7 +587,7 @@ public class main extends StageImp {
     FW5_def.restitution = 0.0f;
     FW5_def.x = 312.92255f;
     FW5_def.name = "FW5";
-    FW5_def.y = 968.0736f;
+    FW5_def.y = 542.8868f;
     FW5_def.z = 11f;
     FW5_def.Tint = "#FFFFFF";
 
@@ -564,6 +621,7 @@ public class main extends StageImp {
     FW5 = (PlayerItem) (FW5_def.build(this));
 
     CircleDef BW_def = new CircleDef();
+    BW_def.Version = "1.0";
     BW_def.Visible = false;
     BW_def.radius = 25.729733f;
     BW_def.Script = "Circle1";
@@ -573,7 +631,7 @@ public class main extends StageImp {
     BW_def.restitution = 0.0f;
     BW_def.x = 196.81729f;
     BW_def.name = "BW";
-    BW_def.y = 1055.7869f;
+    BW_def.y = 440.75366f;
     BW_def.z = 12f;
     BW_def.Tint = "#FFFFFF";
 
@@ -607,6 +665,7 @@ public class main extends StageImp {
     BW = (PlayerItem) (BW_def.build(this));
 
     CircleDef FW4_def = new CircleDef();
+    FW4_def.Version = "1.0";
     FW4_def.Visible = false;
     FW4_def.radius = 25.729733f;
     FW4_def.Script = "Circle1";
@@ -617,7 +676,7 @@ public class main extends StageImp {
     FW4_def.restitution = 0.0f;
     FW4_def.x = 304.8703f;
     FW4_def.name = "FW4";
-    FW4_def.y = 1055.0137f;
+    FW4_def.y = 441.52686f;
     FW4_def.z = 13f;
     FW4_def.Tint = "#FFFFFF";
 
@@ -651,6 +710,7 @@ public class main extends StageImp {
     FW4 = (PlayerItem) (FW4_def.build(this));
 
     CircleDef FW2_def = new CircleDef();
+    FW2_def.Version = "1.0";
     FW2_def.Visible = false;
     FW2_def.radius = 25.729733f;
     FW2_def.Script = "Circle1";
@@ -661,7 +721,7 @@ public class main extends StageImp {
     FW2_def.restitution = 0.0f;
     FW2_def.x = 342.38058f;
     FW2_def.name = "FW2";
-    FW2_def.y = 821.26514f;
+    FW2_def.y = 675.2754f;
     FW2_def.z = 14f;
     FW2_def.Tint = "#FFFFFF";
 
@@ -695,6 +755,7 @@ public class main extends StageImp {
     FW2 = (PlayerItem) (FW2_def.build(this));
 
     CircleDef FW1_def = new CircleDef();
+    FW1_def.Version = "1.0";
     FW1_def.Visible = false;
     FW1_def.radius = 25.729733f;
     FW1_def.Script = "Circle1";
@@ -705,7 +766,7 @@ public class main extends StageImp {
     FW1_def.restitution = 0.0f;
     FW1_def.x = 367.3062f;
     FW1_def.name = "FW1";
-    FW1_def.y = 1063.6664f;
+    FW1_def.y = 432.87415f;
     FW1_def.z = 15f;
     FW1_def.Tint = "#FFFFFF";
 
@@ -739,6 +800,7 @@ public class main extends StageImp {
     FW1 = (PlayerItem) (FW1_def.build(this));
 
     CircleDef FW_def = new CircleDef();
+    FW_def.Version = "1.0";
     FW_def.Visible = false;
     FW_def.radius = 25.729733f;
     FW_def.Script = "Circle1";
@@ -749,7 +811,7 @@ public class main extends StageImp {
     FW_def.restitution = 0.0f;
     FW_def.x = 368.13013f;
     FW_def.name = "FW";
-    FW_def.y = 1055.0137f;
+    FW_def.y = 441.52686f;
     FW_def.z = 16f;
     FW_def.Tint = "#FFFFFF";
 
@@ -786,8 +848,10 @@ public class main extends StageImp {
     txt_def.Script = "txt";
     txt_def.Font_Scale = 5.0f;
     txt_def.Text = "coins : 0";
+    txt_def.Version = "1.0";
     txt_def.name = "txt";
     txt_def.width = 495.31616f;
+    txt_def.y = 1357.5875f;
     txt_def.z = 17f;
     txt_def.height = 190.41243f;
 
@@ -823,13 +887,14 @@ public class main extends StageImp {
     BoxDef Box2_def = new BoxDef();
     Box2_def.type = "STATIC";
     Box2_def.Collider_Width = 50f;
+    Box2_def.Version = "1.0";
     Box2_def.Script = "Box2";
     Box2_def.image = "/ground.png";
     Box2_def.Collider_Height = 50f;
     Box2_def.rotation = 160.86105800866983f;
     Box2_def.x = 500.10446f;
     Box2_def.name = "Box2";
-    Box2_def.y = 1106.7452f;
+    Box2_def.y = 391.25476f;
     Box2_def.z = 18f;
     Box2_def.Tint = "#FFFFFF";
 
@@ -865,13 +930,14 @@ public class main extends StageImp {
     BoxDef Box3_def = new BoxDef();
     Box3_def.type = "STATIC";
     Box3_def.Collider_Width = 50f;
+    Box3_def.Version = "1.0";
     Box3_def.Script = "Box2";
     Box3_def.image = "/ground.png";
     Box3_def.Collider_Height = 50f;
     Box3_def.rotation = 22.46123698746362f;
     Box3_def.x = 836.4872f;
     Box3_def.name = "Box3";
-    Box3_def.y = 1107.0741f;
+    Box3_def.y = 390.9259f;
     Box3_def.z = 19f;
     Box3_def.Tint = "#FFFFFF";
 
@@ -908,13 +974,14 @@ public class main extends StageImp {
     Custom1_def.type = "STATIC";
     Custom1_def.Points =
         "0.0025252525,0.119802654-0.09343434,0.17383134-0.21464646,0.19191921-0.28282827,0.16960305-0.3989899,0.13436693-0.59090906,0.16020674-0.6388889,0.1484614-0.7929293,0.087385535-0.85353535,0.05919665-0.92676765,0.06506932-1.0,0.107352614-0.05050505,0.9765093";
+    Custom1_def.Version = "1.0";
     Custom1_def.height = 120.62603f;
     Custom1_def.Script = "Custom1";
     Custom1_def.image = "/others/SceneBG.png";
     Custom1_def.x = 539.3039f;
     Custom1_def.name = "Custom1";
     Custom1_def.width = 311.06378f;
-    Custom1_def.y = 1085.6296f;
+    Custom1_def.y = 341.74432f;
     Custom1_def.z = 20f;
     Custom1_def.Tint = "#FFFFFF";
 
@@ -947,53 +1014,10 @@ public class main extends StageImp {
     };
     Custom1 = (PlayerItem) (Custom1_def.build(this));
 
-    BoxDef Box4_def = new BoxDef();
-    Box4_def.type = "STATIC";
-    Box4_def.Collider_Width = 2800.0f;
-    Box4_def.Script = "Box4";
-    Box4_def.image = "/ground.png";
-    Box4_def.Collider_Height = 50f;
-    Box4_def.friction = 1.0f;
-    Box4_def.x = 6.205269f;
-    Box4_def.name = "Box4";
-    Box4_def.width = 2800.0f;
-    Box4_def.y = 1108.0842f;
-    Box4_def.z = 2f;
-    Box4_def.Tint = "#FFFFFF";
-    Box4_def.tileX = 1.038f;
-
-    Box4_def.elementEvents = new ElementEvent() {
-      @Override
-      public void onClick(PlayerItem current) {}
-
-      @Override
-      public void onTouchStart(PlayerItem current, InputEvent event) {}
-
-      @Override
-      public void onTouchEnd(PlayerItem current, InputEvent event) {}
-
-      @Override
-      public void onBodyCreated(PlayerItem current) {}
-
-      @Override
-      public void onBodyUpdate(PlayerItem current) {}
-
-      @Override
-      public void onCollisionBegin(PlayerItem current, PlayerItem body2) {}
-
-      @Override
-      public void onCollisionEnd(PlayerItem current, PlayerItem body2) {}
-
-      @Override
-      public String getName() {
-        return "Box4";
-      }
-    };
-    Box4 = (PlayerItem) (Box4_def.build(this));
-
     BoxDef clouds_def = new BoxDef();
     clouds_def.type = "STATIC";
     clouds_def.Collider_Width = 676.0719f;
+    clouds_def.Version = "1.0";
     clouds_def.height = 434.0807f;
     clouds_def.Script = "clouds";
     clouds_def.image = "/others/Clouds.png";
@@ -1002,7 +1026,7 @@ public class main extends StageImp {
     clouds_def.x = 1.1100509f;
     clouds_def.name = "clouds";
     clouds_def.width = 676.0719f;
-    clouds_def.y = 147.63751f;
+    clouds_def.y = 966.2818f;
     clouds_def.z = 21f;
     clouds_def.Tint = "#FFFFFF";
 
@@ -1038,6 +1062,7 @@ public class main extends StageImp {
     BoxDef back_def = new BoxDef();
     back_def.type = "UI";
     back_def.Collider_Width = 134.36433f;
+    back_def.Version = "1.0";
     back_def.height = 145.4649f;
     back_def.Script = "back";
     back_def.image = "/btn.png";
@@ -1046,7 +1071,7 @@ public class main extends StageImp {
     back_def.x = 28.861483f;
     back_def.name = "back";
     back_def.width = 134.36433f;
-    back_def.y = 818.1119f;
+    back_def.y = 584.4233f;
     back_def.z = 22f;
     back_def.Tint = "#FFFFFF";
 
@@ -1087,6 +1112,7 @@ public class main extends StageImp {
     BoxDef front_def = new BoxDef();
     front_def.type = "UI";
     front_def.Collider_Width = 134.36433f;
+    front_def.Version = "1.0";
     front_def.height = 145.4649f;
     front_def.Script = "front";
     front_def.image = "/btn.png";
@@ -1095,7 +1121,7 @@ public class main extends StageImp {
     front_def.x = 533.93726f;
     front_def.name = "front";
     front_def.width = 134.36433f;
-    front_def.y = 818.1119f;
+    front_def.y = 584.4233f;
     front_def.z = 23f;
     front_def.Tint = "#FFFFFF";
 
@@ -1112,7 +1138,6 @@ public class main extends StageImp {
       @Override
       public void onTouchEnd(PlayerItem current, InputEvent event) {
         bwj.enableMotor(false);
-        pauseSound("EngineSound.ogg");
       }
 
       @Override
@@ -1137,6 +1162,7 @@ public class main extends StageImp {
     BoxDef coin8_def = new BoxDef();
     coin8_def.type = "STATIC";
     coin8_def.Collider_Width = 75.91301f;
+    coin8_def.Version = "1.0";
     coin8_def.height = 67.568146f;
     coin8_def.Script = "coin1";
     coin8_def.image = "/others/Coin5.png";
@@ -1145,7 +1171,7 @@ public class main extends StageImp {
     coin8_def.x = 564.23206f;
     coin8_def.name = "coin8";
     coin8_def.width = 75.91301f;
-    coin8_def.y = 1032.09f;
+    coin8_def.y = 448.34192f;
     coin8_def.z = 24f;
     coin8_def.Tint = "#FFFFFF";
 
@@ -1181,6 +1207,7 @@ public class main extends StageImp {
     BoxDef coin7_def = new BoxDef();
     coin7_def.type = "STATIC";
     coin7_def.Collider_Width = 75.91301f;
+    coin7_def.Version = "1.0";
     coin7_def.height = 67.568146f;
     coin7_def.Script = "coin1";
     coin7_def.image = "/others/Coin5.png";
@@ -1189,7 +1216,7 @@ public class main extends StageImp {
     coin7_def.x = 1445.7921f;
     coin7_def.name = "coin7";
     coin7_def.width = 75.91301f;
-    coin7_def.y = 1037.6859f;
+    coin7_def.y = 442.74597f;
     coin7_def.z = 25f;
     coin7_def.Tint = "#FFFFFF";
 
@@ -1225,6 +1252,7 @@ public class main extends StageImp {
     BoxDef coin6_def = new BoxDef();
     coin6_def.type = "STATIC";
     coin6_def.Collider_Width = 75.91301f;
+    coin6_def.Version = "1.0";
     coin6_def.height = 67.568146f;
     coin6_def.Script = "coin1";
     coin6_def.image = "/others/Coin5.png";
@@ -1233,7 +1261,7 @@ public class main extends StageImp {
     coin6_def.x = 1301.7496f;
     coin6_def.name = "coin6";
     coin6_def.width = 75.91301f;
-    coin6_def.y = 1037.6859f;
+    coin6_def.y = 442.74597f;
     coin6_def.z = 26f;
     coin6_def.Tint = "#FFFFFF";
 
@@ -1269,6 +1297,7 @@ public class main extends StageImp {
     BoxDef coin5_def = new BoxDef();
     coin5_def.type = "STATIC";
     coin5_def.Collider_Width = 75.91301f;
+    coin5_def.Version = "1.0";
     coin5_def.height = 67.568146f;
     coin5_def.Script = "coin1";
     coin5_def.image = "/others/Coin5.png";
@@ -1277,7 +1306,7 @@ public class main extends StageImp {
     coin5_def.x = 1172.1495f;
     coin5_def.name = "coin5";
     coin5_def.width = 75.91301f;
-    coin5_def.y = 1037.6859f;
+    coin5_def.y = 442.74597f;
     coin5_def.z = 27f;
     coin5_def.Tint = "#FFFFFF";
 
@@ -1313,6 +1342,7 @@ public class main extends StageImp {
     BoxDef coin4_def = new BoxDef();
     coin4_def.type = "STATIC";
     coin4_def.Collider_Width = 75.91301f;
+    coin4_def.Version = "1.0";
     coin4_def.height = 67.568146f;
     coin4_def.Script = "coin1";
     coin4_def.image = "/others/Coin5.png";
@@ -1321,7 +1351,7 @@ public class main extends StageImp {
     coin4_def.x = 1043.1292f;
     coin4_def.name = "coin4";
     coin4_def.width = 75.91301f;
-    coin4_def.y = 1037.6859f;
+    coin4_def.y = 442.74597f;
     coin4_def.z = 28f;
     coin4_def.Tint = "#FFFFFF";
 
@@ -1357,6 +1387,7 @@ public class main extends StageImp {
     BoxDef coin3_def = new BoxDef();
     coin3_def.type = "STATIC";
     coin3_def.Collider_Width = 75.91301f;
+    coin3_def.Version = "1.0";
     coin3_def.height = 67.568146f;
     coin3_def.Script = "coin1";
     coin3_def.image = "/others/Coin5.png";
@@ -1365,7 +1396,7 @@ public class main extends StageImp {
     coin3_def.x = 916.2543f;
     coin3_def.name = "coin3";
     coin3_def.width = 75.91301f;
-    coin3_def.y = 1037.6859f;
+    coin3_def.y = 442.74597f;
     coin3_def.z = 29f;
     coin3_def.Tint = "#FFFFFF";
 
@@ -1401,6 +1432,7 @@ public class main extends StageImp {
     BoxDef coin2_def = new BoxDef();
     coin2_def.type = "STATIC";
     coin2_def.Collider_Width = 75.91301f;
+    coin2_def.Version = "1.0";
     coin2_def.height = 67.568146f;
     coin2_def.Script = "coin1";
     coin2_def.image = "/others/Coin5.png";
@@ -1409,7 +1441,7 @@ public class main extends StageImp {
     coin2_def.x = 795.3418f;
     coin2_def.name = "coin2";
     coin2_def.width = 75.91301f;
-    coin2_def.y = 1014.7426f;
+    coin2_def.y = 465.68927f;
     coin2_def.z = 30f;
     coin2_def.Tint = "#FFFFFF";
 
@@ -1445,6 +1477,7 @@ public class main extends StageImp {
     BoxDef coin1_def = new BoxDef();
     coin1_def.type = "STATIC";
     coin1_def.Collider_Width = 75.91301f;
+    coin1_def.Version = "1.0";
     coin1_def.height = 67.568146f;
     coin1_def.Script = "coin1";
     coin1_def.image = "/others/Coin5.png";
@@ -1453,7 +1486,7 @@ public class main extends StageImp {
     coin1_def.x = 676.84644f;
     coin1_def.name = "coin1";
     coin1_def.width = 75.91301f;
-    coin1_def.y = 1023.69586f;
+    coin1_def.y = 456.73602f;
     coin1_def.z = 31f;
     coin1_def.Tint = "#FFFFFF";
 
@@ -1489,6 +1522,8 @@ public class main extends StageImp {
     background.getActor().setZIndex((int) (background_def.z));
 
     Car4.getActor().setZIndex((int) (Car4_def.z));
+
+    Box4.getActor().setZIndex((int) (Box4_def.z));
 
     Car2.getActor().setZIndex((int) (Car2_def.z));
 
@@ -1526,8 +1561,6 @@ public class main extends StageImp {
 
     Custom1.getActor().setZIndex((int) (Custom1_def.z));
 
-    Box4.getActor().setZIndex((int) (Box4_def.z));
-
     clouds.getActor().setZIndex((int) (clouds_def.z));
 
     back.getActor().setZIndex((int) (back_def.z));
@@ -1560,27 +1593,6 @@ public class main extends StageImp {
     Car2.addChild(FW2);
     Car1.addChild(FW1);
     Car.addChild(FW);
-
-    WheelJointDef fwj_Def = new WheelJointDef();
-    fwj_Def.dampingRatio = 0.7f;
-
-    fwj_Def.enableMotor = false;
-    fwj_Def.frequencyHz = 10.0f;
-    fwj_Def.localAnchorA.set(new Vector2(0.0f * 0.25f, 0.0f * 0.25f));
-    fwj_Def.localAnchorB.set(new Vector2(0.0f * 0.25f, 0.0f * 0.25f));
-    fwj_Def.localAxisA.set(new Vector2(1.0f * 0.25f, 0.0f * 0.25f));
-    fwj_Def.maxMotorTorque = 0.0f;
-    fwj_Def.motorSpeed = 0.0f;
-
-    fwj_Def.collideConnected = false;
-
-    fwj_Def.initialize(
-        Car.getBody(),
-        FW.getBody(),
-        FW.getBody().getWorldCenter(),
-        new Vector2(0f * 0.25f, 1f * 0.25f));
-    fwj = (WheelJoint) (this.world.createJoint(fwj_Def));
-    addJoint("fwj", fwj);
 
     WheelJointDef bwj_Def = new WheelJointDef();
     bwj_Def.dampingRatio = 0.7f;
@@ -1645,6 +1657,27 @@ public class main extends StageImp {
     bwj2 = (WheelJoint) (this.world.createJoint(bwj2_Def));
     addJoint("bwj2", bwj2);
 
+    WheelJointDef bwj4_Def = new WheelJointDef();
+    bwj4_Def.dampingRatio = 0.7f;
+
+    bwj4_Def.enableMotor = false;
+    bwj4_Def.frequencyHz = 10.0f;
+    bwj4_Def.localAnchorA.set(new Vector2(0.0f * 0.25f, 0.0f * 0.25f));
+    bwj4_Def.localAnchorB.set(new Vector2(0.0f * 0.25f, 0.0f * 0.25f));
+    bwj4_Def.localAxisA.set(new Vector2(1.0f * 0.25f, 0.0f * 0.25f));
+    bwj4_Def.maxMotorTorque = 9999.0f;
+    bwj4_Def.motorSpeed = -80.0f;
+
+    bwj4_Def.collideConnected = false;
+
+    bwj4_Def.initialize(
+        Car4.getBody(),
+        BW4.getBody(),
+        BW4.getBody().getWorldCenter(),
+        new Vector2(0f * 0.25f, 1f * 0.25f));
+    bwj4 = (WheelJoint) (this.world.createJoint(bwj4_Def));
+    addJoint("bwj4", bwj4);
+
     WheelJointDef bwj5_Def = new WheelJointDef();
     bwj5_Def.dampingRatio = 0.7f;
 
@@ -1666,26 +1699,26 @@ public class main extends StageImp {
     bwj5 = (WheelJoint) (this.world.createJoint(bwj5_Def));
     addJoint("bwj5", bwj5);
 
-    WheelJointDef bwj4_Def = new WheelJointDef();
-    bwj4_Def.dampingRatio = 0.7f;
+    WheelJointDef fwj_Def = new WheelJointDef();
+    fwj_Def.dampingRatio = 0.7f;
 
-    bwj4_Def.enableMotor = false;
-    bwj4_Def.frequencyHz = 10.0f;
-    bwj4_Def.localAnchorA.set(new Vector2(0.0f * 0.25f, 0.0f * 0.25f));
-    bwj4_Def.localAnchorB.set(new Vector2(0.0f * 0.25f, 0.0f * 0.25f));
-    bwj4_Def.localAxisA.set(new Vector2(1.0f * 0.25f, 0.0f * 0.25f));
-    bwj4_Def.maxMotorTorque = 9999.0f;
-    bwj4_Def.motorSpeed = -80.0f;
+    fwj_Def.enableMotor = false;
+    fwj_Def.frequencyHz = 10.0f;
+    fwj_Def.localAnchorA.set(new Vector2(0.0f * 0.25f, 0.0f * 0.25f));
+    fwj_Def.localAnchorB.set(new Vector2(0.0f * 0.25f, 0.0f * 0.25f));
+    fwj_Def.localAxisA.set(new Vector2(1.0f * 0.25f, 0.0f * 0.25f));
+    fwj_Def.maxMotorTorque = 0.0f;
+    fwj_Def.motorSpeed = 0.0f;
 
-    bwj4_Def.collideConnected = false;
+    fwj_Def.collideConnected = false;
 
-    bwj4_Def.initialize(
-        Car4.getBody(),
-        BW4.getBody(),
-        BW4.getBody().getWorldCenter(),
+    fwj_Def.initialize(
+        Car.getBody(),
+        FW.getBody(),
+        FW.getBody().getWorldCenter(),
         new Vector2(0f * 0.25f, 1f * 0.25f));
-    bwj4 = (WheelJoint) (this.world.createJoint(bwj4_Def));
-    addJoint("bwj4", bwj4);
+    fwj = (WheelJoint) (this.world.createJoint(fwj_Def));
+    addJoint("fwj", fwj);
 
     WheelJointDef fwj1_Def = new WheelJointDef();
     fwj1_Def.dampingRatio = 0.7f;

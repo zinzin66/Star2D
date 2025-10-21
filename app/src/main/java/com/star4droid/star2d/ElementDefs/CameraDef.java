@@ -5,8 +5,8 @@ import com.star4droid.template.Items.StageImp;
 
 public class CameraDef extends ItemDef {
 	public ElementEvent elementEvents;
-	public static final String TYPE="CAMERA", type="STATIC";
-	public String parentName = "",name="", Script="";
+	public static final String TYPE="CAMERA";
+	public String parentName = "",type="STATIC",name="", Script="";
 	public boolean Active=false, Visible = true;
 	public float x=0,y=0,z=0,rotation=0,Zoom = 1f;
 	

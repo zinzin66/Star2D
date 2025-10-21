@@ -157,8 +157,10 @@ public class TestApp implements ApplicationListener {
         			openSceneInNewEditor(editor.getScene());
         			editor.dispose();
         		}
+        		for(LibgdxEditor ed:editors)
+        		    ed.setLandscape(isLandscape);
         		setCurrentEditor(currentEditorPos);
-        		toast("orientation set to "+(isLandscape?"landscape":"portrait"));
+        		toast("orientation set to "+(editor.isLandscape()?"landscape":"portrait"));
 			}
 		},1.5f);
 		

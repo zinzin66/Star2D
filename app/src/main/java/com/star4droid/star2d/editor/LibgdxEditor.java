@@ -948,6 +948,7 @@ public class LibgdxEditor extends Stage {
 				((EditorItem)selectedActor).update();
 				
 			} else if(touch_mode == TOUCHMODE.SCALE){
+			    deltaY = -deltaY;
 				if(propertySet.containsKey("width")){
 					float x = propertySet.getFloat("width") - deltaX;
 					float y = propertySet.getFloat("height") + deltaY;

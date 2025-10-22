@@ -570,7 +570,7 @@ public class TestApp implements ApplicationListener {
 	    try {
 	        renderIn();
 	    } catch(Exception ex){
-	        Gdx.files.external("logs/renderIn.error.txt").writeString(ex.toString()+"\n",false);
+	        Gdx.files.external("logs/renderIn.error.txt").writeString(Utils.getStackTraceString(ex)+"\n",false);
 	    }
 	}
 	

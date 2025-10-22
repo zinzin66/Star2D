@@ -165,7 +165,7 @@ public class MapItem extends Actor implements PlayerItem {
 		//Utils.showMessage(getContext(),propertySet.get("Text").toString());
 		mapStr = mapDef.Map;
 		if(!mapStr.equals("")){
-			String path = (stage.getProject().getImagesPath()+mapStr).replace("//","/");
+			String path = (stage.getProject().getImagesPath()+mapStr).replace(com.star4droid.template.Utils.seperator,"/").replace("//","/");
 			try {
 		        TiledMap map = (stage.getAssets()!=null&&stage.getAssets().contains(path))? stage.getAssets().get(path):null;
 		        if(map == null){
@@ -179,7 +179,7 @@ public class MapItem extends Actor implements PlayerItem {
 		            //if(!stage.getAssets().contains(path))
 		                //stage.getAssets().addAsset(path, TiledMap.class,map);
 		        }
-		        mapRenderer = new OrthogonalTiledMapRenderer(map);
+		        mapRenderer = new OrthogonalTiledMapRenderer(map, StageImp.WORLD_SCALE);
 			} catch(Exception | Error er){}
 		}
 		
@@ -193,14 +193,15 @@ public class MapItem extends Actor implements PlayerItem {
 	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		super.draw(batch, parentAlpha);
+		//super.draw(batch, parentAlpha);
+		if(mapRenderer==null) return;
 		batch.end();
 		float x = getX(), y = getY();
         boolean isMoved = (x != 0 && y != 0);
         if(isMoved){
             matrix.set(getStage().getCamera().combined);
-            matrix.translate(x, y, 0);
-            matrix.scl(StageImp.WORLD_SCALE, StageImp.WORLD_SCALE, 1);
+            //matrix.scl(StageImp.WORLD_SCALE, StageImp.WORLD_SCALE, 1);
+           matrix.translate(x, y, 0);
         }
         mapRenderer.setView((com.badlogic.gdx.graphics.OrthographicCamera)(getStage().getCamera()));
         if(isMoved)

@@ -752,10 +752,10 @@ public class ControlLayer extends Table {
 			MenuItem item = new MenuItem(getTrans(name),drawable("bodies/"+icons[x]+".png"),new ChangeListener() {
 				@Override
 				public void changed (ChangeEvent event, Actor actor) {
-				    if(pos == 8){
+				    /*if(pos == 8){
 				        app.toast("sorry, not ready yet...");
 				        return;
-				    }
+				    }*/
 					try {
 						EditorItem item = getItem(pos);
                 		app.getEditor().addActor((Actor)item);

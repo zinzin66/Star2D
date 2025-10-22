@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 public class MapDef extends ItemDef {
 	public ElementEvent elementEvents;
 	public static final String TYPE="MAP";
-	public String name="",Map="",parentName ="",Script="",type="DYNAMIC";
+	public String name="",Map="",Tint="",parentName ="",Script="",type="DYNAMIC";
 	public boolean Visible=true;
 	public float x=0,y=0,z=0,rotation=0;
 	

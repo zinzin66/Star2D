@@ -165,7 +165,7 @@ public class MapItem extends Actor implements PlayerItem {
 		//Utils.showMessage(getContext(),propertySet.get("Text").toString());
 		mapStr = mapDef.Map;
 		if(!mapStr.equals("")){
-			String path = (stage.getProject().getImagesPath()+mapStr).replace(com.star4droid.template.Utils.seperator,"/").replace("//","/");
+			String path = (stage.getProject().getImagesPath()+mapStr).replace(com.star4droid.template.Utils.Utils.seperator,"/").replace("//","/");
 			try {
 		        TiledMap map = (stage.getAssets()!=null&&stage.getAssets().contains(path))? stage.getAssets().get(path):null;
 		        if(map == null){

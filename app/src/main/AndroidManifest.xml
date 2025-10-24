@@ -30,7 +30,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-		
+		<activity
+    		android:name="com.star4droid.star2d.Activities.DonateActivity"
+    		android:theme="@style/AppTheme.FullScreen"
+    		android:screenOrientation="portrait"
+    		android:exported="true"/>
 		<activity
 		android:name="com.star4droid.star2d.DebugActivity"
 		android:theme="@style/AppTheme.FullScreen"

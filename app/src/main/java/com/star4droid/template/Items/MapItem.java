@@ -200,8 +200,8 @@ public class MapItem extends Actor implements PlayerItem {
         boolean isMoved = (x != 0 && y != 0);
         if(isMoved){
             matrix.set(getStage().getCamera().combined);
-            //matrix.scl(StageImp.WORLD_SCALE, StageImp.WORLD_SCALE, 1);
-           matrix.translate(x, y, 0);
+            //matrix.setTranslation(x, y, 0);
+            matrix.translate(x, y, 0);
         }
         mapRenderer.setView((com.badlogic.gdx.graphics.OrthographicCamera)(getStage().getCamera()));
         if(isMoved)

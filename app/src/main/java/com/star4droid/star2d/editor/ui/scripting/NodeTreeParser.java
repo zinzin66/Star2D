@@ -128,14 +128,15 @@ public class NodeTreeParser extends ApplicationAdapter {
                 treeTable = new VisTable();
                 treeTable.add().height(200).row();
             }
-            treeTable.add(categoryTable).expandX().fillX().row();
+            treeTable.add(categoryTable).row();
         } else {
             nodesTable = (VisTable) categoryTable.getChildren().get(1); // 2nd child is nodesTable
         }
 
         String nodeN = nodeName.contains("__star__if__") ? nodeName.replace("__star__if__", "") : nodeName;
         VisLabel nodeLabel = new VisLabel(nodeN.split(" ")[0]);
-        nodeLabel.setColor(nodeColor != null ? nodeColor : Color.WHITE);
+        //nodeLabel.setColor(nodeColor != null ? nodeColor : Color.WHITE);
+        nodeLabel.setColor(Color.WHITE);
 
         nodeLabel.addListener(new ClickListener() {
             @Override

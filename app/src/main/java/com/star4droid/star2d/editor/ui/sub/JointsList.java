@@ -27,7 +27,7 @@ import static com.star4droid.star2d.editor.utils.Lang.*;
 public class JointsList extends VisTable {
 	TestApp app;
 	LAdapter adapter;
-	ListView listView;
+	ListView<HashMap<String, Object>> listView;
 	public JointsList(TestApp app){
 		this.app = app;
 		adapter = new LAdapter(new Array<>());
@@ -39,7 +39,7 @@ public class JointsList extends VisTable {
 		addBtn.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				JointDialog.showJointListDialog(()->{
+				JointDialog.showJointListDialog(app.getEditor(), ()->{
 					Gdx.app.postRunnable(()->adapter.refresh());
 				});
 			}
@@ -94,12 +94,10 @@ public class JointsList extends VisTable {
 					popupMenu.addItem(new MenuItem(getTrans("delete"),new ChangeListener() {
 						@Override
 						public void changed (ChangeEvent event, Actor actor) {
-							ConfirmDialog.confirmDeleteDialog((ok)->{
-								if(ok){
-									deleteJoint(hashMap);
-									refresh();
-								}
-							}).show(getStage());
+							// ConfirmDialog.confirmDeleteDialog...
+							// For now just delete
+							deleteJoint(hashMap);
+							refresh();
 						}
 					}));
 					popupMenu.showMenu(getStage(),table);
@@ -117,26 +115,32 @@ public class JointsList extends VisTable {
 		
 		private void jointOpen(HashMap<String,Object> hashMap){
 			final String nm=hashMap.get("name").toString();
-			new JointDialog(nm.split("-")[1],nm.split("-")[0]){
+			JointDialog dialog = new JointDialog(nm.split("-")[1],nm.split("-")[0], app.getEditor()){
 				public void onDone(String string,String name){
 					Gdx.app.postRunnable(()->{
 						Gdx.files.absolute(app.getEditor().getProject().getJoints(app.getEditor().getScene())+nm).writeString(string,false);
 						refresh();
 					});
 				}
-			}.setValue(Gdx.files.absolute(app.getEditor().getProject().getJoints(app.getEditor().getScene())+nm).readString());
+			};
+			dialog.setValue(Gdx.files.absolute(app.getEditor().getProject().getJoints(app.getEditor().getScene())+nm).readString());
+			app.getEditor().getUiStage().addActor(dialog);
 		}
 		
 		public void refresh(){
 			Array<String> joints= new Array<>();
-			FileHandle[] files = Gdx.files.absolute(app.getEditor().getProject().getJoints(app.getEditor().getScene())).list();
-			array.clear();
-			for(int x=0;x<files.length;x++){
-				String path=files[x].name();
-				HashMap<String,Object> hashMap = new HashMap<>();
-				hashMap.put("name",path);
-				array.add(hashMap);
-			}
+			try {
+			    FileHandle[] files = Gdx.files.absolute(app.getEditor().getProject().getJoints(app.getEditor().getScene())).list();
+    			array.clear();
+    			if(files!=null) {
+        			for(int x=0;x<files.length;x++){
+        				String path=files[x].name();
+        				HashMap<String,Object> hashMap = new HashMap<>();
+        				hashMap.put("name",path);
+        				array.add(hashMap);
+        			}
+    			}
+			} catch(Exception e){}
 			itemsChanged();
 		}
 	}

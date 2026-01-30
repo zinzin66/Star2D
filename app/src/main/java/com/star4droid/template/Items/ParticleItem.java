@@ -124,10 +124,12 @@ public class ParticleItem extends Image implements PlayerItem {
 		int dur = (int) particleDef.Duration;
 		if(dur>0)
 			particleEffect.setDuration(dur);
-		if(elementEvent!=null)
-			elementEvent.onBodyCreated(this);
-		if(getScript()!=null)
-			getScript().bodyCreated();
+		if(stage!=null && stage.onCreateCalled){
+			if(elementEvent!=null)
+				elementEvent.onBodyCreated(this);
+			if(getScript()!=null)
+				getScript().bodyCreated();
+		}
 		return this;
 	}
 	

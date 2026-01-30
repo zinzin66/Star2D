@@ -156,9 +156,10 @@ public class StageImp extends ApplicationAdapter {
 		if(spriteSheetLoader!=null&&assetLoader!=null&&!isMain()){
 			onCreate();
 			if(sceneScript!=null)
-				sceneScript.onCreate();
-		    onCreateCalled = true;
-		}
+			sceneScript.onCreate();
+	    onCreateCalled = true;
+	    notifyBodies();
+	}
 		
 		rayHandler = new RayHandler(world);
 		rayHandler.setAmbientLight(0.1f, 0.1f, 0.1f, 1f);
@@ -187,10 +188,11 @@ public class StageImp extends ApplicationAdapter {
 			onCreateCalled = true;
 			if(assetLoader.isFinished()){
 		    	onCreate();
-				if(sceneScript!=null)
-					sceneScript.onCreate();
-			} else {
-				onCreateCalled = false;
+			if(sceneScript!=null)
+				sceneScript.onCreate();
+			notifyBodies();
+		} else {
+			onCreateCalled = false;
 				loadComplete = false;
 			}
 		}
@@ -1292,4 +1294,23 @@ public class StageImp extends ApplicationAdapter {
             return ui || game;
         }
     }
+
+	public void notifyBodies(){
+		if(GameStage!=null)
+		for(Actor actor : GameStage.getActors()){
+		   if(actor instanceof PlayerItem){
+			   PlayerItem item = (PlayerItem)actor;
+			   if(item.getElementEvents()!=null) item.getElementEvents().onBodyCreated(item);
+			   if(item.getScript()!=null) item.getScript().bodyCreated();
+		   }
+		}
+		if(UiStage!=null)
+		for(Actor actor : UiStage.getActors()){
+		   if(actor instanceof PlayerItem){
+			   PlayerItem item = (PlayerItem)actor;
+				 if(item.getElementEvents()!=null) item.getElementEvents().onBodyCreated(item);
+			   if(item.getScript()!=null) item.getScript().bodyCreated();
+		   }
+		}
+	}
 }

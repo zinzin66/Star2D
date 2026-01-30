@@ -74,10 +74,12 @@ public class Joystick extends Touchpad implements PlayerItem {
 		setName(joystickDef.name);
 		if(getStage()==null)
 		    stage.addActor(this);
-		if(elementEvent!=null)
-			elementEvent.onBodyCreated(this);
-		if(getScript()!=null)
-			getScript().bodyCreated();
+		if(stage!=null && stage.onCreateCalled){
+			if(elementEvent!=null)
+				elementEvent.onBodyCreated(this);
+			if(getScript()!=null)
+				getScript().bodyCreated();
+		}
 	}
 	
 	public static Joystick create(StageImp stageImp,Texture button,Texture background){

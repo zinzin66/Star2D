@@ -58,9 +58,6 @@ public class EngineLanguage extends EmptyLanguage {
 	 * تحسين إعدادات المحرر للأداء الأفضل
 	 */
 	private void configureEditorForPerformance(CodeEditor editor) {
-		// تقليل تأخير ظهور الإكمال التلقائي
-		editor.setCompletionDelay(150); // بدلاً من القيمة الافتراضية
-		
 		// تفعيل التحديث التدريجي للأداء
 		editor.setInterceptParentHorizontalScrollIfNeeded(true);
 	}
@@ -155,7 +152,7 @@ public class EngineLanguage extends EmptyLanguage {
 			sb.append(str);
 		}
 		
-		return sb.toString;
+		return sb.toString();
 	}
 	
 	public static boolean isOnlySpaces(String str) {

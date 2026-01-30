@@ -397,6 +397,7 @@ public class EditorAI extends VisTable {
         viewBtn.addListener(new ClickListener() {
              @Override
              public void clicked(InputEvent event, float x, float y) {
+                 event.stop(); // Prevent context menu from popping up
                  showCodeDialog(finalCode, finalLang);
              }
         });
@@ -520,8 +521,9 @@ public class EditorAI extends VisTable {
         sb.append("   - DO NOT import 'java.awt.*'.\n");
         sb.append("   - ENSURE you import 'com.star4droid.template.Utils.ItemScript'.\n");
         sb.append("   - ENSURE you import 'com.star4droid.template.Utils.PlayerItem'.\n");
+        sb.append("   - ITEM TYPES: 'BoxBody', 'CircleItem', 'TextItem', 'CustomBody', 'Joystick', 'MapItem', 'ParticleItem', 'ProgressItem', 'CameraItem' are in 'com.star4droid.template.Items'. IMPORT THEM: `import com.star4droid.template.Items.*;`.\n");
         sb.append("   - If generating for MULTIPLE items, create separate code blocks for EACH item script.\n");
-        sb.append("8. StageImp API (`stage` field) to control the game:\n");
+        sb.append("8. StageImp API (`stage` field, type: `com.star4droid.template.Items.StageImp`) to control the game:\n");
         sb.append("   - `findItem(String name)` -> returns PlayerItem (Actor). Use this to find other items.\n");
         sb.append("   - `findLight(String name)` -> returns box2dLight.Light.\n");
         sb.append("   - `checkCollision(PlayerItem p1, PlayerItem p2)` -> boolean.\n");

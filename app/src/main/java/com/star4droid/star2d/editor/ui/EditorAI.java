@@ -419,7 +419,9 @@ public class EditorAI extends VisTable {
             textArea.getStyle().font = VisUI.getSkin().getFont("small-font");
         } catch(Exception e){}
         
-        textArea.setPrefRows(20);
+        // Dynamically set rows based on code length, with a minimum of 10 and max of 30 (or just let it grow)
+        int lines = code.split("\n").length;
+        textArea.setPrefRows(Math.min( lines + 2, 40)); // Cap it reasonable to avoid massive dialogs
         VisScrollPane scrollPane = new VisScrollPane(textArea);
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(false, false); // Allow both
@@ -680,18 +682,10 @@ public class EditorAI extends VisTable {
         msgTable.pad(10);
         
         // Context Menu Listener
-        msgTable.addListener(new com.badlogic.gdx.scenes.scene2d.InputListener() {
-            long downTime;
+        msgTable.addListener(new ClickListener() {
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                downTime = System.currentTimeMillis();
-                return true;
-            }
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if (System.currentTimeMillis() - downTime < 250) {
-                    showMessageMenu(msg);
-                }
+            public void clicked(InputEvent event, float x, float y) {
+                 showMessageMenu(msg);
             }
         });
         

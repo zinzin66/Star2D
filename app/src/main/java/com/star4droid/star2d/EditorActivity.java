@@ -176,7 +176,7 @@ public class EditorActivity extends AppCompatActivity implements AndroidFragment
 		}).start();
 		*/
         EngineSettings.init(this);
-        JointsHelper.init(this);
+
         setContentView(R.layout.editor);
 		init();
         
@@ -242,6 +242,7 @@ public class EditorActivity extends AppCompatActivity implements AndroidFragment
         // }
     // }
 	private void initApp(){
+	    JointsHelper.init();
 	    com.star4droid.star2d.Adapters.UpdateChecker.checkForUpdate(editor.getApp());
 		editor.getApp().setOrienationChanger(landscape->{
 			boolean isCurrentLandscape = getResources().getConfiguration().orientation==Configuration.ORIENTATION_LANDSCAPE;

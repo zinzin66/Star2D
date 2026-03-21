@@ -156,17 +156,20 @@ public class StageImp extends ApplicationAdapter {
 		if(spriteSheetLoader!=null&&assetLoader!=null&&!isMain()){
 			onCreate();
 			if(sceneScript!=null)
-				sceneScript.onCreate();
-		    onCreateCalled = true;
-		}
+			sceneScript.onCreate();
+	    onCreateCalled = true;
+	    notifyBodies();
+	}
 		
 		rayHandler = new RayHandler(world);
 		rayHandler.setAmbientLight(0.1f, 0.1f, 0.1f, 1f);
 		setupLight();
 		setupCollision();
+		setupCollision();
 		multiplexer = new InputMultiplexer();
-		multiplexer.addProcessor(UiStage);
-		multiplexer.addProcessor(GameStage);
+		multiplexer.addProcessor(getInputProcessor());
+		// multiplexer.addProcessor(UiStage);
+		// multiplexer.addProcessor(GameStage);
 		Gdx.input.setInputProcessor(multiplexer);
 		
 		if(assetLoader==null){
@@ -185,10 +188,11 @@ public class StageImp extends ApplicationAdapter {
 			onCreateCalled = true;
 			if(assetLoader.isFinished()){
 		    	onCreate();
-				if(sceneScript!=null)
-					sceneScript.onCreate();
-			} else {
-				onCreateCalled = false;
+			if(sceneScript!=null)
+				sceneScript.onCreate();
+			notifyBodies();
+		} else {
+			onCreateCalled = false;
 				loadComplete = false;
 			}
 		}
@@ -264,50 +268,32 @@ public class StageImp extends ApplicationAdapter {
 		setZoom(1f/(camera.getCameraDef().Zoom*WORLD_SCALE));
     }
 	
-	public ArrayList<Actor> orderBodies(){
-	    if(actors!=null) return actors;
-		ArrayList<Actor> bodies = new ArrayList<>();
-		ArrayList<Pair<Integer, Actor>> zValues = new ArrayList<>();
-		
-		for (Actor actor:GameStage.getActors()) {
-		    boolean item = false;
-		    if(actor instanceof PlayerItem){
-		        com.star4droid.star2d.ElementDefs.ItemDef ps = ((PlayerItem)actor).getProperties();
-		        if(ps != null){
-			        zValues.add(new Pair<>(ps.getZ(),actor));
-			        item = true;
-			    }
-			}
-			if(!item) zValues.add(new Pair<>(actor.getZIndex(),actor));
-		}
-		
-		for (Actor actor:UiStage.getActors()) {
-		    boolean item = false;
-		    if(actor instanceof PlayerItem){
-		        com.star4droid.star2d.ElementDefs.ItemDef ps = ((PlayerItem)actor).getProperties();
-		        if(ps != null){
-			        zValues.add(new Pair<>(ps.getZ(),actor));
-			        item = true;
-			    }
-			}
-			if(!item) zValues.add(new Pair<>(actor.getZIndex(),actor));
-		}
-		
-		
-		// Sort the zValues list based on the z values
-		Collections.sort(zValues, new Comparator<Pair<Integer, Actor>>() {
-			@Override
-			public int compare(Pair<Integer, Actor> pair1, Pair<Integer, Actor> pair2) {
-				return Integer.compare(pair1.first, pair2.first);
-			}
-		});
-		
-		// Add the names to the bodies list in the sorted order
-		for (Pair<Integer, Actor> pair : zValues) {
-			bodies.add(pair.second);
-		}
-		this.actors = bodies;
-		return bodies;
+	com.badlogic.gdx.utils.Array<Actor> orderedActors = new com.badlogic.gdx.utils.Array<>();
+    
+	public com.badlogic.gdx.utils.Array<Actor> orderBodies(){
+	    orderedActors.clear();
+	    if(GameStage!=null) orderedActors.addAll(GameStage.getActors());
+	    if(UiStage!=null) orderedActors.addAll(UiStage.getActors());
+	    
+	    orderedActors.sort(new Comparator<Actor>(){
+	        @Override
+	        public int compare(Actor a1, Actor a2){
+	            int z1 = getZ(a1);
+	            int z2 = getZ(a2);
+	            return Integer.compare(z1, z2);
+	        }
+	        
+	        private int getZ(Actor actor){
+	            if(actor instanceof PlayerItem){
+	                try {
+	                    com.star4droid.star2d.ElementDefs.ItemDef def = ((PlayerItem)actor).getProperties();
+	                    if(def!=null) return def.getZ();
+	                } catch(Exception e){}
+	            }
+	            return actor.getZIndex();
+	        }
+	    });
+	    return orderedActors;
 	}
 	
 	public void addLight(String name,Light light){
@@ -1036,19 +1022,26 @@ public class StageImp extends ApplicationAdapter {
 		GameStage.getCamera().update();
 		UiStage.getCamera().update();
 		
-		for(Actor actor:orderBodies()){
+		com.badlogic.gdx.utils.Array<Actor> bodies = orderBodies();
+		for(int i=0;i<bodies.size;i++){
+		    Actor actor = bodies.get(i);
 		    if(actor.getStage()==null || !actor.isVisible()) continue;
 		    Stage st = actor.getStage();
-		    boolean drawing = st.getBatch().isDrawing();
-		    if(!drawing){
-		        if(current!=null && current.getBatch().isDrawing())
+		    
+		    // Only switch batch if necessary
+		    if(current != st){
+		        if(current != null && current.getBatch().isDrawing())
 		            current.getBatch().end();
-		        st.getBatch().begin();
-		        st.getBatch().setProjectionMatrix(st.getCamera().combined);
 		        current = st;
+		        if(!current.getBatch().isDrawing()){
+		            current.getBatch().begin();
+		            current.getBatch().setProjectionMatrix(current.getCamera().combined);
+		        }
 		    }
-		    actor.draw(actor.getStage().getBatch(),1);
+		    
+		    actor.draw(current.getBatch(), 1);
 		}
+		
 		if(current!=null && current.getBatch().isDrawing())
 		            current.getBatch().end();
 		if(debugBox2d)
@@ -1109,10 +1102,17 @@ public class StageImp extends ApplicationAdapter {
 	}
 	
 	public void addActor(Actor actor) {
-		if(actor instanceof PlayerItem&&((PlayerItem)actor).getProperties()!=null&&((PlayerItem)actor).getProperties().getType().equals("UI"))
-			UiStage.addActor(actor);
-		else
-		    GameStage.addActor(actor);
+	    boolean isUi = false;
+		if(actor instanceof PlayerItem){
+		    try {
+		        com.star4droid.star2d.ElementDefs.ItemDef props = ((PlayerItem)actor).getProperties();
+		        if(props!=null && props.getType().equals("UI"))
+		            isUi = true;
+		    } catch(Exception e){}
+		}
+		
+		if(isUi) UiStage.addActor(actor);
+        else GameStage.addActor(actor);
 	}
 	
 	public void dispose(){
@@ -1177,12 +1177,140 @@ public class StageImp extends ApplicationAdapter {
 		}
 	}
 	
-	// public int id = new java.util.Random().nextInt(Integer.MAX_VALUE);
-	// @Override
-	// public boolean equals(Object object){
-	    // if(object instanceof StageImp){
-	        // return ((StageImp)object).id == this.id;
-	    // }
-	    // return false;
-	// }
+	// Input Handling
+	public com.badlogic.gdx.InputProcessor getInputProcessor(){
+	    return new ZOrderedInputProcessor();
+	}
+	
+    private class ZOrderedInputProcessor implements com.badlogic.gdx.InputProcessor {
+        private com.badlogic.gdx.math.Vector2 tempCoords = new com.badlogic.gdx.math.Vector2();
+
+        private Actor getHitActor(Stage stage, int screenX, int screenY) {
+            // Use a fresh vector to avoid sharing issues if any
+            com.badlogic.gdx.math.Vector2 v = new com.badlogic.gdx.math.Vector2(screenX, screenY);
+            stage.screenToStageCoordinates(v);
+            return stage.hit(v.x, v.y, true);
+        }
+
+        private int getEffectiveZ(Actor actor) {
+            if (actor == null) return Integer.MIN_VALUE;
+            Actor current = actor;
+            while(current!=null){
+                if(current instanceof PlayerItem){
+                    try {
+                        com.star4droid.star2d.ElementDefs.ItemDef props = ((PlayerItem)current).getProperties();
+                        if(props!=null) return props.getZ();
+                    } catch(Exception e){}
+                }
+                current = current.getParent();
+            }
+            return actor.getZIndex();
+        }
+
+        private Stage getTargetStage(int screenX, int screenY) {
+            Actor uiActor = getHitActor(UiStage, screenX, screenY);
+            Actor gameActor = getHitActor(GameStage, screenX, screenY);
+
+            // If nothing hit, default to UI then Game (standard order)
+            // But if checking for empty space click, we usually want GameStage to handle camera etc.
+            if (uiActor == null && gameActor == null) return UiStage; 
+            
+            if (uiActor == null) return GameStage;
+            if (gameActor == null) return UiStage;
+
+            int uiZ = getEffectiveZ(uiActor);
+            int gameZ = getEffectiveZ(gameActor);
+
+            return (uiZ >= gameZ) ? UiStage : GameStage;
+        }
+
+        @Override
+        public boolean keyDown(int keycode) {
+            if(keycode == 4) { // Back Key
+                // GameStage has the override for Back key, so prioritize it or ensure it gets it
+                if(GameStage.keyDown(keycode)) return true;
+                return UiStage.keyDown(keycode);
+            }
+            if(UiStage.keyDown(keycode)) return true;
+            return GameStage.keyDown(keycode);
+        }
+
+        @Override
+        public boolean keyUp(int keycode) {
+             if(UiStage.keyUp(keycode)) return true;
+             return GameStage.keyUp(keycode);
+        }
+
+        @Override
+        public boolean keyTyped(char character) {
+            if(UiStage.keyTyped(character)) return true;
+            return GameStage.keyTyped(character);
+        }
+
+        @Override
+        public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+            Stage target = getTargetStage(screenX, screenY);
+            // First try the target stage
+            if(target.touchDown(screenX, screenY, pointer, button)) return true;
+            
+            // If not handled, try the other stage (fallback)
+            Stage other = (target == UiStage) ? GameStage : UiStage;
+            return other.touchDown(screenX, screenY, pointer, button);
+        }
+
+        @Override
+        public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+             // Dispatch to both to ensure release events are caught by whoever has focus
+             boolean ui = UiStage.touchUp(screenX, screenY, pointer, button);
+             boolean game = GameStage.touchUp(screenX, screenY, pointer, button);
+             return ui || game;
+        }
+
+        @Override
+        public boolean touchDragged(int screenX, int screenY, int pointer) {
+            // Dispatch to both; Stage handles focus internally
+            boolean ui = UiStage.touchDragged(screenX, screenY, pointer);
+            boolean game = GameStage.touchDragged(screenX, screenY, pointer);
+            return ui || game;
+        }
+
+        @Override
+        public boolean mouseMoved(int screenX, int screenY) {
+            boolean ui = UiStage.mouseMoved(screenX, screenY);
+            boolean game = GameStage.mouseMoved(screenX, screenY);
+            return ui || game;
+        }
+
+        @Override
+        public boolean scrolled(float amountX, float amountY) {
+            if(UiStage.scrolled(amountX, amountY)) return true;
+            return GameStage.scrolled(amountX, amountY);
+        }
+        
+        @Override
+        public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
+            boolean ui = UiStage.touchCancelled(screenX, screenY, pointer, button);
+            boolean game = GameStage.touchCancelled(screenX, screenY, pointer, button);
+            return ui || game;
+        }
+    }
+
+	public void notifyBodies(){
+		if(GameStage!=null)
+		for(Actor actor : GameStage.getActors()){
+		   if(actor instanceof PlayerItem){
+			   PlayerItem item = (PlayerItem)actor;
+			   if(item.getElementEvents()!=null) item.getElementEvents().onBodyCreated(item);
+			   if(item.getScript()!=null) item.getScript().bodyCreated();
+		   }
+		}
+		if(UiStage!=null)
+		for(Actor actor : UiStage.getActors()){
+		   if(actor instanceof PlayerItem){
+			   PlayerItem item = (PlayerItem)actor;
+				 if(item.getElementEvents()!=null) item.getElementEvents().onBodyCreated(item);
+			   if(item.getScript()!=null) item.getScript().bodyCreated();
+		   }
+		}
+	}
 }

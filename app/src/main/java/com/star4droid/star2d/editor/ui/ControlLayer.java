@@ -76,6 +76,7 @@ public class ControlLayer extends Table {
 	TextShow textShow;
 	ControlType controlType;
 	CustomColliderEditor customColliderEditor;
+	EditorAI editorAI;
 	public TabsItem tabsItem;
 	VisImageButton gridBtn,backBtn,sceneActionsBtn,moveBtn,rotateBtn,lockBtn,scaleBtn,undoBtn,redoBtn;
 
@@ -174,6 +175,7 @@ public class ControlLayer extends Table {
 			}
 		};
 		
+
 		varsItem = new VarsItem(){
 		    @Override
 		    public boolean remove(){
@@ -181,6 +183,14 @@ public class ControlLayer extends Table {
 		        return super.remove();
 		    }
 		};
+        
+        editorAI = new EditorAI(app){
+            @Override
+            public boolean remove(){
+                setVisible(false);
+                return super.remove();
+            }
+        };
         
 		centerTable.right();
 		//centerTable.setFillParent(true);
@@ -194,7 +204,12 @@ public class ControlLayer extends Table {
 		btnsTable.add(propsBtn).size(iconSize+2).padTop(2).row();
 		btnsTable.add(jointsBtn).size(iconSize+2).padTop(2).row();
 		btnsTable.add(eventsBtn).size(iconSize+2).padTop(2).row();
-		btnsTable.add(varsBtn).size(iconSize+2).padTop(2);
+		btnsTable.add(varsBtn).size(iconSize+2).padTop(2).row();
+        
+        VisImageButton aiBtn = new VisImageButton(drawable("gemini.png"));
+        aiBtn.setName("AI");
+        btnsTable.add(aiBtn).size(iconSize+2).padTop(2);
+        addListenerToWindow(editorAI, aiBtn);
 		
 		/*
 		bodiesList.setVisible(false);
@@ -207,6 +222,7 @@ public class ControlLayer extends Table {
 		addListenerToWindow(jointsList,jointsBtn);
 		addListenerToWindow(propertiesItem,propsBtn);
 		addListenerToWindow(varsItem,varsBtn);
+
 		left();
 		if(controlType == ControlType.TOP_AND_BOTTOM){
         	add(topScrollPane).height(iconSize + 10).growX().padBottom(1).row();
@@ -719,7 +735,7 @@ public class ControlLayer extends Table {
 	}
 	
 	public void bodySelected(){
-		if (app.getEditor().getSelectedActor() != null) {
+		if (app.getEditor().getSelectedActor() != null && lockBtn != null && lockBtn.getStyle() != null) {
             String isLock = PropertySet.getPropertySet(app.getEditor().getSelectedActor()).getString("lock");
             lockBtn.getStyle().imageUp = (drawable(isLock.equals("true") ? "lock.png" : "unlock.png"));
         }

@@ -193,10 +193,12 @@ public class CustomBody extends Image implements PlayerItem {
 		}
 		if(getStage()==null)
 		    stage.addActor(this);
-		if(elementEvent!=null)
-			elementEvent.onBodyCreated(this);
-		if(getScript()!=null)
-			getScript().bodyCreated();
+		if(stage!=null && stage.onCreateCalled){
+			if(elementEvent!=null)
+				elementEvent.onBodyCreated(this);
+			if(getScript()!=null)
+				getScript().bodyCreated();
+		}
 	}
 	
 	@Override

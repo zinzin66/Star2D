@@ -1,4 +1,4 @@
-name: Android CI
+name: Build Apk
 
 on:
   workflow_dispatch:
@@ -8,65 +8,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      # 🔄 Checkout repository
+      - uses: actions/checkout@v3
 
-    # Set up JDK 17
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+      # ☕ Set up JDK 21
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: gradle
 
-    # ✅ تم إضافة هذه الخطوة لتحديد إصدار NDK r28 أو أحدث
-    - name: Setup Android NDK
-      uses: android-actions/setup-ndk@v2
-      with:
-        ndk-version: '28.0.5195000'
+      # 🛠 Setup Android NDK
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1.5.0
+        with:
+          ndk-version: r28c
 
-    # Grant execute permission for gradlew
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      # 🔧 Ensure gradlew is executable
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-    # Build with Gradle
-    - name: Build with Gradle
-      run: ./gradlew build
+      # ⚡ Build APK
+      - name: Build APK with Gradle
+        run: ./gradlew clean assembleRelease
 
-    # Upload APK artifact
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: engine.apk
-        path: app/build/outputs/apk/debug/app-debug.apk
-        retention-days: 90
-
-    # Extract classes.dex files and zip them
-    - name: Extract and Zip Classes
-      if: always()
-      run: |
-        APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
-        ZIP_OUTPUT="classes.zip"
-        
-        TEMP_DIR=$(mktemp -d)
-        
-        unzip -o -q "$APK_PATH" -d "$TEMP_DIR"
-        
-        cd "$TEMP_DIR"
-        zip "$ZIP_OUTPUT" AndroidManifest.xml
-        zip -r -q "$ZIP_OUTPUT" classes*.dex
-
-        cd -
-        
-        mv "$TEMP_DIR/$ZIP_OUTPUT" .
-
-    # Show files list
-    - name: Show files list
-      run: ls
-      
-    # Upload Classes ZIP artifact
-    - name: Upload Classes ZIP
-      uses: actions/upload-artifact@v4
-      with:
-        name: classes.zip
-        path: classes.zip
-        retention-days: 1
+      # 📦 Upload APK as artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine.apk
+          path: app/build/outputs/apk/release/app-release.apk
+          retention-days: 90

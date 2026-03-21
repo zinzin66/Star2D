@@ -1,62 +1,55 @@
 package com.star4droid.star2d.JointInputs;
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
-import com.star4droid.star2d.EditorActivity;
-import com.star4droid.star2d.Items.Editor;
-import com.star4droid.star2d.evo.R;
-import com.star4droid.star2d.Utils;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.kotcrab.vis.ui.widget.VisLabel;
+import com.kotcrab.vis.ui.widget.VisSelectBox;
+import com.kotcrab.vis.ui.widget.VisTable;
+import com.star4droid.star2d.editor.LibgdxEditor;
+import com.badlogic.gdx.utils.Array;
 import java.util.ArrayList;
 
-public class BodyInput extends LinearLayout implements JointInput {
-	ArrayList<String> bodies;
-	Spinner spinner;
-	TextView name;
-	public BodyInput(Context context,String nm,Editor editor){
-		super(context);
-		View v = LayoutInflater.from(context).inflate(R.layout.spinner_value,null);
-		v.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
-		spinner = v.findViewById(R.id.spinner);
-		name = v.findViewById(R.id.name);
-		bodies = editor.getBodiesList();
-		name.setText(nm);
-		spinner.setAdapter(EditorActivity.getSpinnerAdapter(bodies,context,spinner));
-		addView(v);
+public class BodyInput extends VisTable implements JointInput {
+	VisSelectBox<String> selectBox;
+	VisLabel nameLabel;
+	Array<String> bodies;
+
+	public BodyInput(String nm, LibgdxEditor editor){
+		super();
+		nameLabel = new VisLabel(nm);
+		selectBox = new VisSelectBox<>();
+		bodies = new Array<>();
+		for(String s : editor.getBodiesList()) bodies.add(s);
+		selectBox.setItems(bodies);
+		
+		add(nameLabel).padRight(10);
+		add(selectBox).growX().row();
 	}
 	
 	@Override
 	public String getValue() {
 		try {
-			return bodies.get(spinner.getSelectedItemPosition())+".getBody()";
+			return selectBox.getSelected() + ".getBody()";
 		} catch(Exception ex){}
-	    return null;
+		return null;
 	}
 
 	@Override
 	public void setValue(Object object) {
 		try {
-			String ob=object.toString().replace(".getBody()","");
-			int x=0;
-			for(String str:bodies){
-				if(str.equals(ob)) spinner.setSelection(x);
-				x++;
-			}
+			String ob = object.toString().replace(".getBody()","");
+			selectBox.setSelected(ob);
 		} catch(Exception e){
-			Utils.showMessage(getContext(),e.toString());
+			// e.printStackTrace();
 		}
 	}
 
 	@Override
 	public String getName() {
-	    return name.getText().toString();
+		return nameLabel.getText().toString();
 	}
 	
 	@Override
 	public String getCode() {
-		return getValue()+".getBody()";
+		return getValue() + ".getBody()";
 	}
 }

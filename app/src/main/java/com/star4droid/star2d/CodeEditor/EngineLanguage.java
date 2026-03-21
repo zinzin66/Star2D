@@ -2,9 +2,6 @@ package com.star4droid.star2d.CodeEditor;
 import android.os.Bundle;
 import android.view.View;
 
-//import androidx.annotation.NonNull;
-//import androidx.annotation.Nullable;
-
 import com.star4droid.star2d.Helpers.Project;
 import com.star4droid.star2d.Utils;
 import io.github.rosemoe.sora.widget.CodeEditor;
@@ -37,42 +34,47 @@ public class EngineLanguage extends EmptyLanguage {
 	private final CodeEditor mEditor;
 	private final CodeCompletionHelper codeCompletionHelper;
 	
-	public EngineLanguage(CodeEditor editor/*,ArrayList<String> playerItems*/,String file) {
+	// للتحكم في سلوك الإكمال التلقائي
+	private boolean autoCompletionEnabled = true;
+	
+	public EngineLanguage(CodeEditor editor, String file) {
 		mEditor = editor;
-		codeCompletionHelper = new CodeCompletionHelper(file,editor);
-		//mTextMateLanguage = TextMateLanguage.create("source.java", true);
-		String scope=GrammarRegistry.getInstance().loadGrammars("editor/languages.json").get(0).getScopeName();
+		codeCompletionHelper = new CodeCompletionHelper(file, editor);
+		
+		String scope = GrammarRegistry.getInstance().loadGrammars("editor/languages.json").get(0).getScopeName();
 		mTextMateLanguage = TextMateLanguage.create(scope, false);
 		mIndentationRules = GrammarRegistry.getInstance().findLanguageConfiguration(scope).getIndentationRules();
-		//mIndentationRules = LanguageConfiguration.load(new ContentReference(new Content(Utils.readAssetFile("editor/language-configuration.json",editor.getContext()))).createReader()).getIndentationRules();
-		/*
-		String[] ks = {
-			"and", "break", "do", "else", "elseif",
-			"end", "false", "for", "function", "if",
-			"in", "local", "nil", "not", "or",
-			"repeat", "return", "then", "true", "until", "while"
-		};
 		
-		String[] keywords = new String[playerItems.size()];
-		int x=0;
-		for(String keyword:playerItems){
-			keywords[x++]=keyword;
-			codeCompletionHelper.add(keyword,"PlayerItem");
-		}
-		
-		for(String keyword:ks){
-			keywords[x++]=keyword;
-			codeCompletionHelper.add(keyword,"Keyword");
-		}
-		*/
-		//mTextMateLanguage.setCompleterKeywords(keywords);
-		mTextMateLanguage.setAutoCompleteEnabled(true);
+		// تعطيل الإكمال التلقائي المدمج في TextMate لأننا نستخدم نظامنا الخاص
+		mTextMateLanguage.setAutoCompleteEnabled(false);
 		mTextMateLanguage.setTabSize(editor.getTabWidth());
 		mTextMateLanguage.getSymbolPairs().setEnabled(true);
+		
+		// تحسين إعدادات المحرر للأداء
+		configureEditorForPerformance(editor);
+	}
+	
+	/**
+	 * تحسين إعدادات المحرر للأداء الأفضل
+	 */
+	private void configureEditorForPerformance(CodeEditor editor) {
+		// تفعيل التحديث التدريجي للأداء
+		editor.setInterceptParentHorizontalScrollIfNeeded(true);
+	}
+	
+	/**
+	 * تمكين/تعطيل الإكمال التلقائي
+	 */
+	public void setAutoCompletionEnabled(boolean enabled) {
+		this.autoCompletionEnabled = enabled;
+	}
+	
+	public boolean isAutoCompletionEnabled() {
+		return autoCompletionEnabled;
 	}
 	
 	@Override
-	public int getIndentAdvance(/*@NonNull*/ ContentReference content, int line, int column) {
+	public int getIndentAdvance(ContentReference content, int line, int column) {
 		return getIndentAdvance(content.getLine(line).substring(0, column));
 	}
 	
@@ -93,15 +95,31 @@ public class EngineLanguage extends EmptyLanguage {
 	}
 	
 	@Override
-	///*@NonNull*/
 	public AnalyzeManager getAnalyzeManager() {
 		return mTextMateLanguage.getAnalyzeManager();
 	}
 	
 	@Override
-	public void requireAutoComplete(/*@NonNull*/ ContentReference content, /*@NonNull*/ CharPosition position, /*@NonNull*/ CompletionPublisher publisher, /*@NonNull*/ Bundle extraArguments) {
-		//mTextMateLanguage.requireAutoComplete(content, position, publisher, extraArguments);
-		codeCompletionHelper.requireAutoComplete(content,position,publisher);
+	public void requireAutoComplete(ContentReference content, CharPosition position, CompletionPublisher publisher, Bundle extraArguments) {
+		// فحص إذا كان الإكمال التلقائي مفعل
+		if (!autoCompletionEnabled) {
+			return;
+		}
+		
+		// استخدام نظام الإكمال التلقائي المحسّن
+		try {
+			codeCompletionHelper.requireAutoComplete(content, position, publisher);
+		} catch (Exception e) {
+			// في حالة حدوث خطأ، لا نعرض شيء بدلاً من تعطيل المحرر
+			android.util.Log.e("EngineLanguage", "Auto-completion error: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * الحصول على CodeCompletionHelper للتحكم المباشر
+	 */
+	public CodeCompletionHelper getCompletionHelper() {
+		return codeCompletionHelper;
 	}
 	
 	public class EndwiseNewlineHandler implements NewlineHandler {
@@ -110,18 +128,16 @@ public class EngineLanguage extends EmptyLanguage {
 		private final StringBuilder mStringBuilder = new StringBuilder();
 		
 		@Override
-		public boolean matchesRequirement(/*@NonNull*/ Content text, /*@NonNull*/ CharPosition position, /*@Nullable */Styles style) {
+		public boolean matchesRequirement(Content text, CharPosition position, Styles style) {
 			String line = text.getLineString(position.line);
 			String beforeText = line.substring(0, position.column);
 			
 			return beforeText.matches(ENDWISE_PATTERN);
 		}
 		
-		///*@NonNull*/
 		@Override
-		public NewlineHandleResult handleNewline(/*@NonNull*/ Content text, /*@NonNull*/ CharPosition position, /*@Nullable */Styles style, int tabSize) {
-		//result,shift
-			return new NewlineHandleResult("",0);
+		public NewlineHandleResult handleNewline(Content text, CharPosition position, Styles style, int tabSize) {
+			return new NewlineHandleResult("", 0);
 		}
 		
 	}

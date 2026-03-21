@@ -185,10 +185,12 @@ public class TextItem extends Label implements PlayerItem {
 		setFontScale((UI ? 1 : StageImp.WORLD_SCALE) * textDef.Font_Scale);
 		if(getStage()==null)
 		    stage.addActor(this);
-		if(elementEvent!=null)
-			elementEvent.onBodyCreated(this);
-		if(getScript()!=null)
-			getScript().bodyCreated();
+		if(stage!=null && stage.onCreateCalled){
+			if(elementEvent!=null)
+				elementEvent.onBodyCreated(this);
+			if(getScript()!=null)
+				getScript().bodyCreated();
+		}
 	}
 	
 	@Override

@@ -119,10 +119,12 @@ public class CameraItem extends Actor implements PlayerItem {
 		setRotation(-cameraDef.rotation);
 		//setText(propertySet.get("Text").toString());
 		//Utils.showMessage(getContext(),propertySet.get("Text").toString());
-		if(elementEvent!=null)
-			elementEvent.onBodyCreated(this);
-		if(getScript()!=null)
-			getScript().bodyCreated();
+		if(stage!=null && stage.onCreateCalled){
+			if(elementEvent!=null)
+				elementEvent.onBodyCreated(this);
+			if(getScript()!=null)
+				getScript().bodyCreated();
+		}
 		if(cameraDef.Active){
 		    stage.setCamera(this);
 		}

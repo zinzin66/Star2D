@@ -1,6 +1,6 @@
 package com.star4droid.star2d.Helpers;
 
-import android.content.Context;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
@@ -17,8 +17,9 @@ public class JointsHelper {
 	private static ArrayList<String> jointsList;
 	private static HashMap<String,Object> getMap= new HashMap<>();
 	private static ArrayList<HashMap<String,Object>> jointsListmap;
-	public static void init(Context context){
-		jointDefs = JsonParser.parseString(Utils.readAssetFile("java/joints.json",context)).getAsJsonArray();
+	public static void init(){
+		if(jointDefs!=null) return;
+		jointDefs = JsonParser.parseString(com.badlogic.gdx.Gdx.files.internal("java/joints.json").readString()).getAsJsonArray();
 		
 	}
 	

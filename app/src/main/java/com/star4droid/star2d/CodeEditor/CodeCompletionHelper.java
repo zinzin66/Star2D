@@ -47,42 +47,31 @@ public class CodeCompletionHelper implements EventReceiver<SelectionChangeEvent>
 	private final Path path;
 	private final JavaCompletions completions;
 	private final CodeEditor editor;
-	//private FileSystemModuleManager moduleManager;
+	
+	// Performance optimization: cache last update
+	private String lastContent = "";
+	private long lastUpdateTime = 0;
+	private static final long UPDATE_THROTTLE_MS = 300; // تحديث كل 300ms فقط
+	
 	public CodeCompletionHelper(String file,CodeEditor codeEditor){
 		path = new java.io.File(file).toPath();
 		completions = Editor.getCurrentEditor().getIndexer().getJavaCompletions();
 		codeEditor.subscribeEvent(SelectionChangeEvent.class,this);
-		/*
-		IndexOptions indexOptions=new IndexOptions(){
-			@Override
-			public boolean shouldIndexPrivate() {
-			    return true;
-			}
-
-			@Override
-			public boolean shouldIndexMethodContent() {
-			    return true;
-			}
-			
-		};
-		*/
-		//moduleManager = new FileSystemModuleManager(completions.getFileManager(),new java.io.File(Editor.getCurrentEditor().getProject().get("java")).toPath(),indexOptions);
 		
 		Project project = new Project(Editor.getCurrentEditor().getProject().getPath());
 		editor = codeEditor;
 		try {
-		//moduleManager.initialize();
-		//completions.openFile(path, FileUtil.readFile(file));
-		completions.getFileManager().openFileForSnapshot(getURI(file),/*completions.getFileManager().getFileContent(path).orElse(*/FileUtil.readFile(file)/*).toString()*/);
-		if(Editor.getCurrentEditor()!=null)
-			for(Actor actor:Editor.getCurrentEditor().getLibgdxEditor().getActors()){
-				if(actor instanceof Image && actor instanceof EditorItem){
-					String name = ((EditorItem)actor).getPropertySet().getString("name");
-					//TODO : ...
+			completions.getFileManager().openFileForSnapshot(getURI(file),FileUtil.readFile(file));
+			if(Editor.getCurrentEditor()!=null)
+				for(Actor actor:Editor.getCurrentEditor().getLibgdxEditor().getActors()){
+					if(actor instanceof Image && actor instanceof EditorItem){
+						String name = ((EditorItem)actor).getPropertySet().getString("name");
+						//TODO : ...
+					}
 				}
-			}
 		} catch(Exception exception){}
 	}
+	
 	public void add(String keyword,String type){
 		for(KeywordsHolder holder:keywords){
 			if(holder.type.equals(type)){
@@ -99,50 +88,154 @@ public class CodeCompletionHelper implements EventReceiver<SelectionChangeEvent>
 		return URI.create("file://"+file);
 	}
 	
-	public void requireAutoComplete(ContentReference contentReference, CharPosition charPosition, CompletionPublisher completionPublisher) {
-		completions.updateFileContent(path,editor.getText().toString());
-		CompletionResult result = completions.getCompletions(path,charPosition.line,charPosition.column);
-		//CompletionResult result = new Completor(completions.getFileManager()).getCompletionResult(null,path,charPosition.line,charPosition.column);
+	/**
+	 * فحص ما إذا كان يجب عرض الإكمال التلقائي في السياق الحالي
+	 */
+	private boolean shouldShowCompletion(ContentReference contentReference, CharPosition charPosition) {
+		if (charPosition.column == 0) {
+			return false; // لا تعرض في بداية السطر
+		}
 		
-		for (CompletionCandidate candidate : result.getCompletionCandidates()) {
-			if (!"<error>".equals(candidate.getName())) {
-				CompletionItem item = getCompletion(candidate.getName(),candidate.getDetail().orElse(candidate.getKind().name()),result.getPrefix(),candidate.getKind());
-				completionPublisher.addItem(item);
+		String line = contentReference.getLine(charPosition.line).toString();
+		if (charPosition.column > line.length()) {
+			return false;
+		}
+		
+		// احصل على الحرف قبل المؤشر
+		char prevChar = line.charAt(charPosition.column - 1);
+		
+		// لا تعرض بعد المسافة أو الفاصلة المنقوطة
+		if (prevChar == ' ' || prevChar == ';' || prevChar == '{' || prevChar == '}') {
+			return false;
+		}
+		
+		// لا تعرض داخل التعليقات
+		String beforeCursor = line.substring(0, charPosition.column);
+		if (beforeCursor.trim().startsWith("//") || beforeCursor.contains("/*")) {
+			return false;
+		}
+		
+		// لا تعرض داخل النصوص (strings)
+		int quoteCount = 0;
+		for (int i = 0; i < charPosition.column; i++) {
+			if (line.charAt(i) == '"' && (i == 0 || line.charAt(i-1) != '\\')) {
+				quoteCount++;
 			}
 		}
-		Log.e("completion_pos",charPosition.column+","+charPosition.line);
+		if (quoteCount % 2 != 0) {
+			return false; // داخل نص
+		}
+		
+		// اعرض فقط بعد . أو إذا كان يكتب identifier
+		return prevChar == '.' || MyCharacter.isJavaIdentifierPart(prevChar);
+	}
+	
+	/**
+	 * استخراج الـ prefix الحالي (الكلمة التي يكتبها المستخدم)
+	 */
+	private String getCurrentPrefix(ContentReference contentReference, CharPosition charPosition) {
+		String line = contentReference.getLine(charPosition.line).toString();
+		if (charPosition.column == 0) {
+			return "";
+		}
+		
+		int start = charPosition.column - 1;
+		while (start >= 0 && MyCharacter.isJavaIdentifierPart(line.charAt(start))) {
+			start--;
+		}
+		start++; // نرجع خطوة للأمام
+		
+		return line.substring(start, charPosition.column);
+	}
+	
+	public void requireAutoComplete(ContentReference contentReference, CharPosition charPosition, CompletionPublisher completionPublisher) {
+		// فحص السياق أولاً
+		if (!shouldShowCompletion(contentReference, charPosition)) {
+			completionPublisher.setComparator(null);
+			completionPublisher.setUpdateThreshold(0);
+			return; // لا تعرض الإكمال التلقائي
+		}
+		
+		// Throttling للأداء
+		String currentContent = editor.getText().toString();
+		long currentTime = System.currentTimeMillis();
+		
+		// حدّث المحتوى فقط إذا تغير وبعد فترة معينة
+		if (!currentContent.equals(lastContent) && 
+		    (currentTime - lastUpdateTime) > UPDATE_THROTTLE_MS) {
+			completions.updateFileContent(path, currentContent);
+			lastContent = currentContent;
+			lastUpdateTime = currentTime;
+		}
+		
+		try {
+			CompletionResult result = completions.getCompletions(path, charPosition.line, charPosition.column);
+			
+			String currentPrefix = getCurrentPrefix(contentReference, charPosition);
+			int validCount = 0;
+			
+			for (CompletionCandidate candidate : result.getCompletionCandidates()) {
+				if (!"<error>".equals(candidate.getName())) {
+					// فلتر الاقتراحات بناءً على الـ prefix
+					if (currentPrefix.isEmpty() || 
+					    candidate.getName().toLowerCase().startsWith(currentPrefix.toLowerCase())) {
+						CompletionItem item = getCompletion(
+							candidate.getName(),
+							candidate.getDetail().orElse(candidate.getKind().name()),
+							result.getPrefix(),
+							candidate.getKind()
+						);
+						completionPublisher.addItem(item);
+						validCount++;
+						
+						// حدّد عدد الاقتراحات للأداء
+						if (validCount >= 50) {
+							break;
+						}
+					}
+				}
+			}
+			
+			// إذا لم توجد اقتراحات، لا تعرض القائمة
+			if (validCount == 0) {
+				completionPublisher.setUpdateThreshold(0);
+			}
+			
+		} catch (Exception e) {
+			Log.e("completion_error", Log.getStackTraceString(e));
+		}
 	}
 	
 	private CompletionItemKind getKind(CompletionCandidate.Kind candKind){
 		CompletionItemKind kind;
 		switch (candKind) {
 			case CLASS:
-			kind = CompletionItemKind.Class;
-			break;
+				kind = CompletionItemKind.Class;
+				break;
 			case INTERFACE:
-			kind = CompletionItemKind.Interface;
-			break;
+				kind = CompletionItemKind.Interface;
+				break;
 			case ENUM:
-			kind = CompletionItemKind.Enum;
-			break;
+				kind = CompletionItemKind.Enum;
+				break;
 			case METHOD:
-			kind = CompletionItemKind.Method;
-			break;
+				kind = CompletionItemKind.Method;
+				break;
 			case FIELD:
-			kind = CompletionItemKind.Field;
-			break;
+				kind = CompletionItemKind.Field;
+				break;
 			case VARIABLE:
-			kind = CompletionItemKind.Variable;
-			break;
+				kind = CompletionItemKind.Variable;
+				break;
 			case PACKAGE:
-			kind = CompletionItemKind.Module;
-			break;
+				kind = CompletionItemKind.Module;
+				break;
 			case KEYWORD:
-			kind = CompletionItemKind.Keyword;
-			break;
+				kind = CompletionItemKind.Keyword;
+				break;
 			default:
-			kind = CompletionItemKind.Text;
-			break;
+				kind = CompletionItemKind.Text;
+				break;
 		}
 		return kind;
 	}
@@ -161,7 +254,7 @@ public class CodeCompletionHelper implements EventReceiver<SelectionChangeEvent>
 	
 	private CompletionItem getCompletion(String keyword,String type,String prefix,CompletionCandidate.Kind kind){
 		CompletionItem completionItem = new JavaCompletionItem(keyword,type,prefix,keyword);
-		if(/*type.equals("PlayerItem")&&*/drawablesMap.containsKey(keyword)){
+		if(drawablesMap.containsKey(keyword)){
 			return completionItem.icon(drawablesMap.get(keyword));
 		}
 		return completionItem.kind(kind==null?CompletionItemKind.Keyword:getKind(kind));
@@ -175,9 +268,22 @@ public class CodeCompletionHelper implements EventReceiver<SelectionChangeEvent>
 			keywords = ks;
 		}
 	}
+	
 	@Override
 	public void onReceive(SelectionChangeEvent arg0, Unsubscribe arg1) {
-		completions.updateFileContent(path,editor.getText().toString());
+		// حدّث المحتوى بشكل async لتجنب التأخير
+		new Thread(() -> {
+			try {
+				String content = editor.getText().toString();
+				if (!content.equals(lastContent)) {
+					completions.updateFileContent(path, content);
+					lastContent = content;
+					lastUpdateTime = System.currentTimeMillis();
+				}
+			} catch (Exception e) {
+				// Ignore errors during background update
+			}
+		}).start();
 	}
 	
 }

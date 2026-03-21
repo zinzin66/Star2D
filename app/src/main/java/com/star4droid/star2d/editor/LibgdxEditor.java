@@ -115,6 +115,7 @@ public class LibgdxEditor extends Stage {
 		setupLight();
 		//((OrthographicCamera)getCamera()).zoom = 0.5f;
 	}
+
 	
 	public ShapeRenderer getShapeRenderer(){
 	    return shapeRenderer;
@@ -138,6 +139,8 @@ public class LibgdxEditor extends Stage {
 	public void setUiStage(Stage stage){
 		this.UiStage = stage;
 	}
+	
+
 	
 	// toast manager to show popup messages...
 	public void setToastManager(ToastManager manager){

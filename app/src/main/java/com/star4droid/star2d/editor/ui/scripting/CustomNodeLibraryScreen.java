@@ -13,41 +13,37 @@ import com.kotcrab.vis.ui.widget.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Full-screen overlay for managing the custom node library.
- *
- * Flow: SECTIONS VIEW → [Open] → NODES VIEW → [← Back] → SECTIONS VIEW
- *
- * Each section card shows: Section Name [Open] [Rename] [Delete]
- */
 public class CustomNodeLibraryScreen extends VisWindow {
 
-    private List<CustomNodeSection> sections;
+    private List<CustomNodeSection> nodeSections;
+    private List<CustomBlockSection> blockSections;
     private final Stage ownerStage;
+
+    private boolean isParametersMode = false;
 
     // Persistent top-bar widgets
     private VisTable contentArea;
     private VisLabel topTitle;
     private VisTextButton backBtn;
 
-    // -------------------------------------------------------------------------
-    //  Constructor
-    // -------------------------------------------------------------------------
+    // Toggle buttons
+    private VisTextButton nodesTabBtn;
+    private VisTextButton paramsTabBtn;
+
     public CustomNodeLibraryScreen(Stage owner) {
-        super("");                          // blank built-in title; we draw our own
+        super("");
         this.ownerStage = owner;
         setFillParent(true);
         setMovable(false);
-        getTitleTable().clearChildren();    // remove VisWindow's default title row
+        getTitleTable().clearChildren();
 
-        sections = CustomNodeLibraryManager.load();
+        nodeSections = CustomNodeLibraryManager.load();
+        blockSections = CustomBlockLibraryManager.load();
+
         buildShell();
         showSectionsView();
     }
 
-    // -------------------------------------------------------------------------
-    //  Shell  (top-bar + content area, never rebuilt)
-    // -------------------------------------------------------------------------
     private void buildShell() {
         VisTable topBar = new VisTable();
         topBar.setBackground(VisUI.getSkin().getDrawable("window-bg"));
@@ -56,15 +52,21 @@ public class CustomNodeLibraryScreen extends VisWindow {
         backBtn = new VisTextButton("< Back");
         backBtn.setVisible(false);
 
-        topTitle = new VisLabel("Node Library");
+        topTitle = new VisLabel("Library");
         topTitle.setFontScale(1.1f);
         topTitle.setColor(Color.WHITE);
+
+        nodesTabBtn = new VisTextButton("Nodes Mode");
+        paramsTabBtn = new VisTextButton("Parameters Mode");
+        updateTabStyles();
 
         VisTextButton closeBtn = new VisTextButton("X");
         closeBtn.setColor(Color.RED);
 
         topBar.add(backBtn).size(110, 48).padRight(10);
         topBar.add(topTitle).expandX().left();
+        topBar.add(nodesTabBtn).height(48).padRight(8);
+        topBar.add(paramsTabBtn).height(48).padRight(16);
         topBar.add(closeBtn).size(60, 48);
 
         add(topBar).growX().row();
@@ -76,9 +78,32 @@ public class CustomNodeLibraryScreen extends VisWindow {
         backBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent e, float x, float y) {
+                if (isParametersMode) {
+                    showBlockSectionsView();
+                } else {
+                    showSectionsView();
+                }
+            }
+        });
+
+        nodesTabBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                isParametersMode = false;
+                updateTabStyles();
                 showSectionsView();
             }
         });
+
+        paramsTabBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                isParametersMode = true;
+                updateTabStyles();
+                showBlockSectionsView();
+            }
+        });
+
         closeBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent e, float x, float y) {
@@ -87,15 +112,21 @@ public class CustomNodeLibraryScreen extends VisWindow {
         });
     }
 
+    private void updateTabStyles() {
+        nodesTabBtn.setColor(isParametersMode ? Color.GRAY : Color.valueOf("44bb44ff"));
+        paramsTabBtn.setColor(isParametersMode ? Color.valueOf("44bb44ff") : Color.GRAY);
+    }
+
     // =========================================================================
-    //  SECTIONS VIEW
+    //  NODES SECTIONS VIEW
     // =========================================================================
     private void showSectionsView() {
         contentArea.clearChildren();
         backBtn.setVisible(false);
-        topTitle.setText("Node Library (Beta)");
+        topTitle.setText("Node Library");
+        nodesTabBtn.setVisible(true);
+        paramsTabBtn.setVisible(true);
 
-        // --- action buttons ---
         VisTable actions = new VisTable();
         actions.pad(8, 10, 4, 10);
         VisTextButton newSectionBtn = new VisTextButton("+ New Section");
@@ -106,7 +137,6 @@ public class CustomNodeLibraryScreen extends VisWindow {
         actions.add(exportAllBtn).height(52);
         contentArea.add(actions).left().row();
 
-        // --- list ---
         VisTable listTable = new VisTable();
         listTable.top().left();
         listTable.pad(10);
@@ -116,7 +146,6 @@ public class CustomNodeLibraryScreen extends VisWindow {
 
         populateSectionsList(listTable);
 
-        // listeners
         newSectionBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent e, float x, float y) {
@@ -132,20 +161,20 @@ public class CustomNodeLibraryScreen extends VisWindow {
         exportAllBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent e, float x, float y) {
-                showTextDialog("Export All", CustomNodeLibraryManager.exportAllJson(sections));
+                showTextDialog("Export All", CustomNodeLibraryManager.exportAllJson(nodeSections));
             }
         });
     }
 
     private void populateSectionsList(VisTable listTable) {
         listTable.clearChildren();
-        if (sections.isEmpty()) {
-            VisLabel empty = new VisLabel("No sections yet.  Tap  [ + New Section ]");
+        if (nodeSections.isEmpty()) {
+            VisLabel empty = new VisLabel("No node sections yet.  Tap  [ + New Section ]");
             empty.setColor(Color.LIGHT_GRAY);
             listTable.add(empty).expand().center().pad(40).row();
             return;
         }
-        for (CustomNodeSection sec : sections) {
+        for (CustomNodeSection sec : nodeSections) {
             listTable.add(buildSectionCard(sec, listTable)).growX().padBottom(12).row();
         }
     }
@@ -179,17 +208,15 @@ public class CustomNodeLibraryScreen extends VisWindow {
         renameBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent e, float x, float y) {
-                showSectionNameDialog(section, () -> {
-                    populateSectionsList(listTable); // refresh in place
-                });
+                showSectionNameDialog(section, () -> populateSectionsList(listTable));
             }
         });
         delBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent e, float x, float y) {
                 showConfirm("Delete section \"" + section.name + "\" and all its nodes?", () -> {
-                    sections.remove(section);
-                    CustomNodeLibraryManager.save(sections);
+                    nodeSections.remove(section);
+                    CustomNodeLibraryManager.save(nodeSections);
                     populateSectionsList(listTable);
                 });
             }
@@ -204,8 +231,9 @@ public class CustomNodeLibraryScreen extends VisWindow {
         contentArea.clearChildren();
         backBtn.setVisible(true);
         topTitle.setText(section.name);
+        nodesTabBtn.setVisible(false);
+        paramsTabBtn.setVisible(false);
 
-        // --- action buttons ---
         VisTable actions = new VisTable();
         actions.pad(8, 10, 4, 10);
         VisTextButton newNodeBtn = new VisTextButton("+ New Node");
@@ -214,7 +242,6 @@ public class CustomNodeLibraryScreen extends VisWindow {
         actions.add(exportBtn).height(52);
         contentArea.add(actions).left().row();
 
-        // --- list ---
         VisTable listTable = new VisTable();
         listTable.top().left();
         listTable.pad(10);
@@ -287,7 +314,7 @@ public class CustomNodeLibraryScreen extends VisWindow {
                 String label = node.title.isEmpty() ? node.name : node.title;
                 showConfirm("Delete node \"" + label + "\"?", () -> {
                     section.nodes.remove(node);
-                    CustomNodeLibraryManager.save(sections);
+                    CustomNodeLibraryManager.save(nodeSections);
                     rebuildNodesList(listTable, section);
                 });
             }
@@ -296,11 +323,212 @@ public class CustomNodeLibraryScreen extends VisWindow {
     }
 
     // =========================================================================
-    //  DIALOGS
+    //  BLOCK SECTIONS VIEW (Parameters Mode)
     // =========================================================================
-    /**
-     * Create or rename a section. Pass null for existing to create a new one.
-     */
+    private void showBlockSectionsView() {
+        contentArea.clearChildren();
+        backBtn.setVisible(false);
+        topTitle.setText("Parameter Blocks Library");
+        nodesTabBtn.setVisible(true);
+        paramsTabBtn.setVisible(true);
+
+        VisTable actions = new VisTable();
+        actions.pad(8, 10, 4, 10);
+        VisTextButton newSectionBtn = new VisTextButton("+ New Section");
+        VisTextButton importBtn = new VisTextButton("Import JSON");
+        VisTextButton exportAllBtn = new VisTextButton("Export All");
+        actions.add(newSectionBtn).height(52).padRight(8);
+        actions.add(importBtn).height(52).padRight(8);
+        actions.add(exportAllBtn).height(52);
+        contentArea.add(actions).left().row();
+
+        VisTable listTable = new VisTable();
+        listTable.top().left();
+        listTable.pad(10);
+        ScrollPane sp = new ScrollPane(listTable, VisUI.getSkin());
+        sp.setFadeScrollBars(false);
+        contentArea.add(sp).grow().row();
+
+        populateBlockSectionsList(listTable);
+
+        newSectionBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                showBlockSectionNameDialog(null, () -> showBlockSectionsView());
+            }
+        });
+        importBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                showBlockImportDialog();
+            }
+        });
+        exportAllBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                showTextDialog("Export All Blocks", CustomBlockLibraryManager.exportAllJson(blockSections));
+            }
+        });
+    }
+
+    private void populateBlockSectionsList(VisTable listTable) {
+        listTable.clearChildren();
+        if (blockSections.isEmpty()) {
+            VisLabel empty = new VisLabel("No block sections yet.  Tap  [ + New Section ]");
+            empty.setColor(Color.LIGHT_GRAY);
+            listTable.add(empty).expand().center().pad(40).row();
+            return;
+        }
+        for (CustomBlockSection sec : blockSections) {
+            listTable.add(buildBlockSectionCard(sec, listTable)).growX().padBottom(12).row();
+        }
+    }
+
+    private VisTable buildBlockSectionCard(CustomBlockSection section, VisTable listTable) {
+        VisTable card = new VisTable();
+        card.setBackground(VisUI.getSkin().getDrawable("window-bg"));
+        card.pad(12);
+
+        VisLabel name = new VisLabel(section.name);
+        name.setFontScale(1.05f);
+        name.setColor(Color.WHITE);
+        card.add(name).expandX().left().padBottom(10).colspan(3).row();
+
+        VisTextButton openBtn = new VisTextButton("  Open  ");
+        VisTextButton renameBtn = new VisTextButton(" Rename ");
+        VisTextButton delBtn = new VisTextButton(" Delete ");
+        openBtn.setColor(Color.valueOf("44bb44ff"));
+        delBtn.setColor(Color.valueOf("cc4444ff"));
+
+        card.add(openBtn).height(52).padRight(8);
+        card.add(renameBtn).height(52).padRight(8);
+        card.add(delBtn).height(52);
+
+        openBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                showBlocksView(section);
+            }
+        });
+        renameBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                showBlockSectionNameDialog(section, () -> populateBlockSectionsList(listTable));
+            }
+        });
+        delBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                showConfirm("Delete section \"" + section.name + "\" and all its blocks?", () -> {
+                    blockSections.remove(section);
+                    CustomBlockLibraryManager.save(blockSections);
+                    populateBlockSectionsList(listTable);
+                });
+            }
+        });
+        return card;
+    }
+
+    // =========================================================================
+    //  BLOCKS VIEW
+    // =========================================================================
+    private void showBlocksView(CustomBlockSection section) {
+        contentArea.clearChildren();
+        backBtn.setVisible(true);
+        topTitle.setText(section.name + " (Blocks)");
+        nodesTabBtn.setVisible(false);
+        paramsTabBtn.setVisible(false);
+
+        VisTable actions = new VisTable();
+        actions.pad(8, 10, 4, 10);
+        VisTextButton newBlockBtn = new VisTextButton("+ New Block");
+        VisTextButton exportBtn = new VisTextButton("Export Section");
+        actions.add(newBlockBtn).height(52).padRight(8);
+        actions.add(exportBtn).height(52);
+        contentArea.add(actions).left().row();
+
+        VisTable listTable = new VisTable();
+        listTable.top().left();
+        listTable.pad(10);
+        ScrollPane sp = new ScrollPane(listTable, VisUI.getSkin());
+        sp.setFadeScrollBars(false);
+        contentArea.add(sp).grow().row();
+
+        rebuildBlocksList(listTable, section);
+
+        newBlockBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                showBlockEditDialog(null, section, () -> rebuildBlocksList(listTable, section));
+            }
+        });
+        exportBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                showTextDialog("Export: " + section.name,
+                        CustomBlockLibraryManager.exportSectionJson(section));
+            }
+        });
+    }
+
+    private void rebuildBlocksList(VisTable listTable, CustomBlockSection section) {
+        listTable.clearChildren();
+        if (section.blocks.isEmpty()) {
+            VisLabel empty = new VisLabel("No blocks yet.  Tap  [ + New Block ]");
+            empty.setColor(Color.LIGHT_GRAY);
+            listTable.add(empty).expand().center().pad(40).row();
+            return;
+        }
+        for (CustomBlockDef block : section.blocks) {
+            listTable.add(buildBlockCard(block, section, listTable)).growX().padBottom(8).row();
+        }
+    }
+
+    private VisTable buildBlockCard(CustomBlockDef block, CustomBlockSection section, VisTable listTable) {
+        VisTable card = new VisTable();
+        card.setBackground(VisUI.getSkin().getDrawable("window-bg"));
+        card.pad(10, 14, 10, 14);
+
+        VisLabel titleLbl = new VisLabel(block.title);
+        titleLbl.setFontScale(1.0f);
+        titleLbl.setColor(Color.WHITE);
+
+        VisLabel nameLbl = new VisLabel("  [" + block.name + "]");
+        nameLbl.setColor(Color.LIGHT_GRAY);
+        nameLbl.setFontScale(0.8f);
+
+        VisTextButton editBtn = new VisTextButton("Edit");
+        editBtn.setColor(Color.valueOf("3399ffff"));
+        VisTextButton delBtn = new VisTextButton("X");
+        delBtn.setColor(Color.valueOf("cc4444ff"));
+
+        card.add(titleLbl).expandX().left();
+        card.add(nameLbl).expandX().left();
+        card.add(editBtn).size(90, 48).padRight(6);
+        card.add(delBtn).size(48, 48);
+
+        editBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                showBlockEditDialog(block, section, () -> rebuildBlocksList(listTable, section));
+            }
+        });
+        delBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                showConfirm("Delete block \"" + block.name + "\"?", () -> {
+                    section.blocks.remove(block);
+                    CustomBlockLibraryManager.save(blockSections);
+                    rebuildBlocksList(listTable, section);
+                });
+            }
+        });
+        return card;
+    }
+
+    // =========================================================================
+    //  DIALOGS FOR NODES
+    // =========================================================================
     private void showSectionNameDialog(CustomNodeSection existing, Runnable onDone) {
         VisDialog dialog = new VisDialog(existing == null ? "New Section" : "Rename Section");
         dialog.setMovable(true);
@@ -329,12 +557,13 @@ public class CustomNodeLibraryScreen extends VisWindow {
                 if (name.isEmpty()) {
                     return;
                 }
+
                 if (existing == null) {
-                    sections.add(new CustomNodeSection(name));
+                    nodeSections.add(new CustomNodeSection(name));
                 } else {
                     existing.name = name;
                 }
-                CustomNodeLibraryManager.save(sections);
+                CustomNodeLibraryManager.save(nodeSections);
                 dialog.hide();
                 onDone.run();
             }
@@ -345,13 +574,9 @@ public class CustomNodeLibraryScreen extends VisWindow {
                 dialog.hide();
             }
         });
-
         dialog.show(ownerStage);
     }
 
-    /**
-     * Create or edit a node. Pass null for existing to create a new one.
-     */
     private void showNodeEditDialog(CustomNodeDef existing, CustomNodeSection section, Runnable onDone) {
         boolean isNew = (existing == null);
         CustomNodeDef working = isNew ? new CustomNodeDef() : copyNode(existing);
@@ -363,22 +588,18 @@ public class CustomNodeLibraryScreen extends VisWindow {
         VisTable mainContent = new VisTable();
         mainContent.top().left().pad(16);
 
-        // Name
         mainContent.add(label("Name (editor):")).left().padBottom(4).row();
         VisTextField nameField = new VisTextField(working.name);
         mainContent.add(nameField).growX().padBottom(14).row();
 
-        // Title
         mainContent.add(label("Title (shown on block):")).left().padBottom(4).row();
         VisTextField titleField = new VisTextField(working.title);
         mainContent.add(titleField).growX().padBottom(14).row();
 
-        // Boolean toggle
         VisCheckBox boolCheck = new VisCheckBox("  Boolean Node  (true / false outputs)");
         boolCheck.setChecked(working.isBooleanNode);
         mainContent.add(boolCheck).left().padBottom(14).row();
 
-        // Code
         mainContent.add(label("Code Template:")).left().padBottom(4).row();
         TextArea codeArea = new TextArea(working.code, VisUI.getSkin());
         codeArea.setPrefRows(5);
@@ -386,17 +607,13 @@ public class CustomNodeLibraryScreen extends VisWindow {
         codeScroll.setFadeScrollBars(false);
         mainContent.add(codeScroll).growX().height(135).padBottom(6).row();
 
-        VisLabel hint = new VisLabel(
-                "Placeholders: %1$s … %N$s = field values, last = next node.\n"
-                + "Boolean: second-to-last = true branch, last-1 = false, last = next.");
+        VisLabel hint = new VisLabel("Placeholders: %1$s … %N$s = field values, last = next node.\nBoolean: second-to-last = true branch, last-1 = false, last = next.");
         hint.setColor(Color.GRAY);
         hint.setFontScale(0.75f);
         hint.setWrap(true);
         mainContent.add(hint).growX().padBottom(12).row();
 
-        // Fields
         mainContent.add(label("Fields  (name → default value):")).left().padBottom(4).row();
-
         VisTable fieldsContainer = new VisTable();
         fieldsContainer.top().left();
         ScrollPane fieldsScroll = new ScrollPane(fieldsContainer, VisUI.getSkin());
@@ -410,7 +627,6 @@ public class CustomNodeLibraryScreen extends VisWindow {
 
         VisTextButton addFieldBtn = new VisTextButton("+ Add Field");
         mainContent.add(addFieldBtn).left().padBottom(8).row();
-
         addFieldBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent e, float x, float y) {
@@ -423,7 +639,6 @@ public class CustomNodeLibraryScreen extends VisWindow {
         mainScroll.setFadeScrollBars(false);
         dialog.getContentTable().add(mainScroll).grow().pad(10).row();
 
-        // Buttons row
         VisTextButton saveBtn = new VisTextButton("Save");
         VisTextButton cancelBtn = new VisTextButton("Cancel");
         dialog.getContentTable().add(saveBtn).size(160, 55).padRight(12);
@@ -458,7 +673,7 @@ public class CustomNodeLibraryScreen extends VisWindow {
                     existing.isBooleanNode = boolCheck.isChecked();
                     existing.fields = fds;
                 }
-                CustomNodeLibraryManager.save(sections);
+                CustomNodeLibraryManager.save(nodeSections);
                 dialog.hide();
                 onDone.run();
             }
@@ -502,17 +717,142 @@ public class CustomNodeLibraryScreen extends VisWindow {
         container.add(row).growX().row();
     }
 
+    // =========================================================================
+    //  DIALOGS FOR BLOCKS (Parameters Mode)
+    // =========================================================================
+    private void showBlockSectionNameDialog(CustomBlockSection existing, Runnable onDone) {
+        VisDialog dialog = new VisDialog(existing == null ? "New Block Section" : "Rename Block Section");
+        dialog.setMovable(true);
+
+        VisTable content = new VisTable();
+        content.pad(20, 20, 10, 20);
+
+        VisLabel lbl = new VisLabel("Section name:");
+        lbl.setColor(Color.WHITE);
+        content.add(lbl).left().padBottom(8).row();
+
+        VisTextField field = new VisTextField(existing == null ? "" : existing.name);
+        content.add(field).width(420).padBottom(16).row();
+
+        VisTextButton okBtn = new VisTextButton("Save");
+        VisTextButton cancelBtn = new VisTextButton("Cancel");
+        content.add(okBtn).size(140, 52).padRight(10);
+        content.add(cancelBtn).size(140, 52);
+
+        dialog.getContentTable().add(content).pad(10);
+
+        okBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                String name = field.getText().trim();
+                if (name.isEmpty()) {
+                    return;
+                }
+
+                if (existing == null) {
+                    blockSections.add(new CustomBlockSection(name));
+                } else {
+                    existing.name = name;
+                }
+                CustomBlockLibraryManager.save(blockSections);
+                dialog.hide();
+                onDone.run();
+            }
+        });
+        cancelBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                dialog.hide();
+            }
+        });
+        dialog.show(ownerStage);
+    }
+
+    private void showBlockEditDialog(CustomBlockDef existing, CustomBlockSection section, Runnable onDone) {
+        boolean isNew = (existing == null);
+        CustomBlockDef working = isNew ? new CustomBlockDef() : new CustomBlockDef(existing.name, existing.title, existing.code);
+
+        VisDialog dialog = new VisDialog(isNew ? "New Block" : "Edit Block");
+        dialog.setFillParent(true);
+        dialog.setMovable(false);
+
+        VisTable mainContent = new VisTable();
+        mainContent.top().left().pad(16);
+
+        mainContent.add(label("Name (editor):")).left().padBottom(4).row();
+        VisTextField nameField = new VisTextField(working.name);
+        mainContent.add(nameField).growX().padBottom(14).row();
+
+        mainContent.add(label("Title (like %1$s + %2$s):")).left().padBottom(4).row();
+        VisTextField titleField = new VisTextField(working.title);
+        mainContent.add(titleField).growX().padBottom(14).row();
+
+        mainContent.add(label("Code (like (%1$s + %2$s)):")).left().padBottom(4).row();
+        TextArea codeArea = new TextArea(working.code, VisUI.getSkin());
+        codeArea.setPrefRows(5);
+        ScrollPane codeScroll = new ScrollPane(codeArea, VisUI.getSkin());
+        codeScroll.setFadeScrollBars(false);
+        mainContent.add(codeScroll).growX().height(135).padBottom(6).row();
+
+        VisLabel hint = new VisLabel("Use ___ inside `Title` to create inner slots. Example: to int ___\n%1$s refers to the 1st parameter slot.");
+        hint.setColor(Color.GRAY);
+        hint.setFontScale(0.75f);
+        hint.setWrap(true);
+        mainContent.add(hint).growX().padBottom(12).row();
+
+        ScrollPane mainScroll = new ScrollPane(mainContent, VisUI.getSkin());
+        mainScroll.setFadeScrollBars(false);
+        dialog.getContentTable().add(mainScroll).grow().pad(10).row();
+
+        VisTextButton saveBtn = new VisTextButton("Save");
+        VisTextButton cancelBtn = new VisTextButton("Cancel");
+        dialog.getContentTable().add(saveBtn).size(160, 55).padRight(12);
+        dialog.getContentTable().add(cancelBtn).size(160, 55);
+
+        saveBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                String name = nameField.getText().trim();
+                if (name.isEmpty()) {
+                    showInfo("Name cannot be empty.");
+                    return;
+                }
+
+                if (isNew) {
+                    CustomBlockDef nd = new CustomBlockDef(name, titleField.getText().trim(), codeArea.getText());
+                    section.blocks.add(nd);
+                } else {
+                    existing.name = name;
+                    existing.title = titleField.getText().trim();
+                    existing.code = codeArea.getText();
+                }
+                CustomBlockLibraryManager.save(blockSections);
+                dialog.hide();
+                onDone.run();
+            }
+        });
+        cancelBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                dialog.hide();
+            }
+        });
+
+        dialog.show(ownerStage);
+    }
+
+    // =========================================================================
+    //  IMPORT/EXPORT DIALOGS
+    // =========================================================================
     private void showImportDialog() {
-        VisDialog dialog = new VisDialog("Import JSON");
+        VisDialog dialog = new VisDialog("Import Nodes JSON");
         dialog.setFillParent(true);
         dialog.setMovable(false);
 
         VisTable content = new VisTable();
         content.pad(16);
 
-        VisLabel hint = new VisLabel(
-                "Paste exported JSON below. Same-named sections will have nodes appended.");
-        hint.setWrap(true);
+        VisLabel hint = new VisLabel("Paste exported nodes JSON below.");
         hint.setColor(Color.LIGHT_GRAY);
         content.add(hint).growX().padBottom(10).row();
 
@@ -544,10 +884,66 @@ public class CustomNodeLibraryScreen extends VisWindow {
         importBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent e, float x, float y) {
-                String result = CustomNodeLibraryManager.importFromJson(textArea.getText(), sections);
-                CustomNodeLibraryManager.save(sections);
+                String result = CustomNodeLibraryManager.importFromJson(textArea.getText(), nodeSections);
+                CustomNodeLibraryManager.save(nodeSections);
                 dialog.hide();
                 showSectionsView();
+                showInfo(result);
+            }
+        });
+        cancelBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                dialog.hide();
+            }
+        });
+        dialog.show(ownerStage);
+    }
+
+    private void showBlockImportDialog() {
+        VisDialog dialog = new VisDialog("Import Blocks JSON");
+        dialog.setFillParent(true);
+        dialog.setMovable(false);
+
+        VisTable content = new VisTable();
+        content.pad(16);
+
+        VisLabel hint = new VisLabel("Paste exported blocks JSON below.");
+        hint.setColor(Color.LIGHT_GRAY);
+        content.add(hint).growX().padBottom(10).row();
+
+        TextArea textArea = new TextArea("", VisUI.getSkin());
+        textArea.setPrefRows(20);
+        ScrollPane sp = new ScrollPane(textArea, VisUI.getSkin());
+        sp.setFadeScrollBars(false);
+        content.add(sp).grow().row();
+
+        dialog.getContentTable().add(content).grow().pad(10).row();
+
+        VisTextButton pasteBtn = new VisTextButton("Paste Clipboard");
+        VisTextButton importBtn = new VisTextButton("Import");
+        VisTextButton cancelBtn = new VisTextButton("Cancel");
+
+        dialog.getContentTable().add(pasteBtn).size(210, 55).padRight(8);
+        dialog.getContentTable().add(importBtn).size(140, 55).padRight(8);
+        dialog.getContentTable().add(cancelBtn).size(140, 55);
+
+        pasteBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                String clip = Gdx.app.getClipboard().getContents();
+                if (clip != null) {
+                    textArea.setText(clip);
+                }
+            }
+        });
+        importBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                String result = CustomBlockLibraryManager.importFromJson(textArea.getText(), blockSections);
+                CustomBlockLibraryManager.save(blockSections);
+                dialog.hide();
+                showBlockSectionsView();
                 showInfo(result);
             }
         });
@@ -620,9 +1016,6 @@ public class CustomNodeLibraryScreen extends VisWindow {
         d.show(ownerStage);
     }
 
-    // =========================================================================
-    //  Helpers
-    // =========================================================================
     private VisLabel label(String text) {
         VisLabel lbl = new VisLabel(text);
         lbl.setColor(Color.WHITE);

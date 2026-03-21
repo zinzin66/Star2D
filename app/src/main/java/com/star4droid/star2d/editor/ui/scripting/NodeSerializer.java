@@ -11,7 +11,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 
-/** Handles saving and loading of the node editor state (Gson version, compatible with old JSON) */
+/**
+ * Handles saving and loading of the node editor state (Gson version, compatible
+ * with old JSON)
+ */
 public class NodeSerializer {
 
     private final NodeEditor editor;
@@ -26,7 +29,9 @@ public class NodeSerializer {
         this.uiStage = uiStage;
     }
 
-    /** Save all nodes to a JSON file */
+    /**
+     * Save all nodes to a JSON file
+     */
     public void saveToFile(String filename) {
         try {
             JsonArray nodesArray = new JsonArray();
@@ -52,7 +57,7 @@ public class NodeSerializer {
                     nodesArray.add(nodeJson);
                 }
             }
-            
+
             com.badlogic.gdx.Gdx.files.absolute(filename).writeString(gson.toJson(nodesArray), false);
             /*try (java.io.FileWriter writer = new java.io.FileWriter(
                     "/storage/emulated/0/Android/data/com.star4droid.starvalley/files/" + filename)) {
@@ -66,8 +71,8 @@ public class NodeSerializer {
             e.printStackTrace();
         }
     }
-    
-    private void displayFirst(){
+
+    private void displayFirst() {
         editor.getRoot().clearChildren();
         VisualNode first = new VisualNode("First \u003e", editor);
         first.setCode("%1$s");
@@ -75,14 +80,16 @@ public class NodeSerializer {
         first.setPosition(50, 450);
         first.setColor(Color.RED);
         editor.addNode(first);
-        editor.getCamera().position.set(0,0,0);
+        editor.getCamera().position.set(0, 0, 0);
         nodeIdMap.clear();
         idNodeMap.clear();
         idNodeMap.put("0", first);
         nodeIdMap.put(first, "0");
     }
 
-    /** Load nodes from a JSON file */
+    /**
+     * Load nodes from a JSON file
+     */
     public void loadFromFile(String filename) {
         try {
             java.io.File file = new java.io.File(filename);
@@ -96,14 +103,14 @@ public class NodeSerializer {
             try (java.io.FileReader reader = new java.io.FileReader(file)) {
                 nodesArray = JsonParser.parseReader(reader).getAsJsonArray();
             }
-            if(nodesArray.size() == 0){
+            if (nodesArray.size() == 0) {
                 displayFirst();
                 return;
             }
             editor.getRoot().clearChildren();
             nodeIdMap.clear();
             idNodeMap.clear();
-            
+
             // First pass: create nodes
             for (JsonElement elem : nodesArray) {
                 JsonObject nodeJson = elem.getAsJsonObject();
@@ -132,7 +139,9 @@ public class NodeSerializer {
         }
     }
 
-    /** Serialize a single node */
+    /**
+     * Serialize a single node
+     */
     private JsonObject serializeNode(VisualNode node) {
         JsonObject json = new JsonObject();
 
@@ -163,11 +172,7 @@ public class NodeSerializer {
         JsonArray fieldsArray = new JsonArray();
         for (Actor actor : node.getFieldsTable().getChildren()) {
             if (actor instanceof VisualNode.NodeField) {
-                VisualNode.NodeField field = (VisualNode.NodeField) actor;
-                JsonObject fieldJson = new JsonObject();
-                fieldJson.addProperty("name", field.getFieldName());
-                fieldJson.addProperty("value", field.value);
-                fieldsArray.add(fieldJson);
+                fieldsArray.add(serializeField((VisualNode.NodeField) actor));
             }
         }
         json.addProperty("nf", gson.toJson(fieldsArray));
@@ -180,7 +185,48 @@ public class NodeSerializer {
         return json;
     }
 
-    /** Deserialize a single node */
+    private JsonObject serializeField(VisualNode.NodeField field) {
+        JsonObject fieldJson = new JsonObject();
+        fieldJson.addProperty("name", field.getFieldName());
+        fieldJson.addProperty("value", field.value);
+        if (field.parameterBlock != null) {
+            JsonObject blockJson = new JsonObject();
+            blockJson.addProperty("template", field.parameterBlock.getTemplate());
+            blockJson.addProperty("displayTemplate", field.parameterBlock.getDisplayTemplate());
+            JsonArray innerFieldsArray = new JsonArray();
+            for (VisualNode.NodeField inner : field.parameterBlock.getInnerFields()) {
+                innerFieldsArray.add(serializeField(inner));
+            }
+            blockJson.add("innerFields", innerFieldsArray);
+            fieldJson.add("block", blockJson);
+        }
+        return fieldJson;
+    }
+
+    private void populateFieldFromJson(VisualNode.NodeField field, JsonObject fieldJson, UiStage uiStage) {
+        if (fieldJson.has("value")) {
+            field.value = fieldJson.get("value").getAsString();
+            field.valueButton.setText(field.value.length() > 7 ? field.value.substring(0, 6) + "..." : field.value);
+        }
+        if (fieldJson.has("block")) {
+            JsonObject blockJson = fieldJson.getAsJsonObject("block");
+            String template = blockJson.get("template").getAsString();
+            String displayTemplate = blockJson.get("displayTemplate").getAsString();
+            field.setParameterBlock(template, displayTemplate);
+
+            if (blockJson.has("innerFields")) {
+                JsonArray innerFieldsArray = blockJson.getAsJsonArray("innerFields");
+                List<VisualNode.NodeField> instantiatedInners = field.parameterBlock.getInnerFields();
+                for (int i = 0; i < innerFieldsArray.size() && i < instantiatedInners.size(); i++) {
+                    populateFieldFromJson(instantiatedInners.get(i), innerFieldsArray.get(i).getAsJsonObject(), uiStage);
+                }
+            }
+        }
+    }
+
+    /**
+     * Deserialize a single node
+     */
     private VisualNode deserializeNode(JsonObject json) {
         String title = json.get("title").getAsString();
         float x = Float.parseFloat(json.get("x").getAsString());
@@ -192,7 +238,9 @@ public class NodeSerializer {
         // Restore code
         if (json.has("code")) {
             node.setCode(json.get("code").getAsString());
-        } else throw new RuntimeException("Code Not Found!!\n"+json);
+        } else {
+            throw new RuntimeException("Code Not Found!!\n" + json);
+        }
 
         // Restore close flag
         if (json.has("close")) {
@@ -215,9 +263,11 @@ public class NodeSerializer {
                 }
                 for (JsonElement elem : fieldsArray) {
                     JsonObject fieldJson = elem.getAsJsonObject();
-                    String name = fieldJson.get("name").getAsString();
-                    String value = fieldJson.get("value").getAsString();
-                    node.add(new VisualNode.NodeField(name, value, uiStage));
+                    String name = fieldJson.has("name") ? fieldJson.get("name").getAsString() : "";
+                    String value = fieldJson.has("value") ? fieldJson.get("value").getAsString() : "";
+                    VisualNode.NodeField field = new VisualNode.NodeField(name, value, uiStage);
+                    populateFieldFromJson(field, fieldJson, uiStage);
+                    node.add(field);
                 }
             }
         } catch (Exception e) {
@@ -230,11 +280,12 @@ public class NodeSerializer {
             Color.abgr8888ToColor(color, colorInt); // because toIntBits stores ABGR
             node.setColor(color);
         } catch (Exception ignored) {}*/
-
         return node;
     }
 
-    /** Restore connections */
+    /**
+     * Restore connections
+     */
     private void restoreConnections(VisualNode node, JsonObject json) {
         boolean isBooleanNode = json.get("else").getAsString().equals("true");
 
@@ -262,23 +313,29 @@ public class NodeSerializer {
         }
     }
 
-    /** Generate code placeholder if none is set */
+    /**
+     * Generate code placeholder if none is set
+     */
     private String generateNodeCode(VisualNode node) {
         String title = node.getTitleLabel().getText().toString();
         int fieldCount = 0;
         for (Actor actor : node.getFieldsTable().getChildren()) {
-            if (actor instanceof VisualNode.NodeField) fieldCount++;
+            if (actor instanceof VisualNode.NodeField) {
+                fieldCount++;
+            }
         }
 
         StringBuilder code = new StringBuilder();
         for (int i = 1; i <= fieldCount; i++) {
             code.append("%").append(i).append("$s");
-            if (i < fieldCount) code.append(", ");
+            if (i < fieldCount) {
+                code.append(", ");
+            }
         }
 
         if (node.getTrueNode() != null || node.getFalseNode() != null) {
-            return "if(" + code + "){\n%" + (fieldCount + 1) + "$s\n} else {\n%" +
-                    (fieldCount + 2) + "$s\n}\n%" + (fieldCount + 3) + "$s";
+            return "if(" + code + "){\n%" + (fieldCount + 1) + "$s\n} else {\n%"
+                    + (fieldCount + 2) + "$s\n}\n%" + (fieldCount + 3) + "$s";
         } else {
             return title + "(" + code + ");\n%" + (fieldCount + 1) + "$s";
         }
@@ -286,40 +343,42 @@ public class NodeSerializer {
 // --- Code Exporting ---
 
     public String exportCode() {
-    StringBuilder code = new StringBuilder();
+        StringBuilder code = new StringBuilder();
 
-    // Find entry node (using helper)
-    VisualNode entry = findEntryNode();
-    if (entry != null) {
-        generateCodeRecursive(entry, code, 0, new HashSet<>());
+        // Find entry node (using helper)
+        VisualNode entry = findEntryNode();
+        if (entry != null) {
+            generateCodeRecursive(entry, code, 0, new HashSet<>());
+        }
+
+        return code.toString();
     }
-
-    return code.toString();
-}
 
     private void generateCodeRecursive(
             VisualNode node, StringBuilder code, int indent, Set<VisualNode> visited) {
-    
-        if (node == null || visited.contains(node)) return;
+
+        if (node == null || visited.contains(node)) {
+            return;
+        }
         visited.add(node);
-    
+
         String indentStr = "    ".repeat(indent);
-    
+
         // Get node code template
         String template = node.getCode();
         if (template == null || template.isEmpty()) {
             //template = node.getTitleLabel().getText().toString() + "(%1$s);\n%2$s"; // fallback
             throw new RuntimeException("no code found!!");
         }
-    
+
         // Collect field values
         List<String> args = new ArrayList<>();
         for (Actor actor : node.getFieldsTable().getChildren()) {
             if (actor instanceof VisualNode.NodeField) {
-                args.add(((VisualNode.NodeField) actor).value);
+                args.add(((VisualNode.NodeField) actor).generateCode());
             }
         }
-    
+
         // Recursive branches
         String trueCode = "";
         if (node.getTrueNode() != null) {
@@ -327,37 +386,40 @@ public class NodeSerializer {
             generateCodeRecursive(node.getTrueNode(), trueBuilder, indent + 1, visited);
             trueCode = trueBuilder.toString();
         }
-    
+
         String falseCode = "";
         if (node.getFalseNode() != null) {
             StringBuilder falseBuilder = new StringBuilder();
             generateCodeRecursive(node.getFalseNode(), falseBuilder, indent + 1, visited);
             falseCode = falseBuilder.toString();
         }
-    
+
         String nextCode = "";
         if (node.getNextNode() != null) {
             StringBuilder nextBuilder = new StringBuilder();
             generateCodeRecursive(node.getNextNode(), nextBuilder, indent, visited);
             nextCode = nextBuilder.toString();
         }
-    
+
         // Add branch codes as arguments (order matters for %3$s, %4$s, %5$s etc.)
-        if(node.isBooleanNode()){
+        if (node.isBooleanNode()) {
             args.add(trueCode);
             args.add(falseCode);
         }
         args.add(nextCode);
-    
+
         // Format final code
         String formatted = "";
         try {
             formatted = String.format(template, args.toArray());
-        } catch(Exception ex){}
+        } catch (Exception ex) {
+        }
         code.append(indentStr).append(formatted.replace("\n", "\n" + indentStr));
     }
 
-    /** Find the entry node (node with no incoming connections) */
+    /**
+     * Find the entry node (node with no incoming connections)
+     */
     private VisualNode findEntryNode() {
         Map<VisualNode, Boolean> hasIncoming = new HashMap<>();
 
@@ -365,7 +427,7 @@ public class NodeSerializer {
         for (Actor actor : editor.getRoot().getChildren()) {
             if (actor instanceof VisualNode) {
                 VisualNode nd = (VisualNode) actor;
-                if(!nd.isDeletable()){
+                if (!nd.isDeletable()) {
                     hasIncoming.clear();
                     return nd;
                 }
@@ -399,6 +461,7 @@ public class NodeSerializer {
         return null;
     }
 
-    /** Recursively generate code from nodes */
-    
+    /**
+     * Recursively generate code from nodes
+     */
 }

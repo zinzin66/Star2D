@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
@@ -53,6 +56,7 @@ public class NodeTreeParser extends ApplicationAdapter {
         treeTable.clearChildren();
         treeTable.add().height(200).row();   // restore top spacer
         treeCategories.clear();
+        categoryEntries.clear();             // also reset animated entries
         parseNodesFile();
         treeTable.invalidateHierarchy();
     }
@@ -131,50 +135,125 @@ public class NodeTreeParser extends ApplicationAdapter {
         return Color.valueOf(hexColor);
     }
 
-    private void addNodeToTable(String category, String nodeName, String code, Color nodeColor, List<String> fields) {
-        VisTable categoryTable = treeCategories.get(category);
-        VisTable nodesTable;
+    /**
+     * Category entry stored in treeCategories, bundling the nodes table and its
+     * live animated height so we can expand/collapse smoothly.
+     */
+    private static final class CategoryEntry {
 
-        if (categoryTable == null) {
-            categoryTable = new VisTable();
-            categoryTable.top().left();
-            categoryTable.pad(10); // more padding
+        final VisTable nodesTable;      // raw content table (full height)
+        final VisTable animWrapper;     // clipped wrapper whose getPrefHeight() is animated
+        final float[] animHeight;       // {currentAnimatedHeight, fullMeasuredHeight}
+        final boolean[] expanded;       // {isExpanded}
+        final VisTextButton header;
 
-            // Create collapsible nodes table
-            nodesTable = new VisTable();
+        CategoryEntry(VisTable nodesTable, VisTable animWrapper,
+                float[] animHeight, boolean[] expanded, VisTextButton header) {
+            this.nodesTable = nodesTable;
+            this.animWrapper = animWrapper;
+            this.animHeight = animHeight;
+            this.expanded = expanded;
+            this.header = header;
+        }
+    }
+
+    // Use CategoryEntry map instead of plain VisTable map
+    private Map<String, CategoryEntry> categoryEntries = new HashMap<>();
+
+    private void addNodeToTable(String category, String nodeName, String code,
+            Color nodeColor, List<String> fields) {
+
+        CategoryEntry entry = categoryEntries.get(category);
+
+        if (entry == null) {
+            // ── Header button ───────────────────────────────────────────────
+            VisTextButton header = new VisTextButton("▶  " + category);
+            header.getLabel().setAlignment(Align.left);
+
+            // ── Nodes container (the actual content) ─────────────────────
+            VisTable nodesTable = new VisTable();
             nodesTable.top().left();
-            nodesTable.padLeft(30);
-            nodesTable.setVisible(true);
+            nodesTable.padLeft(16).padBottom(4);
 
-            // Button to toggle collapse/expand
-            VisTextButton toggleButton = new VisTextButton(category + " [+]");
-            categoryTable.add(toggleButton).left().padBottom(12).height(55).row();
+            // ── Animated height state ────────────────────────────────────
+            final float[] animHeight = {0f, 0f}; // [0]=current, [1]=full
+            final boolean[] expanded = {false};
 
-            toggleButton.addListener(new ClickListener() {
+            // ── Clipped wrapper whose prefHeight is driven by animHeight[0] ─
+            final VisTable animWrapper = new VisTable() {
                 @Override
-                public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
-                    boolean visible = nodesTable.isVisible();
-                    nodesTable.setVisible(!visible);
-                    toggleButton.setText(category + (visible ? " [+]" : " [-]"));
+                public float getPrefHeight() {
+                    return animHeight[0];
+                }
+
+                @Override
+                public float getMinHeight() {
+                    return animHeight[0];
+                }
+            };
+            animWrapper.setClip(true);
+            animWrapper.top().left();
+            animWrapper.add(nodesTable).growX().top().left();
+
+            // ── Toggle listener ──────────────────────────────────────────
+            header.addListener(new ClickListener() {
+                @Override
+                public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event,
+                        float x, float y) {
+                    boolean toExpand = !expanded[0];
+                    expanded[0] = toExpand;
+                    header.setText(toExpand ? "▼  " + category : "▶  " + category);
+
+                    // Measure full height if we don't know it yet
+                    if (animHeight[1] == 0f) {
+                        nodesTable.pack();
+                        animHeight[1] = nodesTable.getPrefHeight();
+                    }
+
+                    final float from = animHeight[0];
+                    final float target = toExpand ? animHeight[1] : 0f;
+
+                    animWrapper.clearActions();
+                    final float spanAmt = target - from;
+                    TemporalAction anim = new TemporalAction() {
+                        @Override
+                        protected void update(float percent) {
+                            animHeight[0] = from + spanAmt * percent;
+                            animWrapper.invalidateHierarchy();
+                        }
+                    };
+                    anim.setDuration(0.28f);
+                    anim.setInterpolation(Interpolation.smooth);
+                    animWrapper.addAction(anim);
                 }
             });
 
-            categoryTable.add(nodesTable).expandX().fillX().row();
-            treeCategories.put(category, categoryTable);
+            // ── Assemble the outer category row ─────────────────────────
+            VisTable categoryRow = new VisTable();
+            categoryRow.top().left();
+            categoryRow.add(header).growX().height(52).padBottom(2).row();
+            categoryRow.add(animWrapper).growX().row();
+
             if (treeTable == null) {
                 treeTable = new VisTable();
                 treeTable.add().height(200).row();
             }
-            treeTable.add(categoryTable).row();
-        } else {
-            nodesTable = (VisTable) categoryTable.getChildren().get(1); // 2nd child is nodesTable
+            treeTable.add(categoryRow).growX().row();
+
+            entry = new CategoryEntry(nodesTable, animWrapper, animHeight, expanded, header);
+            categoryEntries.put(category, entry);
+            // keep treeCategories in sync (used by refresh() logic)
+            treeCategories.put(category, nodesTable);
         }
 
-        String nodeN = nodeName.contains("__star__if__") ? nodeName.replace("__star__if__", "") : nodeName;
-        VisLabel nodeLabel = new VisLabel(nodeN.split(" ")[0]);
-        //nodeLabel.setColor(nodeColor != null ? nodeColor : Color.WHITE);
+        // ── Add node label to the nodes table ──────────────────────────────
+        String nodeN = nodeName.contains("__star__if__")
+                ? nodeName.replace("__star__if__", "")
+                : nodeName;
+        VisLabel nodeLabel = new VisLabel("  " + nodeN.split(" ")[0]);
         nodeLabel.setColor(Color.WHITE);
 
+        final CategoryEntry finalEntry = entry;
         nodeLabel.addListener(new ClickListener() {
             @Override
             public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
@@ -182,11 +261,14 @@ public class NodeTreeParser extends ApplicationAdapter {
             }
         });
 
-        nodesTable.add(nodeLabel)
-                .left()
-                .padTop(8).padBottom(8) // more vertical spacing
-                .minHeight(45) // larger row height
+        entry.nodesTable.add(nodeLabel)
+                .left().growX()
+                .padTop(6).padBottom(6)
+                .minHeight(42)
                 .row();
+
+        // Invalidate stored full-height so it gets re-measured on next open
+        entry.animHeight[1] = 0f;
     }
 
     private void createVisualNode(String nodeName, String code, List<String> fields) {

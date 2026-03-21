@@ -56,6 +56,13 @@ public class VisualNode extends VisWindow {
     private MenuItem copyItem, deleteItem;
     public VisTable contentTable;
 
+    @Override
+    public float getPrefWidth() {
+        float pref = super.getPrefWidth();
+        float titlePref = getTitleLabel() != null ? getTitleLabel().getPrefWidth() + 40 : 0;
+        return Math.max(pref, titlePref);
+    }
+
     public VisualNode(String title, NodeEditor nodeEditor) {
         super(title, NodeEditorApp.orangeSkin.get("maroon", WindowStyle.class));
         this.nodeEditor = nodeEditor;
@@ -503,15 +510,19 @@ public class VisualNode extends VisWindow {
                 this.fieldName = name;
             }
 
-            nameBtn = new VisTextButton("  " + fieldName + " ");
+            nameBtn = new VisTextButton(fieldName);
             nameBtn.clearListeners();
             nameBtn.getLabel().setFontScale(0.75f);
-            add(nameBtn).padLeft(5).height(35).minWidth(140).expandX().left();
+            add(nameBtn).padLeft(5).padRight(5).height(35).minWidth(140).expandX().left();
             this.stage = stage;
             this.value = initialValue == null ? "" : initialValue;
 
-            String displayValue
-                    = this.value.length() > 7 ? this.value.substring(0, 6) + "..." : this.value;
+            String displayValue = this.value;
+            if (displayValue.isEmpty()) {
+                displayValue = "___";
+            } else if (displayValue.length() > 7) {
+                displayValue = displayValue.substring(0, 6) + "...";
+            }
             valueButton = new VisTextButton(displayValue);
             valueButton.getLabel().setFontScale(0.75f);
             valueButton.setStyle(getStyle((VisTextButton.VisTextButtonStyle) nameBtn.getStyle(), Color.valueOf("#858585")));
@@ -536,15 +547,25 @@ public class VisualNode extends VisWindow {
                         if (getParentVisualNode() != null) {
                             getParentVisualNode().popupHide();
                         }
+                        final com.badlogic.gdx.graphics.Color oldColor = new com.badlogic.gdx.graphics.Color(valueButton.getColor());
+                        valueButton.setColor(com.badlogic.gdx.graphics.Color.valueOf("#44bb44"));
+
                         ParameterSuggestionDialog.show(stage, new ParameterSuggestionDialog.OnBlockSelected() {
                             @Override
                             public void onEditValue() {
+                                valueButton.setColor(oldColor);
                                 showValueInputDialog();
                             }
 
                             @Override
                             public void onBlockSelected(String template, String displayTemplate) {
+                                valueButton.setColor(oldColor);
                                 setParameterBlock(template, displayTemplate);
+                            }
+
+                            @Override
+                            public void onClosed() {
+                                valueButton.setColor(oldColor);
                             }
                         });
                     }
@@ -606,7 +627,12 @@ public class VisualNode extends VisWindow {
         // TODO : re-use instead of creating new one every tme...
         private void saveValue(TextArea textArea) {
             value = textArea.getText();
-            String displayValue = value.length() > 7 ? value.substring(0, 6) + "..." : value;
+            String displayValue = value;
+            if (displayValue.isEmpty()) {
+                displayValue = "___";
+            } else if (displayValue.length() > 7) {
+                displayValue = displayValue.substring(0, 6) + "...";
+            }
             valueButton.setText(displayValue);
             dialog.hide();
         }

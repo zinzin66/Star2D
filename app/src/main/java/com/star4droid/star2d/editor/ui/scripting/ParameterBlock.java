@@ -49,12 +49,18 @@ public class ParameterBlock extends VisTable {
         }
 
         // Parse display template (e.g. "___ + ___" or "to int ___")
-        String[] parts = displayTemplate.split("___", -1);
+        String parseTemplate = displayTemplate.replaceAll("%[0-9]+\\$s", "___");
+        String[] parts = parseTemplate.split("___", -1);
         for (int i = 0; i < parts.length; i++) {
             if (!parts[i].isEmpty()) {
-                VisLabel lbl = new VisLabel(parts[i]);
+                String text = parts[i];
+                if (text.length() > 14) {
+                    text = text.substring(0, 13) + "...";
+                }
+                VisLabel lbl = new VisLabel(text);
                 lbl.setFontScale(0.75f);
-                add(lbl).padRight(4).padLeft(4);
+                lbl.setEllipsis(true);
+                add(lbl).padRight(4).padLeft(4).minWidth(0);
             }
             if (i < parts.length - 1) { // Add a field for every '___'
                 if (parentField != null) {
@@ -67,7 +73,7 @@ public class ParameterBlock extends VisTable {
                     add(innerField).padRight(2).padLeft(2).minWidth(30);
                 } else {
                     // dummy field for visual representation only
-                    VisTextButton dummyBtn = new VisTextButton("...");
+                    VisTextButton dummyBtn = new VisTextButton("___");
                     dummyBtn.getLabel().setFontScale(0.75f);
                     dummyBtn.setDisabled(true);
                     add(dummyBtn).padRight(2).padLeft(2).size(30, 24);

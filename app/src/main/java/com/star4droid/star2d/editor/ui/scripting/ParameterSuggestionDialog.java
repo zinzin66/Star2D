@@ -14,6 +14,8 @@ import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.CollapsibleWidget;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 
 import java.util.List;
 
@@ -24,13 +26,15 @@ public class ParameterSuggestionDialog extends VisWindow {
         void onEditValue();
 
         void onBlockSelected(String template, String displayTemplate);
+
+        void onClosed();
     }
 
     private final OnBlockSelected listener;
     private final VisTable listTable;
 
     public static void show(Stage stage, OnBlockSelected listener) {
-        ParameterSuggestionDialog dialog = new ParameterSuggestionDialog(listener);
+        ParameterSuggestionDialog dialog = new ParameterSuggestionDialog(stage, listener);
         dialog.pack();
         dialog.setSize(350, stage.getHeight());
         dialog.setPosition(stage.getWidth(), 0);
@@ -40,7 +44,7 @@ public class ParameterSuggestionDialog extends VisWindow {
         dialog.addAction(Actions.moveTo(stage.getWidth() - 350, 0, 0.4f, Interpolation.smooth));
     }
 
-    public ParameterSuggestionDialog(OnBlockSelected listener) {
+    public ParameterSuggestionDialog(Stage stage, OnBlockSelected listener) {
         super("");
         this.listener = listener;
 
@@ -54,11 +58,59 @@ public class ParameterSuggestionDialog extends VisWindow {
 
         // Edit Value
         Section valueSection = new Section("Value");
+        valueSection.expanded = true;
+        valueSection.collapsible.setCollapsed(false, false);
         valueSection.addItem("Edit raw value", () -> {
             closeDialog();
             listener.onEditValue();
         });
         listTable.add(valueSection.getRoot()).growX().row();
+
+        // --- Dynamic Resource Sections ---
+        String hints = "";
+        // if (stage instanceof UiStage) {
+        //     hints = ((UiStage) stage).getHints();
+        // }
+        if (hints != null && !hints.isEmpty()) {
+            String items = hints;
+            FileHandle hd = Gdx.files.internal("java/hints.java");
+            if (hd.exists()) {
+                items = ((hints.isEmpty()) ? "" : (hints + "\n")) + hd.readString();
+            }
+
+            Section currentSection = null;
+            for (String line : items.split("\n")) {
+                line = line.trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
+
+                if (line.startsWith("- ")) {
+                    if (currentSection != null) {
+                        listTable.add(currentSection.getRoot()).growX().row();
+                    }
+                    currentSection = new Section(line.replace("- ", ""));
+                } else if (currentSection != null) {
+                    final String val = line;
+                    String displayVal = val;
+                    if (displayVal.contains("/")) {
+                        displayVal = displayVal.substring(displayVal.lastIndexOf("/") + 1);
+                    }
+                    if (displayVal.contains("\\")) {
+                        displayVal = displayVal.substring(displayVal.lastIndexOf("\\") + 1);
+                    }
+
+                    final String finalDisplayVal = displayVal;
+                    currentSection.addItem(finalDisplayVal, () -> {
+                        closeDialog();
+                        listener.onBlockSelected(val, finalDisplayVal);
+                    });
+                }
+            }
+            if (currentSection != null) {
+                listTable.add(currentSection.getRoot()).growX().row();
+            }
+        }
 
         // Operators
         Section opSection = new Section("Operators");
@@ -75,10 +127,9 @@ public class ParameterSuggestionDialog extends VisWindow {
         listTable.add(opSection.getRoot()).growX().row();
 
         // Strings
-        Section strSection = new Section("Strings");
-        strSection.addBlockItem("___ + ___", "(String.valueOf(%1$s) + String.valueOf(%2$s))", listener, this);
-        listTable.add(strSection.getRoot()).growX().row();
-
+        // Section strSection = new Section("Strings");
+        // strSection.addBlockItem("___ + ___", "(String.valueOf(%1$s) + String.valueOf(%2$s))", listener, this);
+        // listTable.add(strSection.getRoot()).growX().row();
         // Convert
         Section convSection = new Section("Convert");
         convSection.addBlockItem("to int ___", "((int)(%1$s))", listener, this);
@@ -101,18 +152,15 @@ public class ParameterSuggestionDialog extends VisWindow {
         bodySection.addBlockItem("___ .getAngularVelocity()", "%1$s.getAngularVelocity()", listener, this);
         bodySection.addBlockItem("___ .getPosition()", "%1$s.getPosition()", listener, this);
         bodySection.addBlockItem("___ .getMass()", "%1$s.getMass()", listener, this);
-        bodySection.addBlockItem("___ .applyForceToCenter(___, ___, ___)", "%1$s.applyForceToCenter(%2$s, %3$s, %4$s)", listener, this);
-        bodySection.addBlockItem("___ .setLinearVelocity(___, ___)", "%1$s.setLinearVelocity(%2$s, %3$s)", listener, this);
-        bodySection.addBlockItem("___ .setTransform(___, ___, ___)", "%1$s.setTransform(%2$s, %3$s, %4$s)", listener, this);
         listTable.add(bodySection.getRoot()).growX().row();
 
         // Engine - Stage
         Section stageSection = new Section("Stage / Scene");
-        stageSection.addBlockItem("stage.getWidth()", "stage.getWidth()", listener, this);
-        stageSection.addBlockItem("stage.getHeight()", "stage.getHeight()", listener, this);
-        stageSection.addBlockItem("stage.getRoot()", "stage.getRoot()", listener, this);
-        stageSection.addBlockItem("stage.getActors()", "stage.getActors()", listener, this);
-        stageSection.addBlockItem("stage.getCamera()", "stage.getCamera()", listener, this);
+        stageSection.addBlockItem("getWidth()", "getWidth()", listener, this);
+        stageSection.addBlockItem("getHeight()", "getHeight()", listener, this);
+        stageSection.addBlockItem("getRoot()", "getRoot()", listener, this);
+        stageSection.addBlockItem("getActors()", "getActors()", listener, this);
+        stageSection.addBlockItem("getCamera()", "getCamera()", listener, this);
         listTable.add(stageSection.getRoot()).growX().row();
 
         // --- Custom User Blocks ---
@@ -127,15 +175,28 @@ public class ParameterSuggestionDialog extends VisWindow {
 
         ScrollPane scrollPane = new VisScrollPane(listTable);
         scrollPane.setFadeScrollBars(false);
-        scrollPane.setScrollingDisabled(true, false);
+        scrollPane.setScrollingDisabled(false, false);
 
         add(scrollPane).grow().pad(10);
     }
 
+    @Override
+    public void close() {
+        super.close();
+        if (listener != null) {
+            listener.onClosed();
+        }
+    }
+
     public void closeDialog() {
-        addAction(Actions.sequence(
-                Actions.moveTo(getStage().getWidth(), 0, 0.3f, Interpolation.pow3In),
-                Actions.removeActor()
+        addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence(
+                com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo(getStage().getWidth(), 0, 0.3f, com.badlogic.gdx.math.Interpolation.pow3In),
+                com.badlogic.gdx.scenes.scene2d.actions.Actions.run(() -> {
+                    if (listener != null) {
+                        listener.onClosed();
+                    }
+                }),
+                com.badlogic.gdx.scenes.scene2d.actions.Actions.removeActor()
         ));
     }
 

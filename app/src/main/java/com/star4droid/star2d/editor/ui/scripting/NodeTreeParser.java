@@ -53,12 +53,17 @@ public class NodeTreeParser extends ApplicationAdapter {
         if (treeTable == null) {
             return;
         }
-        treeTable.clearChildren();
-        treeTable.add().height(200).row();   // restore top spacer
-        treeCategories.clear();
-        categoryEntries.clear();             // also reset animated entries
-        parseNodesFile();
-        treeTable.invalidateHierarchy();
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                treeTable.clearChildren();
+                treeTable.add().height(200).row();   // restore top spacer
+                treeCategories.clear();
+                categoryEntries.clear();             // also reset animated entries
+                parseNodesFile();
+                treeTable.invalidateHierarchy();
+            }
+        });
     }
 
     private void parseNodesFile() {

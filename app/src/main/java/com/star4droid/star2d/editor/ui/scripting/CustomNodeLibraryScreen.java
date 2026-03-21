@@ -57,7 +57,7 @@ public class CustomNodeLibraryScreen extends VisWindow {
         topTitle.setColor(Color.WHITE);
 
         nodesTabBtn = new VisTextButton("Nodes Mode");
-        paramsTabBtn = new VisTextButton("Parameters Mode");
+        paramsTabBtn = new VisTextButton("Ps Mode");
         updateTabStyles();
 
         VisTextButton closeBtn = new VisTextButton("X");
@@ -132,9 +132,14 @@ public class CustomNodeLibraryScreen extends VisWindow {
         VisTextButton newSectionBtn = new VisTextButton("+ New Section");
         VisTextButton importBtn = new VisTextButton("Import JSON");
         VisTextButton exportAllBtn = new VisTextButton("Export All");
-        actions.add(newSectionBtn).height(52).padRight(8);
-        actions.add(importBtn).height(52).padRight(8);
-        actions.add(exportAllBtn).height(52);
+
+        VisTable leftBtns = new VisTable();
+        leftBtns.add(newSectionBtn).height(40).growX().padBottom(4).row();
+        leftBtns.add(importBtn).height(40).growX();
+
+        actions.add(leftBtns).padRight(8).padLeft(8).width(160);
+        actions.add().padRight(20).padLeft(20);
+        actions.add(exportAllBtn).height(84).width(120);
         contentArea.add(actions).left().row();
 
         VisTable listTable = new VisTable();
@@ -328,7 +333,7 @@ public class CustomNodeLibraryScreen extends VisWindow {
     private void showBlockSectionsView() {
         contentArea.clearChildren();
         backBtn.setVisible(false);
-        topTitle.setText("Parameter Blocks Library");
+        topTitle.setText("Ps Library");
         nodesTabBtn.setVisible(true);
         paramsTabBtn.setVisible(true);
 
@@ -541,12 +546,16 @@ public class CustomNodeLibraryScreen extends VisWindow {
         content.add(lbl).left().padBottom(8).row();
 
         VisTextField field = new VisTextField(existing == null ? "" : existing.name);
-        content.add(field).width(420).padBottom(16).row();
+        content.add(field).width(260).padBottom(16).row();
 
         VisTextButton okBtn = new VisTextButton("Save");
         VisTextButton cancelBtn = new VisTextButton("Cancel");
-        content.add(okBtn).size(140, 52).padRight(10);
-        content.add(cancelBtn).size(140, 52);
+
+        VisTable btnTable = new VisTable();
+        btnTable.add(okBtn).height(45).growX().padRight(8);
+        btnTable.add(cancelBtn).height(45).growX();
+
+        content.add(btnTable).growX();
 
         dialog.getContentTable().add(content).pad(10);
 
@@ -641,8 +650,12 @@ public class CustomNodeLibraryScreen extends VisWindow {
 
         VisTextButton saveBtn = new VisTextButton("Save");
         VisTextButton cancelBtn = new VisTextButton("Cancel");
-        dialog.getContentTable().add(saveBtn).size(160, 55).padRight(12);
-        dialog.getContentTable().add(cancelBtn).size(160, 55);
+
+        VisTable btnTable = new VisTable();
+        btnTable.add(saveBtn).height(50).growX().padRight(8);
+        btnTable.add(cancelBtn).height(50).growX();
+
+        dialog.getContentTable().add(btnTable).growX().pad(10);
 
         saveBtn.addListener(new ClickListener() {
             @Override

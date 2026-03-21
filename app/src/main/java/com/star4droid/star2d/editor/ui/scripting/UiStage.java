@@ -27,6 +27,7 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
     private String savePath = "", hints = "";
     private Vector2 camStart = new Vector2();
     final float panelWidth = 300;
+    private NodeTreeParser nodeTree;  // kept as field so we can refresh it
 
     private float prevDistance = -1f;
 
@@ -56,11 +57,11 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
         VisTextButton load = new VisTextButton("Load");
         VisTextButton export = new VisTextButton("Code");
         VisTextButton exit = new VisTextButton("Cancel");
-        
+
         // Add toggle button to top table
         VisTextButton toggleSidePanel = new VisTextButton("Nodes");
         top.add(toggleSidePanel).height(55).padLeft(20);
-        
+
         //top.add(zoomIn).size(55, 55).padRight(8);
         //top.add(zoomOut).size(55, 55).padRight(8);
         top.add().growX();
@@ -72,109 +73,115 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
         // Continuous zoom while pressed
         zoomIn.addListener(
                 new com.badlogic.gdx.scenes.scene2d.utils.ClickListener() {
-                    @Override
-                    public boolean touchDown(
-                            InputEvent event, float x, float y, int pointer, int button) {
-                        editor.zoomSpeed = -0.35f;
-                        return true;
-                    }
+            @Override
+            public boolean touchDown(
+                    InputEvent event, float x, float y, int pointer, int button) {
+                editor.zoomSpeed = -0.35f;
+                return true;
+            }
 
-                    @Override
-                    public void touchUp(
-                            InputEvent event, float x, float y, int pointer, int button) {
-                        editor.zoomSpeed = 0;
-                    }
-                });
+            @Override
+            public void touchUp(
+                    InputEvent event, float x, float y, int pointer, int button) {
+                editor.zoomSpeed = 0;
+            }
+        });
         zoomOut.addListener(
                 new com.badlogic.gdx.scenes.scene2d.utils.ClickListener() {
-                    @Override
-                    public boolean touchDown(
-                            InputEvent event, float x, float y, int pointer, int button) {
-                        editor.zoomSpeed = 0.35f;
-                        return true;
-                    }
+            @Override
+            public boolean touchDown(
+                    InputEvent event, float x, float y, int pointer, int button) {
+                editor.zoomSpeed = 0.35f;
+                return true;
+            }
 
-                    @Override
-                    public void touchUp(
-                            InputEvent event, float x, float y, int pointer, int button) {
-                        editor.zoomSpeed = 0;
-                    }
-                });
+            @Override
+            public void touchUp(
+                    InputEvent event, float x, float y, int pointer, int button) {
+                editor.zoomSpeed = 0;
+            }
+        });
 
         save.addListener(
                 new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
-                    @Override
-                    public void changed(
-                            ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
-                        serializer.saveToFile(savePath);
-                        String code = serializer.exportCode();
-                        String codePath = savePath.substring(0, savePath.lastIndexOf("."))+".java";
-                        Gdx.files.absolute(codePath).writeString(code, false);
-                        showDialog("Save", "Nodes saved successfully!");
-                    }
-                });
-        
+            @Override
+            public void changed(
+                    ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                serializer.saveToFile(savePath);
+                String code = serializer.exportCode();
+                String codePath = savePath.substring(0, savePath.lastIndexOf(".")) + ".java";
+                Gdx.files.absolute(codePath).writeString(code, false);
+                showDialog("Save", "Nodes saved successfully!");
+            }
+        });
+
         load.addListener(
                 new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
-                    @Override
-                    public void changed(
-                            ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
-                        serializer.loadFromFile("nodes_save.json");
-                        showDialog("Load", "Nodes loaded successfully!");
-                    }
-                });
-        
+            @Override
+            public void changed(
+                    ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                serializer.loadFromFile("nodes_save.json");
+                showDialog("Load", "Nodes loaded successfully!");
+            }
+        });
+
         export.addListener(
                 new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
-                    @Override
-                    public void changed(
-                            ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
-                        String code = serializer.exportCode();
-                        showCodeDialog(code);
-                    }
-                });
-        
+            @Override
+            public void changed(
+                    ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                String code = serializer.exportCode();
+                showCodeDialog(code);
+            }
+        });
+
         exit.addListener(
                 new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
-                    @Override
-                    public void changed(
-                            ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
-                        new ConfirmDialog(getTrans("exit"),getTrans("areYouSure"),ok->{
-						if(ok)
-							com.star4droid.star2d.editor.TestApp.getCurrentApp().showVisualScripting(false);
-					}).show(UiStage.this);
+            @Override
+            public void changed(
+                    ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                new ConfirmDialog(getTrans("exit"), getTrans("areYouSure"), ok -> {
+                    if (ok) {
+                        com.star4droid.star2d.editor.TestApp.getCurrentApp().showVisualScripting(false);
                     }
-                });
+                }).show(UiStage.this);
+            }
+        });
 
         // Camera drag
         cameraPad.addListener(
                 new DragListener() {
-                    boolean zoomHappen = false;
-                    @Override
-                    public boolean touchDown(
-                            InputEvent event, float x, float y, int pointer, int button) {
-                        zoomHappen = false;
-                        dragStart.set(x, y);
-                        Vector2 editorXY =
-                                editor.screenToStageCoordinates(
-                                        new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-                        Object obj = editor.hit(editorXY.x, editorXY.y, true);
-                        if (obj != null) return false;
-                        camStart.set(editor.getCamera().position.x, editor.getCamera().position.y);
-                        return true;
-                    }
+            boolean zoomHappen = false;
 
-                    @Override
-                    public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                        zoomHappen = zoomHappen || Gdx.input.isTouched(1);
-                        if(zoomHappen) return;
-                        float dx = x - dragStart.x;
-                        float dy = y - dragStart.y;
-                        dragStart.set(x, y);
-                        camStart.set(editor.getCamera().position.x, editor.getCamera().position.y);
-                        editor.moveCamera(dx * MOVEMENT_SPEED, -dy * MOVEMENT_SPEED);
-                    }
-                });
+            @Override
+            public boolean touchDown(
+                    InputEvent event, float x, float y, int pointer, int button) {
+                zoomHappen = false;
+                dragStart.set(x, y);
+                Vector2 editorXY
+                        = editor.screenToStageCoordinates(
+                                new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+                Object obj = editor.hit(editorXY.x, editorXY.y, true);
+                if (obj != null) {
+                    return false;
+                }
+                camStart.set(editor.getCamera().position.x, editor.getCamera().position.y);
+                return true;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                zoomHappen = zoomHappen || Gdx.input.isTouched(1);
+                if (zoomHappen) {
+                    return;
+                }
+                float dx = x - dragStart.x;
+                float dy = y - dragStart.y;
+                dragStart.set(x, y);
+                camStart.set(editor.getCamera().position.x, editor.getCamera().position.y);
+                editor.moveCamera(dx * MOVEMENT_SPEED, -dy * MOVEMENT_SPEED);
+            }
+        });
 
         /* ------------ NodeTreeParser Side Panel ------------ */
         sidePanel = new VisTable();
@@ -183,7 +190,7 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
         sidePanel.top().left();
 
         // Initialize NodeTreeParser tree
-        NodeTreeParser nodeTree = new NodeTreeParser(this, editor);
+        nodeTree = new NodeTreeParser(this, editor);
         nodeTree.create();
 
         // Wrap tree in a scroll pane and add to panel
@@ -194,58 +201,62 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
         // Start off-screen on the RIGHT
         sidePanel.setPosition(Gdx.graphics.getWidth(), 0);
         addActor(sidePanel);
-        
+
         // Scale up labels inside tree (optional)
         for (Actor a : nodeTree.treeTable.getChildren()) {
             if (a instanceof Label) {
-                Label label = (Label)a;
+                Label label = (Label) a;
             }
         }
 
         // Slide panel in/out on button press
         toggleSidePanel.addListener(
                 new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
-                    @Override
-                    public void changed(
-                            ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
-                        visible = !visible;
-                        if (visible) {
-                            sidePanel.addAction(
-                                    Actions.moveTo(
-                                            Gdx.graphics.getWidth() - panelWidth,
-                                            0,
-                                            0.3f));
-                        } else {
-                            sidePanel.addAction(
-                                    Actions.moveTo(Gdx.graphics.getWidth(), 0, 0.3f));
-                        }
-                    }
-                });
+            @Override
+            public void changed(
+                    ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+                visible = !visible;
+                if (visible) {
+                    sidePanel.addAction(
+                            Actions.moveTo(
+                                    Gdx.graphics.getWidth() - panelWidth,
+                                    0,
+                                    0.3f));
+                } else {
+                    sidePanel.addAction(
+                            Actions.moveTo(Gdx.graphics.getWidth(), 0, 0.3f));
+                }
+            }
+        });
     }
-    
-    public String getHints(){
+
+    public String getHints() {
         return hints;
     }
-    
-    public void setHints(String hints){
+
+    public void setHints(String hints) {
         this.hints = hints;
     }
-    
-    public NodeSerializer getNodeSerializer(){
+
+    public NodeSerializer getNodeSerializer() {
         return serializer;
     }
-    
-    public void loadFrom(String file){
+
+    public void loadFrom(String file) {
         serializer.loadFromFile(file);
         visible = false;
-        
-        if(sidePanel != null){
+
+        if (sidePanel != null) {
             sidePanel.setPosition(Gdx.graphics.getWidth(), 0);
             sidePanel.setSize(panelWidth, Gdx.graphics.getHeight());
         }
         this.savePath = file;
+        // Refresh custom nodes so newly-added ones appear without restarting
+        if (nodeTree != null) {
+            nodeTree.refresh();
+        }
     }
-    
+
     private void showDialog(String title, String message) {
         VisDialog dialog = new VisDialog(title);
         dialog.text(message);
@@ -256,16 +267,16 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
     private void showCodeDialog(String code) {
         VisDialog dialog = new VisDialog("Exported Code");
         dialog.setFillParent(false);
-        
-        com.badlogic.gdx.scenes.scene2d.ui.TextArea textArea = 
-            new com.badlogic.gdx.scenes.scene2d.ui.TextArea(code, VisUI.getSkin());
+
+        com.badlogic.gdx.scenes.scene2d.ui.TextArea textArea
+                = new com.badlogic.gdx.scenes.scene2d.ui.TextArea(code, VisUI.getSkin());
         textArea.setPrefRows(20);
-        
+
         ScrollPane scrollPane = new ScrollPane(textArea);
         scrollPane.setFadeScrollBars(false);
-        
+
         dialog.getContentTable().add(scrollPane).size(600, 400).pad(10);
-        
+
         VisTextButton copyButton = new VisTextButton("Copy to Clipboard");
         copyButton.addListener(new com.badlogic.gdx.scenes.scene2d.utils.ChangeListener() {
             @Override
@@ -274,7 +285,7 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
                 showDialog("Success", "Code copied to clipboard!");
             }
         });
-        
+
         dialog.button(copyButton);
         dialog.button("Close");
         dialog.show(this);
@@ -288,7 +299,7 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
             float gx1 = Gdx.input.getX(1), gx0 = Gdx.input.getX(0);
             float gy1 = Gdx.input.getY(1), gy0 = Gdx.input.getY(0);
             OrthographicCamera cam = (OrthographicCamera) editor.getCamera();
-            if(gx1 == 0 || gx0 == 0 || gy1 == 0 || gy0 == 0){
+            if (gx1 == 0 || gx0 == 0 || gy1 == 0 || gy0 == 0) {
                 cam.update();
                 return;
             }
@@ -306,8 +317,12 @@ public class UiStage extends com.badlogic.gdx.scenes.scene2d.Stage {
                 float dx1 = -Gdx.input.getDeltaX(1) * cam.zoom * 0.5f;
                 float dy1 = Gdx.input.getDeltaY(1) * cam.zoom * 0.5f;
 
-                if (Math.signum(dx0) == Math.signum(dx1)) cam.position.x += (dx0 + dx1);
-                if (Math.signum(dy0) == Math.signum(dy1)) cam.position.y += (dy0 + dy1);
+                if (Math.signum(dx0) == Math.signum(dx1)) {
+                    cam.position.x += (dx0 + dx1);
+                }
+                if (Math.signum(dy0) == Math.signum(dy1)) {
+                    cam.position.y += (dy0 + dy1);
+                }
 
                 cam.update();
             }

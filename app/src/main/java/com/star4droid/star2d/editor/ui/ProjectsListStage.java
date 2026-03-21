@@ -18,6 +18,7 @@ import com.star4droid.star2d.editor.TestApp;
 import com.star4droid.star2d.editor.ui.sub.ConfirmDialog;
 import com.star4droid.star2d.editor.ui.sub.EditorField;
 import com.star4droid.star2d.editor.ui.sub.ExamplesDialog;
+import com.star4droid.star2d.editor.ui.scripting.CustomNodeLibraryScreen;
 import com.star4droid.template.Utils.Utils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,6 +27,7 @@ import java.util.concurrent.Executors;
 import static com.star4droid.star2d.editor.utils.Lang.*;
 
 public class ProjectsListStage extends Stage {
+
     private VisTable rootTable, projectsTable, welcomeTable, projectsContainer;
     private TestApp app;
     private Runnable importRunnable, exportRunnable, backupRunnable;
@@ -53,7 +55,7 @@ public class ProjectsListStage extends Stage {
         projectsContainer = createProjectsPanel();
 
         rootTable.add(welcomeTable).grow().pad(30).row();
-        
+
         addActor(rootTable);
 
         refresh();
@@ -73,7 +75,7 @@ public class ProjectsListStage extends Stage {
         table.add(welcomeLabel).align(Align.topLeft).padBottom(40).row();
 
         VisTable largeButtonsTable = new VisTable();
-        
+
         VisTable newProjectBtnContainer = new VisTable();
         newProjectBtnContainer.setBackground(drawable("button-blue"));
         newProjectBtnContainer.pad(10);
@@ -82,7 +84,7 @@ public class ProjectsListStage extends Stage {
         newProjectBtnContainer.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                 createNewProject();
+                createNewProject();
             }
         });
 
@@ -94,16 +96,18 @@ public class ProjectsListStage extends Stage {
         importProjectBtnContainer.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (importRunnable != null) importRunnable.run();
+                if (importRunnable != null) {
+                    importRunnable.run();
+                }
             }
         });
 
         largeButtonsTable.add(newProjectBtnContainer).growX().height(60).row();
         largeButtonsTable.add(importProjectBtnContainer).growX().height(60).padTop(15).row();
         table.add(largeButtonsTable).growX().padBottom(40).row();
-        
+
         VisTable smallButtonsTable = new VisTable();
-        
+
         VisTable settingsTable = new VisTable();
         settingsTable.setBackground(drawable("border"));
         settingsTable.add(new VisImage(drawable("properties"))).size(48, 48).row();
@@ -114,7 +118,7 @@ public class ProjectsListStage extends Stage {
                 settingsDialog.show(ProjectsListStage.this);
             }
         });
-        
+
         VisTable examplesTable = new VisTable();
         examplesTable.setBackground(drawable("border"));
         examplesTable.add(new VisImage(drawable("menu"))).size(48, 48).row();
@@ -125,7 +129,7 @@ public class ProjectsListStage extends Stage {
                 examplesDialog.show(ProjectsListStage.this);
             }
         });
-        
+
         VisTable projectsTableBtn = new VisTable();
         projectsTableBtn.setBackground(drawable("border"));
         projectsTableBtn.add(new VisImage(drawable("menu"))).size(48, 48).row();
@@ -144,7 +148,22 @@ public class ProjectsListStage extends Stage {
         smallButtonsTable.add(settingsTable).size(150, 100).padRight(20);
         smallButtonsTable.add(examplesTable).size(150, 100).padRight(20);
         smallButtonsTable.add(projectsTableBtn).size(150, 100).row();
-        
+
+        // Node Library button
+        VisTable nodeLibraryTable = new VisTable();
+        nodeLibraryTable.setBackground(drawable("border"));
+        nodeLibraryTable.add(new VisImage(drawable("menu"))).size(48, 48).row();
+        nodeLibraryTable.add(new VisLabel("Node Library")).padTop(5);
+        nodeLibraryTable.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                CustomNodeLibraryScreen screen = new CustomNodeLibraryScreen(ProjectsListStage.this);
+                addActor(screen);
+                screen.toFront();
+            }
+        });
+        smallButtonsTable.add(nodeLibraryTable).size(150, 100).padRight(20).padTop(8).row();
+
         // social media...
         VisTable facebookTable = new VisTable();
         facebookTable.setBackground(drawable("border"));
@@ -156,7 +175,7 @@ public class ProjectsListStage extends Stage {
                 Gdx.net.openURI("https://facebook.com/groups/995354408402399/");
             }
         });
-        
+
         VisTable whatsAppTable = new VisTable();
         whatsAppTable.setBackground(drawable("border"));
         whatsAppTable.add(new VisImage(drawable("whatsapp"))).size(48, 48).row();
@@ -167,7 +186,7 @@ public class ProjectsListStage extends Stage {
                 Gdx.net.openURI("https://chat.whatsapp.com/Bxu3kM0b1oE9UL0iZhti4E?mode=ems_copy_c");
             }
         });
-        
+
         VisTable telegramTable = new VisTable();
         telegramTable.setBackground(drawable("border"));
         telegramTable.add(new VisImage(drawable("telegram"))).size(48, 48).row();
@@ -178,7 +197,7 @@ public class ProjectsListStage extends Stage {
                 Gdx.net.openURI("https://t.me/+pE4VREnP04s5NDNk");
             }
         });
-        
+
         VisTable discordTable = new VisTable();
         discordTable.setBackground(drawable("border"));
         discordTable.add(new VisImage(drawable("discord"))).size(48, 48).row();
@@ -189,7 +208,7 @@ public class ProjectsListStage extends Stage {
                 Gdx.net.openURI("https://discord.gg/9gxPUTEP");
             }
         });
-        
+
         VisTable githubTable = new VisTable();
         githubTable.setBackground(drawable("border"));
         githubTable.add(new VisImage(drawable("github"))).size(48, 48).row();
@@ -200,7 +219,7 @@ public class ProjectsListStage extends Stage {
                 Gdx.net.openURI("https://github.com/star4droid/Star2D/");
             }
         });
-        
+
         VisTable youtubeTable = new VisTable();
         youtubeTable.setBackground(drawable("border"));
         youtubeTable.add(new VisImage(drawable("youtube"))).size(48, 48).row();
@@ -211,7 +230,7 @@ public class ProjectsListStage extends Stage {
                 Gdx.net.openURI("https://youtube.com/@star4droid?si=wNDqN_fbRIzf3KSQ");
             }
         });
-        
+
         VisTable donateTable = new VisTable();
         donateTable.setBackground(drawable("border"));
         donateTable.add(new VisImage(drawable("donate"))).size(48, 48).row();
@@ -219,21 +238,22 @@ public class ProjectsListStage extends Stage {
         donateTable.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                app.openDonate.run();
+                //app.openDonate.run();
+                app.toast("Coming soon...");
             }
         });
-        
+
         smallButtonsTable.add(whatsAppTable).size(150, 100).padRight(20).padTop(8);
         smallButtonsTable.add(facebookTable).size(150, 100).padRight(20).padTop(8);
-        
+
         smallButtonsTable.add(telegramTable).size(150, 100).padRight(20).padTop(8).row();
         smallButtonsTable.add(discordTable).size(150, 100).padRight(20).padTop(8);
-        
+
         smallButtonsTable.add(youtubeTable).size(150, 100).padRight(20).padTop(8);
         smallButtonsTable.add(githubTable).size(150, 100).padRight(20).padTop(8).row();
-        
+
         smallButtonsTable.add(donateTable).growX().padTop(8).colspan(3).padLeft(9).padRight(9);
-        
+
         smallButtonsTable.add().growX();
         table.add(smallButtonsTable).growX().row();
 
@@ -266,17 +286,17 @@ public class ProjectsListStage extends Stage {
                 welcomeTable.setVisible(true);
                 addActor(welcomeTable);
                 welcomeTable.addAction(Actions.sequence(
-                    Actions.moveTo(0, welcomeTable.getY(), 0.5f),
-                    Actions.run(() -> projectsContainer.remove())
+                        Actions.moveTo(0, welcomeTable.getY(), 0.5f),
+                        Actions.run(() -> projectsContainer.remove())
                 ));
             }
         });
-        
+
         topSection.add(backBtn).size(40, 40);
 
         topSection.add().growX();
         table.add(topSection).growX().padBottom(20).row();
-        
+
         VisLabel recentProjectsLabel = new VisLabel("Recent Projects");
         recentProjectsLabel.setFontScale(1.1f);
         table.add(recentProjectsLabel).align(Align.left).padBottom(10).row();
@@ -295,7 +315,7 @@ public class ProjectsListStage extends Stage {
         searchField.setColor(Color.WHITE);
         searchContainer.add(searchField).growX();
         table.add(searchContainer).growX().padBottom(20).row();
-        
+
         searchField.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
@@ -320,14 +340,14 @@ public class ProjectsListStage extends Stage {
         card.pad(10);
         card.padLeft(20).padRight(20);
         card.align(Align.left);
-        
+
         VisTable clickableArea = new VisTable();
         clickableArea.align(Align.left);
-        clickableArea.add(new VisImage(shineIcon)).size(40,40).padRight(15);
-        
+        clickableArea.add(new VisImage(shineIcon)).size(40, 40).padRight(15);
+
         VisTable infoTable = new VisTable();
         infoTable.align(Align.left);
-        
+
         VisLabel nameLabel = new VisLabel(file.name());
         nameLabel.setFontScale(1.1f);
         nameLabel.setWrap(false);
@@ -338,34 +358,34 @@ public class ProjectsListStage extends Stage {
         dateLabel.setColor(Color.LIGHT_GRAY);
         dateLabel.setFontScale(0.8f);
         infoTable.add(dateLabel).left().row();
-        
+
         VisLabel sizeLabel = new VisLabel("Size: ...");
         sizeLabel.setColor(Color.LIGHT_GRAY);
         sizeLabel.setFontScale(0.8f);
         infoTable.add(sizeLabel).left().row();
 
-        Executors.newSingleThreadExecutor().execute(()->{
+        Executors.newSingleThreadExecutor().execute(() -> {
             final String sizeText = getFileSizeString(file);
-            Gdx.app.postRunnable(()->{
+            Gdx.app.postRunnable(() -> {
                 sizeLabel.setText("Size: " + sizeText);
             });
         });
 
         clickableArea.add(infoTable).expandX().fillX();
-        
+
         card.add(clickableArea).expandX().fillX();
-        
+
         VisImageButton moreBtn = new VisImageButton(drawable("dots.png"));
-        moreBtn.addListener(new ClickListener(){
+        moreBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 event.stop();
                 showProjectMenu(file, moreBtn);
             }
         });
-        
+
         card.add(moreBtn).size(40, 40).pad(10);
-        
+
         clickableArea.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -376,7 +396,7 @@ public class ProjectsListStage extends Stage {
 
         return card;
     }
-    
+
     private void showProjectMenu(FileHandle file, VisImageButton anchor) {
         PopupMenu menu = new PopupMenu();
         MenuItem exportItem = new MenuItem("Export");
@@ -387,14 +407,18 @@ public class ProjectsListStage extends Stage {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 selectedProject = file;
-                if (exportRunnable != null) exportRunnable.run();
+                if (exportRunnable != null) {
+                    exportRunnable.run();
+                }
             }
         });
         backupItem.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 selectedProject = file;
-                if (backupRunnable != null) backupRunnable.run();
+                if (backupRunnable != null) {
+                    backupRunnable.run();
+                }
             }
         });
         deleteItem.addListener(new ClickListener() {
@@ -402,9 +426,11 @@ public class ProjectsListStage extends Stage {
             public void clicked(InputEvent event, float x, float y) {
                 new ConfirmDialog("Confirm Deletion", "Are you sure you want to delete this project?", ok -> {
                     if (ok) {
-                        if (file.deleteDirectory())
+                        if (file.deleteDirectory()) {
                             app.toast("Project deleted.");
-                        else app.toast("Failed to delete project.");
+                        } else {
+                            app.toast("Failed to delete project.");
+                        }
                         refresh();
                     }
                 }).show(ProjectsListStage.this);
@@ -442,8 +468,9 @@ public class ProjectsListStage extends Stage {
         String[] paths = {"sounds", "anims", "images", "files", "icon"};
         for (String path : paths) {
             FileHandle child = fileHandle.child(path);
-            if (!child.exists())
+            if (!child.exists()) {
                 child.mkdirs();
+            }
         }
     }
 
@@ -470,7 +497,7 @@ public class ProjectsListStage extends Stage {
     }
 
     private Drawable drawable(String name) {
-        if(!(name.contains("/")||name.contains("."))) {
+        if (!(name.contains("/") || name.contains("."))) {
             try {
                 return VisUI.getSkin().getDrawable(name);
             } catch (Exception | Error e) {
@@ -480,9 +507,9 @@ public class ProjectsListStage extends Stage {
         int start = name.contains("/") ? name.lastIndexOf("/") : 0;
         String namePure = start == 0 ? name : name.substring(start + 1);
         if (namePure.contains(".")) {
-             namePure = namePure.substring(0, namePure.indexOf("."));
+            namePure = namePure.substring(0, namePure.indexOf("."));
         }
-        
+
         try {
             return VisUI.getSkin().getDrawable(namePure);
         } catch (Exception | Error e) {
@@ -490,7 +517,7 @@ public class ProjectsListStage extends Stage {
             return Utils.getDrawable(Gdx.files.internal("images/" + name));
         }
     }
-    
+
     public FileHandle getSelectedProject() {
         return selectedProject;
     }
@@ -514,9 +541,11 @@ public class ProjectsListStage extends Stage {
 
     public static String getFileSizeString(FileHandle file) {
         long bytes = getFileSize(file);
-        if (bytes < 1024) return bytes + " B";
+        if (bytes < 1024) {
+            return bytes + " B";
+        }
         int exp = (int) (Math.log(bytes) / Math.log(1024));
-        String pre = "KMGTPE".charAt(exp-1) + "";
+        String pre = "KMGTPE".charAt(exp - 1) + "";
         return String.format(Locale.ENGLISH, "%.1f %sB", bytes / Math.pow(1024, exp), pre);
     }
 

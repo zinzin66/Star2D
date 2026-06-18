@@ -39,8 +39,43 @@ public class EditorAI extends VisTable {
     private ChatSession currentSession;
     private static final String PREF_READ_FILES = "ai_read_files";
     
-    private static final String PREF_API_KEY = "gemini_api_key";
+    private static final String PREF_GEMINI_API_KEY = "gemini_api_key";
     private static final String PREF_MODEL = "gemini_model";
+    private static final String PREF_ZEN_API_KEY = "zen_api_key";
+    private static final String ZEN_API_BASE_URL = "https://api.opencode.ai/v1/chat/completions";
+    
+    private static class ModelEntry {
+        String displayName;
+        String apiModelId;
+        String provider;
+        ModelEntry(String displayName, String apiModelId, String provider) {
+            this.displayName = displayName;
+            this.apiModelId = apiModelId;
+            this.provider = provider;
+        }
+    }
+    
+    private static final ModelEntry[] MODELS = {
+        new ModelEntry("Big Pickle", "opencode/big-pickle", "opencode"),
+        new ModelEntry("DeepSeek V4 Flash Free", "deepseek/deepseek-v4-flash-free", "opencode"),
+        new ModelEntry("MiMo-V2.5 Free", "mimo/mimo-v2.5-free", "opencode"),
+        new ModelEntry("North Mini Code Free", "north/north-mini-code-free", "opencode"),
+        new ModelEntry("Nemotron 3 Ultra Free", "nemotron/nemotron-3-ultra-free", "opencode"),
+        new ModelEntry("gemini-1.5-flash", "gemini-1.5-flash", "gemini"),
+        new ModelEntry("gemini-2.0-flash", "gemini-2.0-flash", "gemini"),
+        new ModelEntry("gemini-2.0-flash-lite", "gemini-2.0-flash-lite", "gemini"),
+        new ModelEntry("gemini-2.5-pro", "gemini-2.5-pro", "gemini"),
+        new ModelEntry("gemini-2.5-flash", "gemini-2.5-flash", "gemini"),
+        new ModelEntry("gemini-2.5-flash-lite", "gemini-2.5-flash-lite", "gemini")
+    };
+    
+    private static final String[] MODEL_DISPLAY_NAMES;
+    static {
+        MODEL_DISPLAY_NAMES = new String[MODELS.length];
+        for (int i = 0; i < MODELS.length; i++) {
+            MODEL_DISPLAY_NAMES[i] = MODELS[i].displayName;
+        }
+    }
     
     public EditorAI(TestApp app) {
         this.app = app;
@@ -51,6 +86,8 @@ public class EditorAI extends VisTable {
         setBackground(drawable("window-bg"));
         
         createUI();
+        
+        Gdx.app.postRunnable(() -> promptForApiKeyIfNeeded());
     }
     
     // --- History Classes ---
@@ -159,17 +196,14 @@ public class EditorAI extends VisTable {
         header.add(new VisLabel("Star2D AI")).expandX().align(Align.left);
         
         modelSelector = new VisSelectBox<>();
-        modelSelector.setItems(
-            "gemini-1.5-flash",
-            "gemini-2.0-flash", 
-            "gemini-2.0-flash-lite", 
-            "gemini-2.5-pro",
-            "gemini-2.5-flash", 
-            "gemini-2.5-flash-lite"
-        );
+        modelSelector.setItems(MODEL_DISPLAY_NAMES);
         try {
-             String saved = app.preferences.getString(PREF_MODEL, "gemini-1.5-flash");
-             modelSelector.setSelected(saved);
+             String saved = app.preferences.getString(PREF_MODEL, "Big Pickle");
+             boolean valid = false;
+             for (String name : MODEL_DISPLAY_NAMES) {
+                 if (name.equals(saved)) { valid = true; break; }
+             }
+             modelSelector.setSelected(valid ? saved : "Big Pickle");
         } catch(Exception e){}
         
         header.add(modelSelector).width(160).padRight(5);
@@ -243,10 +277,13 @@ public class EditorAI extends VisTable {
         }
     }
     
-    private void showApiKeyDialog() {
-        String currentKey = app.preferences.getString(PREF_API_KEY, "");
-        new SingleInputDialog("API Key", "Enter Gemini API Key:", currentKey, key -> {
-            app.preferences.putString(PREF_API_KEY, key);
+    private void showApiKeyDialog(String provider) {
+        String prefKey = provider.equals("opencode") ? PREF_ZEN_API_KEY : PREF_GEMINI_API_KEY;
+        String title = provider.equals("opencode") ? "OpenCode Zen API Key" : "Gemini API Key";
+        String message = provider.equals("opencode") ? "Enter OpenCode Zen API Key:" : "Enter Gemini API Key:";
+        String currentKey = app.preferences.getString(prefKey, "");
+        new SingleInputDialog(title, message, currentKey, key -> {
+            app.preferences.putString(prefKey, key);
             app.preferences.flush();
             app.toast("API Key Saved");
         }).show(getStage());
@@ -256,14 +293,26 @@ public class EditorAI extends VisTable {
         String text = inputField.getText().trim();
         if (text.isEmpty()) return;
         
-        String apiKey = app.preferences.getString(PREF_API_KEY, "");
-        if (apiKey.isEmpty()) {
-            app.toast("Please set API Key first!");
-            showApiKeyDialog();
-            return;
+        String displayName = modelSelector.getSelected();
+        ModelEntry entry = getModelEntry(displayName);
+        
+        String apiKey = "";
+        if (entry.provider.equals("opencode")) {
+            apiKey = app.preferences.getString(PREF_ZEN_API_KEY, "");
+            if (apiKey.isEmpty()) {
+                app.toast("Please set OpenCode Zen API Key first!");
+                showApiKeyDialog("opencode");
+                return;
+            }
+        } else {
+            apiKey = app.preferences.getString(PREF_GEMINI_API_KEY, "");
+            if (apiKey.isEmpty()) {
+                app.toast("Please set Gemini API Key first!");
+                showApiKeyDialog("gemini");
+                return;
+            }
         }
         
-        // User Message
         // User Message
         ChatMessage userMsg = new ChatMessage(text, true);
         currentSession.addMessage(userMsg);
@@ -276,69 +325,62 @@ public class EditorAI extends VisTable {
         String context = buildContext();
         String prompt = context + "\n\nUser Request: " + text;
         
-        // Send to Gemini
-        sendRequest(apiKey, prompt);
+        // Save model preference
+        app.preferences.putString(PREF_MODEL, displayName);
+        app.preferences.flush();
+        
+        // Send based on provider
+        if (entry.provider.equals("opencode")) {
+            sendOpenCodeRequest(apiKey, prompt, entry.apiModelId);
+        } else {
+            sendGeminiRequest(apiKey, prompt, entry.apiModelId);
+        }
     }
     
-    private void sendRequest(String apiKey, String prompt) {
+    private void sendOpenCodeRequest(String apiKey, String prompt, String modelId) {
         sendBtn.setDisabled(true);
         VisTable statusTable = new VisTable();
         
-        VisImage loadingIcon = new VisImage(drawable("gemini"));
-        loadingIcon.setOrigin(12, 12);
-        loadingIcon.addAction(com.badlogic.gdx.scenes.scene2d.actions.Actions.forever(
-            com.badlogic.gdx.scenes.scene2d.actions.Actions.rotateBy(360, 1f)
-        ));
-        
-        statusLabel = new VisLabel("AI is thinking...");
-        
-        statusTable.add(loadingIcon).size(24).padRight(10);
-        statusTable.add(statusLabel).left();
+        VisLabel loadingLabel = new VisLabel("AI is thinking...");
+        statusTable.add(loadingLabel).left();
         
         chatTable.add(statusTable).left().pad(5).row();
         final VisTable finalStatusTable = statusTable;
         
-        String model = modelSelector.getSelected();
-        app.preferences.putString(PREF_MODEL, model);
-        app.preferences.flush();
-        
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + apiKey;
-        
-
-        
-        // Simple JSON construction manually or using LibGDX Json
-        // { "contents": [{ "parts": [{ "text": "..." }] }] }
-        
-        String jsonBody = "{ \"contents\": [{ \"parts\": [{ \"text\": " + escapeJson(prompt) + " }] }] }";
+        String jsonBody = "{"
+            + "\"model\": \"" + modelId + "\","
+            + "\"messages\": [{\"role\": \"user\", \"content\": " + escapeJson(prompt) + "}]"
+            + "}";
         
         Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.POST);
-        request.setUrl(url);
+        request.setUrl(ZEN_API_BASE_URL);
         request.setHeader("Content-Type", "application/json");
+        request.setHeader("Authorization", "Bearer " + apiKey);
         request.setContent(jsonBody);
+        request.setTimeOut(120000);
         
         Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
             @Override
             public void handleHttpResponse(Net.HttpResponse httpResponse) {
                 String result = httpResponse.getResultAsString();
                 Gdx.app.postRunnable(() -> {
-                     sendBtn.setDisabled(false);
-                     finalStatusTable.remove();
-                     parseResponse(result);
+                    sendBtn.setDisabled(false);
+                    finalStatusTable.remove();
+                    parseOpenCodeResponse(result);
                 });
             }
-
+            
             @Override
             public void failed(Throwable t) {
                 Gdx.app.postRunnable(() -> {
                     sendBtn.setDisabled(false);
-                    loadingIcon.clearActions();
-                    statusLabel.setText("Error: " + t.getMessage());
-                    statusLabel.setColor(Color.RED);
+                    finalStatusTable.remove();
+                    addMessageToUI(new ChatMessage("Error: " + t.getMessage(), false));
                 });
             }
-
+            
             @Override
-            public void cancelled() { 
+            public void cancelled() {
                 Gdx.app.postRunnable(() -> {
                     sendBtn.setDisabled(false);
                     finalStatusTable.remove();
@@ -347,10 +389,83 @@ public class EditorAI extends VisTable {
         });
     }
     
-    private void parseResponse(String jsonResult) {
+    private void sendGeminiRequest(String apiKey, String prompt, String modelId) {
+        sendBtn.setDisabled(true);
+        VisTable statusTable = new VisTable();
+        
+        VisLabel loadingLabel = new VisLabel("AI is thinking...");
+        statusTable.add(loadingLabel).left();
+        
+        chatTable.add(statusTable).left().pad(5).row();
+        final VisTable finalStatusTable = statusTable;
+        
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelId + ":generateContent?key=" + apiKey;
+        String jsonBody = "{ \"contents\": [{ \"parts\": [{ \"text\": " + escapeJson(prompt) + " }] }] }";
+        
+        Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.POST);
+        request.setUrl(url);
+        request.setHeader("Content-Type", "application/json");
+        request.setContent(jsonBody);
+        request.setTimeOut(120000);
+        
+        Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
+            @Override
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                String result = httpResponse.getResultAsString();
+                Gdx.app.postRunnable(() -> {
+                    sendBtn.setDisabled(false);
+                    finalStatusTable.remove();
+                    parseGeminiResponse(result);
+                });
+            }
+            
+            @Override
+            public void failed(Throwable t) {
+                Gdx.app.postRunnable(() -> {
+                    sendBtn.setDisabled(false);
+                    finalStatusTable.remove();
+                    addMessageToUI(new ChatMessage("Error: " + t.getMessage(), false));
+                });
+            }
+            
+            @Override
+            public void cancelled() {
+                Gdx.app.postRunnable(() -> {
+                    sendBtn.setDisabled(false);
+                    finalStatusTable.remove();
+                });
+            }
+        });
+    }
+    
+    private void parseOpenCodeResponse(String jsonResult) {
         try {
             JsonValue root = new JsonReader().parse(jsonResult);
-            // Navigate: candidates[0].content.parts[0].text
+            if (root.has("error")) {
+                String errMsg = root.get("error").getString("message", "Unknown error");
+                addMessageToUI(new ChatMessage("API Error: " + errMsg, false));
+                return;
+            }
+            if (root.has("choices") && root.get("choices").size > 0) {
+                JsonValue choice = root.get("choices").get(0);
+                if (choice.has("message")) {
+                    String responseText = choice.get("message").getString("content");
+                    ChatMessage aiMsg = new ChatMessage(responseText, false);
+                    currentSession.addMessage(aiMsg);
+                    historyManager.saveSession(currentSession);
+                    addMessageToUI(aiMsg);
+                    return;
+                }
+            }
+            addMessageToUI(new ChatMessage("Unexpected response format: " + jsonResult, false));
+        } catch (Exception e) {
+            addMessageToUI(new ChatMessage("Error: " + e.getMessage(), false));
+        }
+    }
+    
+    private void parseGeminiResponse(String jsonResult) {
+        try {
+            JsonValue root = new JsonReader().parse(jsonResult);
             if (root.has("candidates") && root.get("candidates").size > 0) {
                 JsonValue candidate = root.get("candidates").get(0);
                 if (candidate.has("content") && candidate.get("content").has("parts")) {
@@ -369,8 +484,6 @@ public class EditorAI extends VisTable {
              addMessageToUI(new ChatMessage("Error: " + e.getMessage(), false));
         }
     }
-    
-
     
     private void createCodeBlock(VisTable table, String codeBlock) {
         // Extract language if present
@@ -645,10 +758,15 @@ public class EditorAI extends VisTable {
         Table content = dialog.getContentTable();
         content.pad(20);
         
-        // API Key
-        final VisTextField keyField = new VisTextField(app.preferences.getString(PREF_API_KEY, ""));
-        content.add(new VisLabel("API Key:")).left();
-        content.add(keyField).width(250).row();
+        // Gemini API Key
+        content.add(new VisLabel("Gemini API Key:")).left();
+        final VisTextField geminiKeyField = new VisTextField(app.preferences.getString(PREF_GEMINI_API_KEY, ""));
+        content.add(geminiKeyField).width(250).row();
+        
+        // OpenCode Zen API Key
+        content.add(new VisLabel("OpenCode Zen API Key:")).left();
+        final VisTextField zenKeyField = new VisTextField(app.preferences.getString(PREF_ZEN_API_KEY, ""));
+        content.add(zenKeyField).width(250).row();
         
         // Read Files
         final VisCheckBox readCheck = new VisCheckBox("Read relevant files for context");
@@ -659,7 +777,8 @@ public class EditorAI extends VisTable {
         saveBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                app.preferences.putString(PREF_API_KEY, keyField.getText());
+                app.preferences.putString(PREF_GEMINI_API_KEY, geminiKeyField.getText());
+                app.preferences.putString(PREF_ZEN_API_KEY, zenKeyField.getText());
                 app.preferences.putBoolean(PREF_READ_FILES, readCheck.isChecked());
                 app.preferences.flush();
                 dialog.fadeOut();
@@ -797,5 +916,26 @@ public class EditorAI extends VisTable {
             addMessageToUI(m);
         }
         Gdx.app.postRunnable(() -> chatScroll.setScrollPercentY(100));
+    }
+    
+    private ModelEntry getModelEntry(String displayName) {
+        for (ModelEntry m : MODELS) {
+            if (m.displayName.equals(displayName)) return m;
+        }
+        return MODELS[0];
+    }
+    
+    private void promptForApiKeyIfNeeded() {
+        String displayName = modelSelector.getSelected();
+        ModelEntry entry = getModelEntry(displayName);
+        String key = "";
+        if (entry.provider.equals("opencode")) {
+            key = app.preferences.getString(PREF_ZEN_API_KEY, "");
+        } else {
+            key = app.preferences.getString(PREF_GEMINI_API_KEY, "");
+        }
+        if (key.isEmpty()) {
+            showApiKeyDialog(entry.provider);
+        }
     }
 }

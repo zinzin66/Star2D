@@ -85,7 +85,7 @@ public class ProjectAssetLoader extends AssetManager {
 	
 	public static boolean endsWith(String string,String... with){
 		for(String s:with)
-			if(s.toLowerCase().endsWith(s))
+			if(string.toLowerCase().endsWith(s.toLowerCase()))
 				return true;
 		return false;
 	}

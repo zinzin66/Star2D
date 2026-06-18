@@ -20,11 +20,10 @@ jobs:
       pull-requests: write
     
     steps:
-      # 1. Setup Environment
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: true # Crucial so the runner can push back to GitHub
+          persist-credentials: true
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -34,6 +33,42 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+
+      - name: Create New Branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b ${{ inputs.branch_name }}
+
+      - name: Run OpenCode Agent
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_ZEN_API_KEY: ${{ secrets.OPENCODE_ZEN_API_KEY }}
+        with:
+          model: opencode/big-pickle
+          prompt: ${{ inputs.custom_prompt }}
+
+      - name: Commit and Push Changes
+        run: |
+          git add .
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "automation(opencode): ${{ inputs.custom_prompt }}"
+            git push origin ${{ inputs.branch_name }} --force
+          else
+            echo "No changes made by OpenCode."
+          fi
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build Android Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: app/build/outputs/apk/release/*.apk
 
       # 2. Create and switch to the new feature branch
       - name: Create New Branch

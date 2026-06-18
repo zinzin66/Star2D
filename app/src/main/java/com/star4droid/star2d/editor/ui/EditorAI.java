@@ -286,7 +286,7 @@ public class EditorAI extends VisTable {
             app.preferences.putString(prefKey, key);
             app.preferences.flush();
             app.toast("API Key Saved");
-        }).show(getStage());
+        }).show(app.getUiStage());
     }
     
     private void sendMessage() {
@@ -563,7 +563,7 @@ public class EditorAI extends VisTable {
         dialog.getButtonsTable().add(applyBtn).pad(5);
         dialog.getButtonsTable().add(copyBtn).pad(5);
         
-        dialog.show(getStage());
+        dialog.show(app.getUiStage());
         dialog.setSize(700, 600);
         dialog.centerWindow();
     }
@@ -738,7 +738,7 @@ public class EditorAI extends VisTable {
         
         VisScrollPane scroll = new VisScrollPane(listTable);
         dialog.getContentTable().add(scroll).grow().width(400).height(500);
-        dialog.show(getStage());
+        dialog.show(app.getUiStage());
         dialog.centerWindow();
     }
     
@@ -787,7 +787,7 @@ public class EditorAI extends VisTable {
         });
         
         dialog.getButtonsTable().add(saveBtn).pad(10);
-        dialog.show(getStage());
+        dialog.show(app.getUiStage());
         dialog.centerWindow();
     }
     
@@ -878,7 +878,7 @@ public class EditorAI extends VisTable {
         t.add(editBtn).growX().pad(5).row();
         t.add(deleteBtn).growX().pad(5).row();
         
-        dialog.show(getStage());
+        dialog.show(app.getUiStage());
         dialog.centerWindow();
     }
     
@@ -906,7 +906,7 @@ public class EditorAI extends VisTable {
         });
         
         dialog.getButtonsTable().add(saveBtn).pad(10);
-        dialog.show(getStage());
+        dialog.show(app.getUiStage());
         dialog.centerWindow();
     }
 

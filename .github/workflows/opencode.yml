@@ -1,4 +1,4 @@
-name: OpenCode Action & Build APK
+name: OpenCode Action
 
 on:
   workflow_dispatch:
@@ -8,23 +8,13 @@ on:
         required: true
         type: string
       branch_name:
-        description: 'Name for the new branch'
+        description: 'Name for the branch to create/use'
         required: true
         default: 'feature/opencode-patch'
         type: string
-      upload_to_playstore:
-        description: 'Upload to Google Play?'
-        type: boolean
-        required: true
-        default: false
-      changes_not_sent_for_review:
-        description: 'changesNotSentForReview?'
-        type: boolean
-        required: false
-        default: true
 
 jobs:
-  opencode-and-build:
+  opencode-task:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -37,49 +27,7 @@ jobs:
         with:
           persist-credentials: true
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '21'
-          cache: gradle
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      # 🔐 Create keystore from secrets
-      - name: Create keystore from secret
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/Star4droid.jks
-          if [ -f app/Star4droid.jks ]; then
-            echo "Keystore file created successfully."
-            echo "KEYSTORE_FILE=$GITHUB_WORKSPACE/app/Star4droid.jks" >> $GITHUB_ENV
-            echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
-            echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
-            echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
-          else
-            echo "Error: Keystore file was not created."
-            exit 1
-          fi
-
-      # 🔥 Create google-services.json from secret
-      - name: Create google-services.json from secret
-        run: |
-          echo "${{ secrets.FIREBASE_SERVICES_JSON }}" | base64 --decode > app/google-services.json
-          if [ -f app/google-services.json ]; then
-            echo "google-services.json file created successfully."
-          else
-            echo "Error: google-services.json file was not created."
-            exit 1
-          fi
-
-      # 🛠 Setup Android NDK
-      - name: Setup Android NDK
-        uses: nttld/setup-ndk@v1.5.0
-        with:
-          ndk-version: r28c
-
-      - name: Create New Branch
+      - name: Create and Switch to Branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -102,38 +50,3 @@ jobs:
           else
             echo "No changes made by OpenCode."
           fi
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
-      - name: Build Android Release APK
-        run: ./gradlew clean assembleRelease
-
-      - name: Build Android Release AAB
-        run: ./gradlew bundleRelease
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release-apk
-          path: app/build/outputs/apk/release/*.apk
-          retention-days: 90
-
-      - name: Upload AAB Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release-aab
-          path: app/build/outputs/bundle/release/*.aab
-          retention-days: 90
-
-      - name: Upload to Play Store
-        if: ${{ github.event.inputs.upload_to_playstore == 'true' }}
-        uses: r0adkll/upload-google-play@v1.1.3
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
-          packageName: com.star4droid.star2d.evo
-          releaseFiles: app/build/outputs/bundle/release/*.aab
-          track: production
-          status: completed
-          whatsNewDirectory: whatsNewDirectory
-          changesNotSentForReview: ${{ github.event.inputs.changes_not_sent_for_review == 'true' }}

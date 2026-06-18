@@ -16,6 +16,7 @@ jobs:
   opencode-and-build:
     runs-on: ubuntu-latest
     permissions:
+      id-token: write
       contents: write
       pull-requests: write
     
@@ -64,48 +65,6 @@ jobs:
       - name: Build Android Release APK
         run: ./gradlew assembleRelease
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release-apk
-          path: app/build/outputs/apk/release/*.apk
-
-      # 2. Create and switch to the new feature branch
-      - name: Create New Branch
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b ${{ inputs.branch_name }}
-
-      # 3. OpenCode modifies the codebase on the new branch
-      - name: Run OpenCode Agent
-        uses: anomalyco/opencode/github@latest
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        with:
-          model: anthropic/claude-sonnet-4-20250514
-          prompt: ${{ inputs.custom_prompt }}
-
-      # 4. Push OpenCode's changes back to the remote repository
-      - name: Commit and Push Changes
-        run: |
-          git add .
-          # Check if there are changes to commit so the pipeline doesn't fail if OpenCode edited nothing
-          if ! git diff-index --quiet HEAD; then
-            git commit -m "automation(opencode): ${{ inputs.custom_prompt }}"
-            git push origin ${{ inputs.branch_name }} --force
-          else
-            echo "No changes made by OpenCode."
-          fi
-
-      # 5. Build the APK using the newly modified code
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
-      - name: Build Android Release APK
-        run: ./gradlew assembleRelease
-
-      # 6. Upload the compiled APK so you can download it from the GitHub Actions dashboard
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:

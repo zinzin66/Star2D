@@ -42,7 +42,7 @@ public class EditorAI extends VisTable {
     private static final String PREF_GEMINI_API_KEY = "gemini_api_key";
     private static final String PREF_MODEL = "gemini_model";
     private static final String PREF_ZEN_API_KEY = "zen_api_key";
-    private static final String ZEN_API_BASE_URL = "https://api.opencode.ai/v1/chat/completions";
+    private static final String ZEN_API_BASE_URL = "https://opencode.ai/zen/v1/chat/completions";
     
     private static class ModelEntry {
         String displayName;

@@ -42,7 +42,7 @@ public class EditorAI extends VisTable {
     private static final String PREF_GEMINI_API_KEY = "gemini_api_key";
     private static final String PREF_MODEL = "gemini_model";
     private static final String PREF_ZEN_API_KEY = "zen_api_key";
-    private static final String ZEN_API_BASE_URL = "https://opencode.ai/zen/v1/responses";
+    private static final String ZEN_API_BASE_URL = "https://opencode.ai/zen/v1/chat/completions";
     
     private static class ModelEntry {
         String displayName;
@@ -323,7 +323,6 @@ public class EditorAI extends VisTable {
         
         // Build Context
         String context = buildContext();
-        String prompt = context + "\n\nUser Request: " + text;
         
         // Save model preference
         app.preferences.putString(PREF_MODEL, displayName);
@@ -331,13 +330,13 @@ public class EditorAI extends VisTable {
         
         // Send based on provider
         if (entry.provider.equals("opencode")) {
-            sendOpenCodeRequest(apiKey, prompt, entry.apiModelId);
+            sendOpenCodeRequest(apiKey, context, text, entry.apiModelId);
         } else {
-            sendGeminiRequest(apiKey, prompt, entry.apiModelId);
+            sendGeminiRequest(apiKey, context + "\n\nUser Request: " + text, entry.apiModelId);
         }
     }
     
-    private void sendOpenCodeRequest(String apiKey, String prompt, String modelId) {
+    private void sendOpenCodeRequest(String apiKey, String context, String userText, String modelId) {
         sendBtn.setDisabled(true);
         VisTable statusTable = new VisTable();
         
@@ -347,9 +346,19 @@ public class EditorAI extends VisTable {
         chatTable.add(statusTable).left().pad(5).row();
         final VisTable finalStatusTable = statusTable;
         
+        StringBuilder messagesJson = new StringBuilder();
+        messagesJson.append("[");
+        messagesJson.append("{\"role\":\"system\",\"content\":").append(escapeJson(context)).append("}");
+        for (ChatMessage msg : currentSession.messages) {
+            messagesJson.append(",");
+            String role = msg.isUser ? "user" : "assistant";
+            messagesJson.append("{\"role\":\"").append(role).append("\",\"content\":").append(escapeJson(msg.text)).append("}");
+        }
+        messagesJson.append("]");
+        
         String jsonBody = "{"
             + "\"model\": \"" + modelId + "\","
-            + "\"input\": " + escapeJson(prompt)
+            + "\"messages\": " + messagesJson.toString()
             + "}";
         
         Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.POST);
@@ -446,10 +455,10 @@ public class EditorAI extends VisTable {
                 addMessageToUI(new ChatMessage("API Error: " + errMsg, false));
                 return;
             }
-            if (root.has("output") && root.get("output").size > 0) {
-                JsonValue output = root.get("output").get(0);
-                if (output.has("content") && output.get("content").size > 0) {
-                    String responseText = output.get("content").get(0).getString("text", "");
+            if (root.has("choices") && root.get("choices").size > 0) {
+                JsonValue choice = root.get("choices").get(0);
+                if (choice.has("message") && choice.get("message").has("content")) {
+                    String responseText = choice.get("message").getString("content", "");
                     if (!responseText.isEmpty()) {
                         ChatMessage aiMsg = new ChatMessage(responseText, false);
                         currentSession.addMessage(aiMsg);

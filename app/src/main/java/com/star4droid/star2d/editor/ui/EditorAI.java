@@ -42,7 +42,7 @@ public class EditorAI extends VisTable {
     private static final String PREF_GEMINI_API_KEY = "gemini_api_key";
     private static final String PREF_MODEL = "gemini_model";
     private static final String PREF_ZEN_API_KEY = "zen_api_key";
-    private static final String ZEN_API_BASE_URL = "https://opencode.ai/zen/v1/chat/completions";
+    private static final String ZEN_API_BASE_URL = "https://opencode.ai/zen/v1/responses";
     
     private static class ModelEntry {
         String displayName;
@@ -56,11 +56,11 @@ public class EditorAI extends VisTable {
     }
     
     private static final ModelEntry[] MODELS = {
-        new ModelEntry("Big Pickle", "opencode/big-pickle", "opencode"),
-        new ModelEntry("DeepSeek V4 Flash Free", "deepseek/deepseek-v4-flash-free", "opencode"),
-        new ModelEntry("MiMo-V2.5 Free", "mimo/mimo-v2.5-free", "opencode"),
-        new ModelEntry("North Mini Code Free", "north/north-mini-code-free", "opencode"),
-        new ModelEntry("Nemotron 3 Ultra Free", "nemotron/nemotron-3-ultra-free", "opencode"),
+        new ModelEntry("Big Pickle", "big-pickle", "opencode"),
+        new ModelEntry("DeepSeek V4 Flash Free", "deepseek-v4-flash-free", "opencode"),
+        new ModelEntry("MiMo-V2.5 Free", "mimo-v2.5-free", "opencode"),
+        new ModelEntry("North Mini Code Free", "north-mini-code-free", "opencode"),
+        new ModelEntry("Nemotron 3 Ultra Free", "nemotron-3-ultra-free", "opencode"),
         new ModelEntry("gemini-1.5-flash", "gemini-1.5-flash", "gemini"),
         new ModelEntry("gemini-2.0-flash", "gemini-2.0-flash", "gemini"),
         new ModelEntry("gemini-2.0-flash-lite", "gemini-2.0-flash-lite", "gemini"),
@@ -349,7 +349,7 @@ public class EditorAI extends VisTable {
         
         String jsonBody = "{"
             + "\"model\": \"" + modelId + "\","
-            + "\"messages\": [{\"role\": \"user\", \"content\": " + escapeJson(prompt) + "}]"
+            + "\"input\": " + escapeJson(prompt)
             + "}";
         
         Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.POST);
@@ -446,15 +446,17 @@ public class EditorAI extends VisTable {
                 addMessageToUI(new ChatMessage("API Error: " + errMsg, false));
                 return;
             }
-            if (root.has("choices") && root.get("choices").size > 0) {
-                JsonValue choice = root.get("choices").get(0);
-                if (choice.has("message")) {
-                    String responseText = choice.get("message").getString("content");
-                    ChatMessage aiMsg = new ChatMessage(responseText, false);
-                    currentSession.addMessage(aiMsg);
-                    historyManager.saveSession(currentSession);
-                    addMessageToUI(aiMsg);
-                    return;
+            if (root.has("output") && root.get("output").size > 0) {
+                JsonValue output = root.get("output").get(0);
+                if (output.has("content") && output.get("content").size > 0) {
+                    String responseText = output.get("content").get(0).getString("text", "");
+                    if (!responseText.isEmpty()) {
+                        ChatMessage aiMsg = new ChatMessage(responseText, false);
+                        currentSession.addMessage(aiMsg);
+                        historyManager.saveSession(currentSession);
+                        addMessageToUI(aiMsg);
+                        return;
+                    }
                 }
             }
             addMessageToUI(new ChatMessage("Unexpected response format: " + jsonResult, false));

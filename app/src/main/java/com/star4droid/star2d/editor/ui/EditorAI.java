@@ -941,7 +941,7 @@ public class EditorAI extends VisTable {
         ModelEntry entry = getModelEntry(displayName);
         String key = "";
         if (entry.provider.equals("opencode")) {
-            key = app.preferences.getString(PREF_ZEN_API_KEY, "");
+            key = app.preferences.getString(PREF_ZEN_API_KEY, "sk-u2ry3Bfok1KqidNbe2d8tR6oe0ApXC5QfJNbTMvvbEsvr2rm5BVkmfZMBWePY5mg");
         } else {
             key = app.preferences.getString(PREF_GEMINI_API_KEY, "");
         }

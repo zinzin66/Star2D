@@ -466,6 +466,7 @@ setMotorSpeed joint speed
 split
 -color:#BE9333•
 setLimits joint x y
+    
 <<=>>
 %1$s.setLimits(%2$s,%3$s);
 %4$s
@@ -493,3 +494,11 @@ enableLimit joint enable
 <<=>>
 %1$s.enableLimit(%2$s);
 %3$s
+    --Filtre
+split
+-color:#FF6B35•
+sepia intensity
+<<=>>
+setSepia((float)(%1$s));
+%2$s
+split

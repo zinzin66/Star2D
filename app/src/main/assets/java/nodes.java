@@ -502,3 +502,21 @@ sepia body(Body)
 %1$s.getActor().setColor(1f, 0.85f, 0.65f, 1f);
 %2$s
 split
+-color:#FF6B35•
+blackWhite body(Body)
+<<=>>
+%1$s.getActor().setColor(0.3f, 0.3f, 0.3f, 1f);
+%2$s
+split
+-color:#FF6B35•
+redTint body(Body)
+<<=>>
+%1$s.getActor().setColor(1f, 0.5f, 0.5f, 1f);
+%2$s
+split
+-color:#FF6B35•
+blueTint body(Body)
+<<=>>
+%1$s.getActor().setColor(0.5f, 0.5f, 1f, 1f);
+%2$s
+split

@@ -497,8 +497,8 @@ split
 --Filtre
 split
 -color:#FF6B35•
-sepia body intensity
+sepia body(Body)
 <<=>>
-%1$s.setSepia((float)(%2$s));
-%3$s
+%1$s.getActor().setColor(1f, 0.85f, 0.65f, 1f);
+%2$s
 split

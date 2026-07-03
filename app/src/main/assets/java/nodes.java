@@ -497,8 +497,8 @@ split
 --Filtre
 split
 -color:#FF6B35•
-testNodeorange
+sepia intensity
 <<=>>
-finish();
-%1$s
+setSepia((float)(%1$s));
+%2$s
 split

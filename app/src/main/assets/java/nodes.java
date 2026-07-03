@@ -494,7 +494,7 @@ enableLimit joint enable
 <<=>>
 %1$s.enableLimit(%2$s);
 %3$s
-    --Filtre
+--Filtre
 split
 -color:#FF6B35•
 sepia intensity

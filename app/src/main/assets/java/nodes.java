@@ -497,8 +497,8 @@ split
 --Filtre
 split
 -color:#FF6B35•
-sepia intensity
+sepia body intensity
 <<=>>
-setSepia((float)(%1$s));
-%2$s
+%1$s.setSepia((float)(%2$s));
+%3$s
 split

@@ -497,8 +497,8 @@ enableLimit joint enable
 --Filtre
 split
 -color:#FF6B35•
-sepia intensity
+testZoom zoom
 <<=>>
-setSepia((float)(%1$s));
+setZoom((float)(%1$s));
 %2$s
 split

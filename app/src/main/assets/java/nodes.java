@@ -520,3 +520,41 @@ blueTint body(Body)
 %1$s.getActor().setColor(0.5f, 0.5f, 1f, 1f);
 %2$s
 split
+--Utilitaires
+split
+-color:#9C27B0•
+comment text
+<<=>>
+// %1$s
+%2$s
+split
+-color:#9C27B0•
+callFunction functionName
+<<=>>
+%1$s();
+%2$s
+split
+-color:#9C27B0•
+RandomInt min max
+<<=>>
+int %3$s = (int)(Math.random() * ((%2$s) - (%1$s) + 1)) + (%1$s);
+%4$s
+split
+-color:#9C27B0•
+UpdateText body(Body) text
+<<=>>
+%1$s.setText("%2$s");
+%3$s
+split
+-color:#9C27B0•
+PlayRandomSound sound(sound)
+<<=>>
+playSound("%1$s");
+%2$s
+split
+-color:#9C27B0•
+LogMessage message
+<<=>>
+System.out.println("%1$s");
+%2$s
+split

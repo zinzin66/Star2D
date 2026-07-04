@@ -222,11 +222,8 @@ split
 -color:#88213B•
 setAlpha body(Body) alpha
 <<=>>
-//%1$s.setAlpha(%2$s);
-//ToDo : I think can be done by :
-//Color c = item.getActor().getColor();
-//item.getActor.setColor(c.r,c.g,c.b,alpha);
-//later ≈≈
+com.badlogic.gdx.graphics.Color c = %1$s.getActor().getColor();
+%1$s.getActor().setColor(c.r, c.g, c.b, (float)(%2$s));
 %3$s
 split
 -color:#88213B•
@@ -533,6 +530,14 @@ callFunction functionName
 <<=>>
 %1$s();
 %2$s
+split
+-color:#9C27B0•
+DestroyIfGroup body(Body) groupName
+<<=>>
+if (%1$s.getName().startsWith("%2$s")) { 
+    %1$s.destroy(); 
+}
+%3$s
 split
 --Random
 split

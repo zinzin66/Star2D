@@ -148,7 +148,19 @@ setCameraOffset offsetX offsetY
 setCameraOffset((float)(%1$s),(float)(%2$s));
 %3$s
 split
---Configurations
+--Debug
+split
+-color:#88213B•
+Toast message
+<<=>>
+toast(%1$s);
+%2$s
+split
+-color:#88213B•
+debug message
+<<=>>
+debug(%1$s);
+%2$s
 split
 -color:#88213B•
 setsplits splits
@@ -190,22 +202,33 @@ setGravity x y
 setGravity(%1$s,%2$s);
 %3$s
 split
---Debug
+--Sounds
 split
--color:#88213B•
-Toast message
+-color:#BE9333•
+loopSound Sound(sound) repeat?
 <<=>>
-toast(%1$s);
+loopSound("%1$s",%2$s);
+%3$s
+split
+-color:#BE9333•
+playSound Sound(sound)
+<<=>>
+startSound("%1$s");
 %2$s
 split
--color:#88213B•
-debug message
+-color:#BE9333•
+pauseSound Sound(sound)
 <<=>>
-debug(%1$s);
+pauseSound("%1$s");
 %2$s
 split
--color:#88213B•
---Ui Nodes
+-color:#BE9333•
+releaseSound Sound(sound)
+<<=>>
+releaseSound("%1$s");
+%2$s
+split
+--UI Nodes
 split
 -color:#88213B•
 setVisibility item(Body) visibility(Boolean)
@@ -238,8 +261,7 @@ setMax progress(Body) max
 %1$s.setMax((int)(%2$s));
 %3$s
 split
--color:#88213B•
---BodyModify
+--Body
 split
 -color:#4A7814•
 setScaleXY item(Body) scaleX scaleY
@@ -314,19 +336,7 @@ destroy body(Body)
 %1$s.destroy();
 %2$s
 split
--color:#4A7814•
-moveTowardBody body(Body) target step
-<<=>>
-//%1$s.moveTowardBody(%2$s,(float)(%3$s));
-%4$s
-split
--color:#4A7814•
-moveTowardBody body(Body) Vector2 step
-<<=>>
-//%1$s.moveTowardPoint(%2$s,(float)(%3$s));
-%4$s
-split
---bodyControl
+--Physics
 split
 -color:#008375•
 applyForceToCenter body(Body) x y wake(Boolean)
@@ -388,8 +398,7 @@ setLinearDamping body(Body) value
 %1$s.getBody().setLinearDamping((float)(%2$s));
 %3$s
 split
--color:#008375•
---bodyBooleans
+--Physics Properties
 split
 -color:#008375•
 setAwake body(Body) wake(Boolean)
@@ -420,32 +429,6 @@ setSleepingAllowed body(Body) sleeping
 <<=>>
 %1$s.getBody().setSleepingAllowed(%2$s);
 %3$s
-split
---Sounds
-split
--color:#BE9333•
-loopSound Sound(sound) repeat?
-<<=>>
-loopSound("%1$s",%2$s);
-%3$s
-split
--color:#BE9333•
-playSound Sound(sound)
-<<=>>
-startSound("%1$s");
-%2$s
-split
--color:#BE9333•
-pauseSound Sound(sound)
-<<=>>
-pauseSound("%1$s");
-%2$s
-split
--color:#BE9333•
-releaseSound Sound(sound)
-<<=>>
-releaseSound("%1$s");
-%2$s
 split
 --Joints
 split
@@ -491,7 +474,7 @@ enableLimit joint enable
 %1$s.enableLimit(%2$s);
 %3$s
 split
---Filtre
+--Effects
 split
 -color:#FF6B35•
 sepia body(Body)
@@ -517,7 +500,24 @@ blueTint body(Body)
 %1$s.getActor().setColor(0.5f, 0.5f, 1f, 1f);
 %2$s
 split
---Utilitaires
+--Random
+split
+-color:#FF9800•
+RandomAndSetText body(Body) min max
+<<=>>
+int randomValue = (int)(Math.random() * ((%3$s) - (%2$s) + 1)) + (%2$s);
+%1$s.setItemText(String.valueOf(randomValue));
+%4$s
+split
+-color:#FF9800•
+RandomImageForBody body(Body) image1 image2 image3
+<<=>>
+String[] images = {"%2$s", "%3$s", "%4$s"};
+String randomImage = images[(int)(Math.random() * images.length)];
+setImage(%1$s, randomImage);
+%5$s
+split
+--Utils
 split
 -color:#9C27B0•
 comment text
@@ -538,21 +538,4 @@ if (%1$s.getName().startsWith("%2$s")) {
     %1$s.destroy(); 
 }
 %3$s
-split
---Random
-split
--color:#FF9800•
-RandomAndSetText body(Body) min max
-<<=>>
-int randomValue = (int)(Math.random() * ((%3$s) - (%2$s) + 1)) + (%2$s);
-%1$s.setItemText(String.valueOf(randomValue));
-%4$s
-split
--color:#FF9800•
-RandomImageForBody body(Body) image1 image2 image3
-<<=>>
-String[] images = {"%2$s", "%3$s", "%4$s"};
-String randomImage = images[(int)(Math.random() * images.length)];
-setImage(%1$s, randomImage);
-%5$s
 split

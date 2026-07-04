@@ -539,3 +539,23 @@ if (%1$s.getName().startsWith("%2$s")) {
 }
 %3$s
 split
+--Variables
+split
+-color:#FFC107•
+SetVariable variable(variable) value
+<<=>>
+%1$s = %2$s;
+%3$s
+split
+-color:#FFC107•
+AddToVariable variable(variable) value
+<<=>>
+%1$s += %2$s;
+%3$s
+split
+-color:#FFC107•
+SubtractFromVariable variable(variable) value
+<<=>>
+%1$s -= %2$s;
+%3$s
+split

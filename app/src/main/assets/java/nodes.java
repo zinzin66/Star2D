@@ -540,7 +540,7 @@ split
 RandomAndSetText body(Body) min max
 <<=>>
 int randomValue = (int)(Math.random() * ((%3$s) - (%2$s) + 1)) + (%2$s);
-%1$s.setText(String.valueOf(randomValue));
+%1$s.setItemText(String.valueOf(randomValue));
 %4$s
 split
 -color:#FF9800•
@@ -548,6 +548,6 @@ RandomImageForBody body(Body) image1 image2 image3
 <<=>>
 String[] images = {"%2$s", "%3$s", "%4$s"};
 String randomImage = images[(int)(Math.random() * images.length)];
-%1$s.setImage(randomImage);
+setImage(%1$s, randomImage);
 %5$s
 split

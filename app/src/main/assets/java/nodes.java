@@ -534,27 +534,20 @@ callFunction functionName
 %1$s();
 %2$s
 split
--color:#9C27B0•
-RandomInt min max
+--Random
+split
+-color:#FF9800•
+RandomAndSetText body(Body) min max
 <<=>>
-int %3$s = (int)(Math.random() * ((%2$s) - (%1$s) + 1)) + (%1$s);
+int randomValue = (int)(Math.random() * ((%3$s) - (%2$s) + 1)) + (%2$s);
+%1$s.setText(String.valueOf(randomValue));
 %4$s
 split
--color:#9C27B0•
-UpdateText body(Body) text
+-color:#FF9800•
+RandomImageForBody body(Body) image1 image2 image3
 <<=>>
-%1$s.setText("%2$s");
-%3$s
-split
--color:#9C27B0•
-PlayRandomSound sound(sound)
-<<=>>
-playSound("%1$s");
-%2$s
-split
--color:#9C27B0•
-LogMessage message
-<<=>>
-System.out.println("%1$s");
-%2$s
+String[] images = {"%2$s", "%3$s", "%4$s"};
+String randomImage = images[(int)(Math.random() * images.length)];
+%1$s.setImage(randomImage);
+%5$s
 split

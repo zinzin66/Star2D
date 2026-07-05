@@ -563,7 +563,7 @@ split
 split
 -color:#FF6B6B•GetKeyboardInput
 Texte|text
-<==>
+<<=>>
 for (int i = Input.Keys.A; i <= Input.Keys.Z; i++) {
     if (Gdx.input.isKeyJustPressed(i)) {
         String letter = Input.Keys.toString(i);

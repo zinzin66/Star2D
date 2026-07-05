@@ -562,7 +562,7 @@ split
 --Keyboard
 split
 -color:#FF6B6B•GetKeyboardInput
-Texte|text
+textItem(Body)
 <<=>>
 for (int i = Input.Keys.A; i <= Input.Keys.Z; i++) {
     if (Gdx.input.isKeyJustPressed(i)) {
@@ -572,4 +572,5 @@ for (int i = Input.Keys.A; i <= Input.Keys.Z; i++) {
         break;
     }
 }
+%2$s
 split

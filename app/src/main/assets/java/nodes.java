@@ -559,3 +559,17 @@ SubtractFromVariable variable(variable) value
 %1$s -= %2$s;
 %3$s
 split
+--Keyboard
+split
+-color:#FF6B6B•GetKeyboardInput
+Texte|text
+<==>
+for (int i = Input.Keys.A; i <= Input.Keys.Z; i++) {
+    if (Gdx.input.isKeyJustPressed(i)) {
+        String letter = Input.Keys.toString(i);
+        String current = %1$s.getText();
+        %1$s.setItemText(current + letter);
+        break;
+    }
+}
+split

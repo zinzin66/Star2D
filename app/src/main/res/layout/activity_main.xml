@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="#333333"
+    android:background="#000000"
     tools:context=".MainActivity" >
     
     <!-- Zone centrale avec sprites et barre -->
@@ -18,15 +18,15 @@
         
         <!-- Sprite 1 -->
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
             android:src="@drawable/sprite1"
             android:layout_marginBottom="15dp" />
         
         <!-- Sprite 2 -->
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
             android:src="@drawable/sprite2"
             android:layout_marginBottom="20dp" />
         

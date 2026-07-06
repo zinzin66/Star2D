@@ -37,14 +37,14 @@
             
     </LinearLayout>
     
-    <!-- Crédit développeur en bas (même pattern que translation_by) -->
+    <!-- Texte en bas -->
     <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="@string/developer_credit"
-        android:textStyle="bold"
-        android:padding="8dp"
-        android:textColor="@color/text_color"
-        android:textSize="15sp"/>
+    	android:layout_height="wrap_content"
+    	android:layout_width="wrap_content"
+    	android:text="@string/translation_by"
+    	android:textStyle="bold"
+    	android:padding="8dp"
+    	android:textColor="@color/text_color"
+    	android:textSize="15sp"/>
         
 </LinearLayout>
